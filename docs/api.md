@@ -62,3 +62,11 @@ Content-Type: application/json
 兑换码只存 HMAC 摘要和尾号；明文创建时仅返回一次。每个账号对同一码仅可领取一次，受总使用次数、停用和到期约束，领取与发放在同一事务。重复已完成领取返回原兑换结果，不再次发权益。
 
 权益流水和管理审计通过数据库触发器禁止更新 / 删除。运营记录含操作者、时间、原因、变更前后值；用户查询和敏感凭据不写入公开日志。当前页面展示最近记录，历史流水可用带 limit/offset 的运营 API 查询。
+
+## 运营筛选与分页
+
+兼容原数组接口；运营新版传 `paginated=1&page=1`，返回 `{items,total,page,page_size}`，每页20条。用户支持 `q`、`product`、`status=normal|blocked`、`membership=active|expired|none`、`data_kind=all|test|business`；产品筛选限定权益摘要及会员条件作用范围。摘要额度仅统计已经入账、未过期的桶，不会为查看列表发放免费额度。
+
+兑换码支持 `q`（尾号）、`product`、`status=available|expired|exhausted|disabled`；状态优先级是停用、过期、用尽、可用。流水与审计支持 `q`、`product`、`action`、`from`、`to`（UTC 日期，含截止日）、`data_kind`；流水另支持 `reconcile=hide` 排除核对记录。流水可按实际业务 request_id 或预占 reference 追溯；审计搜索包含操作者、目标用户和原因。审计数据范围筛选针对操作者。
+
+测试账号标签按 `test_`、`dummy_test_`、`probe_`、`qa_` 命名前缀识别，仅用于本地展示与筛选，不参与授权或安全隔离。所有新版查询仍要求独立管理员会话。

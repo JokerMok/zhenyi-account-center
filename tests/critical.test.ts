@@ -114,6 +114,117 @@ after(async () => {
   await pool.end();
 });
 
+test("运营列表：真实分页、用户筛选与产品权益隔离", async () => {
+  const all = await request(admin, "/api/admin/users?paginated=1&page=1");
+  assert.equal(all.status, 200);
+  assert.ok(all.body.items.length <= 20);
+  const expected = Number(
+    (
+      await pool.query(
+        "SELECT count(*) FROM identities WHERE organization='consumers'",
+      )
+    ).rows[0].count,
+  );
+  assert.equal(all.body.total, expected);
+  const next = await request(admin, "/api/admin/users?paginated=1&page=2");
+  assert.equal(next.status, 200);
+  assert.equal(
+    next.body.items.some((u: any) =>
+      all.body.items.some((v: any) => v.uid === u.uid),
+    ),
+    false,
+  );
+  const own = await request(
+    admin,
+    "/api/admin/users?paginated=1&product=beadgrid&q=" + usernameA,
+  );
+  assert.equal(own.status, 200);
+  assert.equal(own.body.total, 1);
+  assert.equal(own.body.items[0].uid, a.me.user.uid);
+  assert.deepEqual(
+    own.body.items[0].rights.map((r: any) => r.product_id),
+    ["beadgrid"],
+  );
+  const empty = await request(
+    admin,
+    "/api/admin/users?paginated=1&q=missing-'OR'1'='1",
+  );
+  assert.equal(empty.status, 200);
+  assert.equal(empty.body.total, 0);
+  assert.equal(
+    (await request(admin, "/api/admin/users?paginated=1&page=-1")).status,
+    400,
+  );
+});
+test("运营流水：筛选与总数一致，核对记录可排除", async () => {
+  const r = await request(
+    admin,
+    "/api/admin/records/ledger?paginated=1&product=beadgrid&reconcile=hide",
+  );
+  assert.equal(r.status, 200);
+  assert.ok(
+    r.body.items.every(
+      (x: any) =>
+        x.product_id === "beadgrid" && x.action !== "subscription_reconcile",
+    ),
+  );
+  const expected = Number(
+    (
+      await pool.query(
+        "SELECT count(*) FROM ledger WHERE product_id='beadgrid' AND action<>'subscription_reconcile'",
+      )
+    ).rows[0].count,
+  );
+  assert.equal(r.body.total, expected);
+  const audit = await request(
+    admin,
+    "/api/admin/records/audit?paginated=1&product=beadgrid",
+  );
+  assert.equal(audit.status, 200);
+  assert.ok(audit.body.items.every((x: any) => x.actor_uid && x.reason));
+  assert.equal(
+    (await request(admin, "/api/admin/records/ledger?paginated=1&from=invalid"))
+      .status,
+    400,
+  );
+});
+test("运营兑换码：有效状态筛选和分页总数使用数据库事实", async () => {
+  for (const status of ["available", "expired", "exhausted", "disabled"]) {
+    const r = await request(
+      admin,
+      "/api/admin/codes?paginated=1&status=" + status,
+    );
+    assert.equal(r.status, 200);
+    assert.ok(r.body.items.length <= 20);
+    assert.ok(
+      r.body.items.every((x: any) =>
+        status === "disabled"
+          ? !x.active
+          : status === "expired"
+            ? x.active && new Date(x.expires_at) <= new Date()
+            : status === "exhausted"
+              ? x.active &&
+                new Date(x.expires_at) > new Date() &&
+                x.uses >= x.max_uses
+              : x.active &&
+                new Date(x.expires_at) > new Date() &&
+                x.uses < x.max_uses,
+      ),
+    );
+    assert.ok(r.body.items.every((x: any) => !("hash" in x)));
+  }
+});
+test("运营分页接口仍拒绝消费者与未登录访问", async () => {
+  for (const path of [
+    "/api/admin/users?paginated=1",
+    "/api/admin/codes?paginated=1",
+    "/api/admin/records/audit?paginated=1",
+  ]) {
+    assert.equal((await request(center, path)).status, 401);
+    assert.equal((await fetch(config.CENTER_URL + path)).status, 401);
+  }
+});
+
 test("真实 OIDC：跨应用映射相同 UID，消费者与管理员组织隔离", () => {
   assert.equal(center.me.user.uid, a.me.user.uid);
   assert.equal(focus.me.user.uid, a.me.user.uid);

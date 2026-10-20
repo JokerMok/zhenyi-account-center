@@ -188,6 +188,77 @@ if (serverId === "center") {
     ON CONFLICT(issuer,subject) DO UPDATE SET username=EXCLUDED.username,display_name=EXCLUDED.display_name`,
         [config.CASDOOR_URL, u.id, u.owner, u.name, u.displayName || u.name],
       );
+    if (req.query.paginated === "1") {
+      const page = z.coerce
+        .number()
+        .int()
+        .min(1)
+        .default(1)
+        .parse(req.query.page);
+      const size = 20;
+      const product = String(req.query.product || "");
+      const status = z
+        .enum(["", "normal", "blocked"])
+        .default("")
+        .parse(req.query.status);
+      const membership = z
+        .enum(["", "active", "expired", "none"])
+        .default("")
+        .parse(req.query.membership);
+      const dataKind = z
+        .enum(["all", "test", "business"])
+        .default("all")
+        .parse(req.query.data_kind);
+      const forbidden = users
+        .filter((u: any) => u.isForbidden)
+        .map((u: any) => u.id);
+      const values: unknown[] = [
+        `%${q}%`,
+        q,
+        product,
+        forbidden,
+        status,
+        membership,
+        dataKind,
+      ];
+      const base = `WITH member_dates AS (
+        SELECT uid,product_id,max(expires_at) AS expires_at FROM (
+          SELECT uid,product_id,expires_at FROM memberships UNION ALL
+          SELECT uid,product_id,expires_at FROM subscription_projections WHERE active
+        ) m GROUP BY uid,product_id
+      ), source AS (
+        SELECT i.*, i.subject = ANY($4::text[]) AS casdoor_blocked,
+          i.username ~ '^(test_|dummy_test_|probe_|qa_)' AS is_test,
+          COALESCE((SELECT jsonb_agg(jsonb_build_object('product_id',p.id,'product_name',p.name,'status',p.status,
+            'expires_at',m.expires_at,'active',COALESCE(m.expires_at>now(),false),
+            'quotas',COALESCE((SELECT jsonb_agg(jsonb_build_object('name',f.name,'remaining',b.remaining))
+              FROM (SELECT feature_id,sum(remaining)::int AS remaining FROM quota_buckets
+                WHERE uid=i.uid AND product_id=p.id AND (expires_at IS NULL OR expires_at>now()) GROUP BY feature_id) b
+              JOIN features f ON f.product_id=p.id AND f.id=b.feature_id AND f.active),'[]'::jsonb)))
+            FROM products p LEFT JOIN member_dates m ON m.uid=i.uid AND m.product_id=p.id
+            WHERE ($3='' OR p.id=$3)), '[]'::jsonb) AS rights
+        FROM identities i WHERE organization='consumers'
+          AND (username ILIKE $1 OR display_name ILIKE $1 OR uid::text=$2)
+      ), filtered AS (SELECT * FROM source WHERE
+        ($5='' OR ($5='blocked' AND (blocked OR casdoor_blocked)) OR ($5='normal' AND NOT blocked AND NOT casdoor_blocked))
+        AND ($7='all' OR ($7='test' AND is_test) OR ($7='business' AND NOT is_test))
+        AND ($6='' OR EXISTS(SELECT 1 FROM jsonb_array_elements(rights) r WHERE
+          ($6='active' AND (r->>'active')::boolean) OR ($6='expired' AND r->>'expires_at' IS NOT NULL AND NOT (r->>'active')::boolean)
+          OR ($6='none' AND r->>'expires_at' IS NULL))))`;
+      const total = Number(
+        (await pool.query(base + " SELECT count(*) FROM filtered", values))
+          .rows[0].count,
+      );
+      const items = (
+        await pool.query(
+          base +
+            " SELECT * FROM filtered ORDER BY created_at DESC,uid LIMIT $8 OFFSET $9",
+          [...values, size, (page - 1) * size],
+        )
+      ).rows;
+      res.json({ items, total, page, page_size: size });
+      return;
+    }
     const rows = (
       await pool.query(
         "SELECT * FROM identities WHERE organization='consumers' AND (username ILIKE $1 OR display_name ILIKE $1 OR uid::text=$2) ORDER BY created_at DESC LIMIT 100",
@@ -253,15 +324,52 @@ if (serverId === "center") {
     });
     res.json(result);
   });
-  app.get("/api/admin/codes", async (_req, res) =>
-    res.json(
-      (
-        await pool.query(
-          "SELECT id,hint,product_id,days,feature_id,amount,max_uses,uses,active,expires_at,quota_expires_at,created_at FROM redemption_codes ORDER BY created_at DESC LIMIT 200",
-        )
-      ).rows,
-    ),
-  );
+  app.get("/api/admin/codes", async (req, res) => {
+    const fields =
+      "id,hint,product_id,days,feature_id,amount,max_uses,uses,active,expires_at,quota_expires_at,created_at";
+    if (req.query.paginated !== "1") {
+      res.json(
+        (
+          await pool.query(
+            `SELECT ${fields} FROM redemption_codes ORDER BY created_at DESC LIMIT 200`,
+          )
+        ).rows,
+      );
+      return;
+    }
+    const page = z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(1)
+      .parse(req.query.page);
+    const status = z
+      .enum(["", "available", "expired", "exhausted", "disabled"])
+      .default("")
+      .parse(req.query.status);
+    const args = [
+      String(req.query.product || ""),
+      "%" + String(req.query.q || "").slice(0, 50) + "%",
+      status,
+    ];
+    const where = ` WHERE ($1='' OR product_id=$1) AND hint ILIKE $2 AND ($3='' OR
+      ($3='disabled' AND NOT active) OR ($3='expired' AND active AND expires_at<=now()) OR
+      ($3='exhausted' AND active AND expires_at>now() AND uses>=max_uses) OR
+      ($3='available' AND active AND expires_at>now() AND uses<max_uses))`;
+    const total = Number(
+      (await pool.query("SELECT count(*) FROM redemption_codes" + where, args))
+        .rows[0].count,
+    );
+    const items = (
+      await pool.query(
+        `SELECT ${fields} FROM redemption_codes` +
+          where +
+          " ORDER BY created_at DESC,id LIMIT 20 OFFSET $4",
+        [...args, (page - 1) * 20],
+      )
+    ).rows;
+    res.json({ items, total, page, page_size: 20 });
+  });
   app.post("/api/admin/codes", async (req: Authenticated, res) =>
     res.json(await createCode(req.identity.uid, codeSchema.parse(req.body))),
   );
@@ -308,6 +416,67 @@ if (serverId === "center") {
         "reconcile_runs",
       ])
       .parse(req.params.type);
+    if (req.query.paginated === "1" && ["ledger", "audit"].includes(type)) {
+      const page = z.coerce
+        .number()
+        .int()
+        .min(1)
+        .default(1)
+        .parse(req.query.page);
+      const values: unknown[] = [];
+      const clauses: string[] = [];
+      const bind = (v: unknown) => {
+        values.push(v);
+        return "$" + values.length;
+      };
+      const product = String(req.query.product || "");
+      if (product)
+        clauses.push(
+          type === "ledger"
+            ? `r.product_id=${bind(product)}`
+            : (() => {
+                const v = bind(product);
+                return `(r.target=${v} OR split_part(r.target,'/',1)=${v} OR split_part(r.target,'/',2)=${v} OR r.after_value->>'product_id'=${v} OR r.before_value->>'product_id'=${v} OR EXISTS(SELECT 1 FROM redemption_codes rc WHERE rc.id::text=r.target AND rc.product_id=${v}))`;
+              })(),
+        );
+      if (req.query.action)
+        clauses.push(`r.action=${bind(String(req.query.action))}`);
+      if (req.query.q) {
+        const v = bind("%" + String(req.query.q).slice(0, 100) + "%");
+        clauses.push(
+          `(i.display_name ILIKE ${v} OR i.username ILIKE ${v} OR i.uid::text ILIKE ${v}${type === "ledger" ? ` OR r.reference ILIKE ${v} OR rs.request_id ILIKE ${v}` : ` OR r.target ILIKE ${v} OR r.reason ILIKE ${v} OR subject_identity.display_name ILIKE ${v} OR subject_identity.username ILIKE ${v}`})`,
+        );
+      }
+      for (const [key, operator] of [
+        ["from", ">="],
+        ["to", "<"],
+      ] as const)
+        if (req.query[key]) {
+          const d = z.coerce.date().parse(req.query[key]);
+          if (key === "to") d.setUTCDate(d.getUTCDate() + 1);
+          clauses.push(`r.created_at${operator}${bind(d.toISOString())}`);
+        }
+      if (type === "ledger" && req.query.reconcile === "hide")
+        clauses.push("r.action<>'subscription_reconcile'");
+      if (req.query.data_kind === "test")
+        clauses.push("i.username ~ '^(test_|dummy_test_|probe_|qa_)'");
+      if (req.query.data_kind === "business")
+        clauses.push("i.username !~ '^(test_|dummy_test_|probe_|qa_)'");
+      const join = ` FROM ${type} r LEFT JOIN identities i ON i.uid=r.${type === "audit" ? "actor_uid" : "uid"} ${type === "audit" ? "LEFT JOIN identities subject_identity ON subject_identity.uid::text=split_part(r.target,'/',1) LEFT JOIN redemption_codes rc ON rc.id::text=r.target" : "LEFT JOIN products p ON p.id=r.product_id LEFT JOIN features f ON f.product_id=r.product_id AND f.id=r.feature_id LEFT JOIN reservations rs ON rs.id::text=r.reference"} ${clauses.length ? "WHERE " + clauses.join(" AND ") : ""}`;
+      const total = Number(
+        (await pool.query("SELECT count(*)" + join, values)).rows[0].count,
+      );
+      const items = (
+        await pool.query(
+          `SELECT r.*,i.display_name,i.username${type === "audit" ? ",subject_identity.display_name AS target_name,rc.hint AS code_hint" : ",p.name AS product_name,f.name AS feature_name,rs.request_id AS business_request"}` +
+            join +
+            ` ORDER BY r.created_at DESC,r.id DESC LIMIT 20 OFFSET ${bind((page - 1) * 20)}`,
+          values,
+        )
+      ).rows;
+      res.json({ items, total, page, page_size: 20 });
+      return;
+    }
     const limit = Math.min(200, Math.max(1, Number(req.query.limit) || 100)),
       offset = Math.max(0, Number(req.query.offset) || 0);
     const uid = req.query.uid ? ident.parse(req.query.uid) : null;

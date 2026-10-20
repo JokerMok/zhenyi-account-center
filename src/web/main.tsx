@@ -1,4 +1,10 @@
-import React, { useEffect, useState, type FormEvent } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useId,
+  type FormEvent,
+} from "react";
 import { createRoot } from "react-dom/client";
 import {
   LayoutGrid,
@@ -20,6 +26,8 @@ import {
   Check,
   Download,
   AlertCircle,
+  X,
+  Copy,
 } from "lucide-react";
 import "./style.css";
 
@@ -201,10 +209,34 @@ function App() {
           ["records", "权益记录", History],
           ["security", "账号与安全", ShieldCheck],
         ];
-  useEffect(() => setTab(admin ? "users" : "overview"), [admin]);
-  const context = { cfg: cfg!, me: me!, busy, perform, version, refresh };
+  useEffect(() => {
+    const requested = new URLSearchParams(location.search).get("tab");
+    setTab(
+      admin && nav.some((x) => x[0] === requested)
+        ? requested!
+        : admin
+          ? "users"
+          : "overview",
+    );
+  }, [admin]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [tab]);
+  const context = {
+    cfg: cfg!,
+    me: me!,
+    busy,
+    perform,
+    version,
+    refresh,
+    error,
+    notice,
+  };
   return (
-    <div className="shell">
+    <div className={"shell" + (admin ? " ops-shell" : "")}>
+      <a className="skip-link" href="#main-content">
+        跳至主要内容
+      </a>
       <aside className="sidebar">
         <a className="brand" href={isDemo ? cfg?.center : "/"}>
           <span className="brand-mark">臻</span>
@@ -220,9 +252,22 @@ function App() {
             return (
               <button
                 key={id as string}
+                data-group={
+                  admin
+                    ? id === "users"
+                      ? "用户运营"
+                      : id === "products"
+                        ? "产品配置"
+                        : id === "ledger"
+                          ? "记录与支付"
+                          : undefined
+                    : undefined
+                }
+                aria-current={tab === id ? "page" : undefined}
                 className={tab === id ? "selected" : ""}
                 onClick={() => {
                   setTab(id as string);
+                  if (admin) history.replaceState(null, "", "/admin?tab=" + id);
                   setError("");
                   setNotice("");
                 }}
@@ -271,7 +316,7 @@ function App() {
             )}
           </div>
         </header>
-        <div className="content">
+        <div className="content" id="main-content" tabIndex={-1}>
           {error && (
             <div role="alert" className="message error">
               <AlertCircle size={18} />
@@ -323,6 +368,8 @@ type Context = {
   perform: (fn: () => Promise<unknown>, success?: string) => Promise<void>;
   version: number;
   refresh: () => void;
+  error?: string;
+  notice?: string;
 };
 function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
   return (
@@ -856,83 +903,753 @@ function Demo(c: Context & { tab: string }) {
   );
 }
 
-function Admin(c: Context & { tab: string }) {
-  const [v, setV] = useState(0);
-  const cat = useData("/api/admin/catalog", v);
-  const [q, setQ] = useState(""),
-    [search, setSearch] = useState(""),
-    [selected, setSelected] = useState<Any | null>(null),
-    [editor, setEditor] = useState<Any | null>(null),
-    [revealed, setRevealed] = useState("");
-  const users = useData("/api/admin/users?q=" + encodeURIComponent(search), v);
+function useDebounced(value: string) {
+  const [settled, setSettled] = useState(value);
+  useEffect(() => {
+    const id = window.setTimeout(() => setSettled(value), 250);
+    return () => window.clearTimeout(id);
+  }, [value]);
+  return settled;
+}
+function Pager({
+  total,
+  page,
+  onPage,
+  size = 20,
+}: {
+  total: number;
+  page: number;
+  onPage: (p: number) => void;
+  size?: number;
+}) {
+  const pages = Math.max(1, Math.ceil(total / size));
+  return (
+    <div className="pagination">
+      <span>
+        共 <strong>{total}</strong> 条 · 每页 {size} 条
+      </span>
+      <div>
+        <button
+          disabled={page <= 1}
+          onClick={() => {
+            onPage(page - 1);
+            window.scrollTo({ top: 0, behavior: "instant" });
+          }}
+        >
+          上一页
+        </button>
+        <span>
+          {page} / {pages}
+        </span>
+        <button
+          disabled={page >= pages}
+          onClick={() => {
+            onPage(page + 1);
+            window.scrollTo({ top: 0, behavior: "instant" });
+          }}
+        >
+          下一页
+        </button>
+      </div>
+    </div>
+  );
+}
+function Drawer({
+  title,
+  subtitle,
+  children,
+  onClose,
+  busy,
+  error,
+  notice,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  onClose: () => void;
+  busy?: boolean;
+  error?: string;
+  notice?: string;
+}) {
+  const ref = useRef<HTMLDialogElement>(null),
+    titleId = useId();
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement;
+    const d = ref.current!;
+    d.showModal();
+    const old = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      d.close();
+      document.body.style.overflow = old;
+      previous?.focus();
+    };
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="drawer"
+      aria-labelledby={titleId}
+      onCancel={(e) => {
+        e.preventDefault();
+        if (!busy) onClose();
+      }}
+    >
+      <header className="drawer-heading">
+        <div>
+          <span className="eyebrow">权益运营</span>
+          <h2 id={titleId}>{title}</h2>
+          {subtitle && <p>{subtitle}</p>}
+        </div>
+        <button aria-label="关闭详情" disabled={busy} onClick={onClose}>
+          <X size={20} />
+        </button>
+      </header>
+      <div className="drawer-body">
+        {error && (
+          <div role="alert" className="message error">
+            {error}
+          </div>
+        )}
+        {notice && (
+          <div role="status" className="message success">
+            {notice}
+          </div>
+        )}
+        {children}
+      </div>
+    </dialog>
+  );
+}
+function CopyUid({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false),
+    [failed, setFailed] = useState(false);
+  return (
+    <button
+      className="copy-uid"
+      title={value}
+      aria-label="复制完整统一 UID"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setCopied(true);
+          setFailed(false);
+        } catch {
+          setFailed(true);
+        }
+      }}
+    >
+      {failed
+        ? "复制失败，请在详情中选取"
+        : copied
+          ? "已复制"
+          : `${value.slice(0, 8)}…`}{" "}
+      {copied ? <Check size={13} /> : <Copy size={13} />}
+    </button>
+  );
+}
+const testUser = (s: string) => /^(test_|dummy_test_|probe_|qa_)/.test(s || "");
+const fieldNames: Any = {
+  uid: "用户 UID",
+  product_id: "产品",
+  feature_id: "功能",
+  days: "会员天数",
+  amount: "次数",
+  expires_at: "到期时间",
+  active: "启用",
+  status: "状态",
+  blocked: "停用权益访问",
+  remaining: "可用次数",
+  held: "预占次数",
+  id: "标识",
+  name: "名称",
+  kind: "类型",
+  member_only: "仅会员可用",
+  free_quota: "免费次数",
+  period: "重置周期",
+  application: "身份应用",
+  callback_url: "登录回调",
+  origin: "产品地址",
+  reason: "原因",
+  casdoor_plan: "订阅套餐映射",
+  quotas: "套餐次数",
+  reference: "关联请求",
+  source_id: "来源订阅",
+  max_uses: "最多领取次数",
+  uses: "已领取次数",
+  hint: "兑换码尾号",
+  key: "业务标识",
+};
+function ReadableValue({ value }: { value: any }): React.ReactNode {
+  if (value === null || value === undefined)
+    return <span className="muted">无</span>;
+  if (typeof value === "boolean") return value ? "是" : "否";
+  if (Array.isArray(value))
+    return (
+      <div>
+        {value.map((v, i) => (
+          <div key={i}>
+            <ReadableValue value={v} />
+          </div>
+        ))}
+      </div>
+    );
+  if (typeof value === "object")
+    return (
+      <dl className="value-list">
+        {Object.entries(value).map(([k, v]) => (
+          <React.Fragment key={k}>
+            <dt>{fieldNames[k] || k}</dt>
+            <dd>
+              <ReadableValue value={v} />
+            </dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    );
+  return (
+    <span className="break-text">
+      {periods[String(value)] ||
+        (
+          {
+            active: "启用",
+            disabled: "停用",
+            quota: "次数额度",
+            access: "访问权限",
+          } as Any
+        )[String(value)] ||
+        String(value)}
+    </span>
+  );
+}
+function OpsRecords(c: Context & { tab: string; cat: Any }) {
+  const [filters, setFilters] = useState({
+      q: "",
+      product: "",
+      action: "",
+      from: "",
+      to: "",
+      data_kind: "all",
+      reconcile: "hide",
+    }),
+    [page, setPage] = useState(1),
+    [selected, setSelected] = useState<Any | null>(null);
+  const searchText = useDebounced(filters.q);
   const records = useData(
     "/api/admin/records/" +
-      (["ledger", "audit"].includes(c.tab) ? c.tab : "ledger"),
-    v,
+      c.tab +
+      "?" +
+      new URLSearchParams({
+        ...filters,
+        q: searchText,
+        paginated: "1",
+        page: String(page),
+      }),
+    c.version,
   );
-  const codes = useData("/api/admin/codes", v),
-    subs = useData("/api/admin/subscriptions", v);
+  const change = (key: string, value: string) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    setPage(1);
+  };
+  const auditMode = c.tab === "audit";
+  const choices = auditMode
+    ? [
+        "configure_products",
+        "configure_features",
+        "configure_plans",
+        "membership",
+        "quota",
+        "revoke_membership",
+        "revoke_quota",
+        "code_create",
+        "code_status",
+        "user_status",
+        "subscription_reconcile",
+      ]
+    : [
+        "free_grant",
+        "quota_grant",
+        "membership_extend",
+        "membership_revoke",
+        "quota_revoke",
+        "reserve",
+        "confirmed",
+        "cancelled",
+        "refunded",
+        "expired",
+        "redeem",
+        "subscription_reconcile",
+      ];
+  return (
+    <>
+      <PageTitle
+        title={auditMode ? "操作记录" : "权益流水"}
+        description={
+          auditMode
+            ? "查看每次管理操作的人员、原因和变更前后值。"
+            : "追踪权益发放、预占、消费与返还；所有记录只追加。"
+        }
+      />
+      <div className="ops-toolbar">
+        <Field label={auditMode ? "操作者 / 对象 / 原因" : "用户 / 业务请求"}>
+          <input
+            value={filters.q}
+            onChange={(e) => change("q", e.target.value)}
+            placeholder="输入关键词筛选"
+          />
+        </Field>
+        <Field label="产品">
+          <select
+            value={filters.product}
+            onChange={(e) => change("product", e.target.value)}
+          >
+            <option value="">全部产品</option>
+            {c.cat?.products.map((p: Any) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="操作类型">
+          <select
+            value={filters.action}
+            onChange={(e) => {
+              change("action", e.target.value);
+              if (e.target.value === "subscription_reconcile")
+                setFilters((f) => ({ ...f, reconcile: "show" }));
+            }}
+          >
+            <option value="">全部类型</option>
+            {choices.map((x) => (
+              <option key={x} value={x}>
+                {actions[x]}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="起始日期（UTC）">
+          <input
+            type="date"
+            value={filters.from}
+            onChange={(e) => change("from", e.target.value)}
+          />
+        </Field>
+        <Field label="截止日期（UTC）">
+          <input
+            type="date"
+            value={filters.to}
+            min={filters.from}
+            onChange={(e) => change("to", e.target.value)}
+          />
+        </Field>
+        <Field label={auditMode ? "操作者范围" : "数据范围"}>
+          <select
+            value={filters.data_kind}
+            onChange={(e) => change("data_kind", e.target.value)}
+          >
+            <option value="all">{auditMode ? "全部操作者" : "全部账号"}</option>
+            <option value="business">
+              {auditMode ? "非测试命名操作者" : "非测试命名账号"}
+            </option>
+            <option value="test">
+              {auditMode ? "测试命名操作者" : "测试命名账号"}
+            </option>
+          </select>
+        </Field>
+        <button
+          onClick={() => {
+            setFilters({
+              q: "",
+              product: "",
+              action: "",
+              from: "",
+              to: "",
+              data_kind: "all",
+              reconcile: "hide",
+            });
+            setPage(1);
+          }}
+        >
+          重置
+        </button>
+      </div>
+      {!auditMode && (
+        <label className="checkbox reconcile-filter">
+          <input
+            type="checkbox"
+            checked={filters.reconcile === "show"}
+            onChange={(e) => {
+              change("reconcile", e.target.checked ? "show" : "hide");
+              if (
+                !e.target.checked &&
+                filters.action === "subscription_reconcile"
+              )
+                change("action", "");
+            }}
+          />
+          包含订阅核对记录 <span className="muted">默认聚焦实际权益变更</span>
+        </label>
+      )}
+      <DataState {...records}>
+        {records.data?.items.length ? (
+          <div className="table-wrap ops-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>{auditMode ? "操作者" : "用户"}</th>
+                  <th>{auditMode ? "操作 / 对象" : "产品 / 功能"}</th>
+                  <th>{auditMode ? "变更原因" : "权益变更"}</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.data?.items.map((r: Any) => (
+                  <tr key={r.id}>
+                    <td data-label="时间">{date(r.created_at)}</td>
+                    <td data-label={auditMode ? "操作者" : "用户"}>
+                      <strong>{r.display_name || "未知账号"}</strong>
+                      <small>{r.username}</small>
+                    </td>
+                    <td data-label={auditMode ? "操作 / 对象" : "产品 / 功能"}>
+                      {auditMode ? (
+                        <>
+                          {actions[r.action] || r.action}
+                          <small>
+                            {r.target_name
+                              ? `${r.target_name}${r.target.includes("/") ? " · " + (c.cat?.products.find((p: Any) => p.id === r.target.split("/")[1])?.name || r.target.split("/")[1]) : ""}`
+                              : r.code_hint
+                                ? "兑换码 …" + r.code_hint
+                                : c.cat?.products.find(
+                                    (p: Any) => p.id === r.target,
+                                  )?.name || r.target}
+                          </small>
+                        </>
+                      ) : (
+                        <>
+                          {r.product_name || r.product_id}
+                          <small>{r.feature_name || "会员 / 产品权益"}</small>
+                        </>
+                      )}
+                    </td>
+                    <td data-label={auditMode ? "原因" : "变更"}>
+                      {auditMode ? (
+                        r.reason
+                      ) : (
+                        <>
+                          <span
+                            className={
+                              "change-amount " +
+                              (r.amount > 0
+                                ? "positive"
+                                : r.amount < 0
+                                  ? "negative"
+                                  : "")
+                            }
+                          >
+                            {r.action === "redeem"
+                              ? "兑换完成"
+                              : r.amount == null
+                                ? "—"
+                                : `${r.amount > 0 ? "+" : ""}${r.amount}${r.action === "membership_extend" ? " 天" : " 次"}`}
+                          </span>
+                          <small>
+                            {actions[r.action] || r.action}
+                            {r.action === "confirmed"
+                              ? "（预占时已扣除）"
+                              : r.action === "redeem"
+                                ? "（权益见关联发放记录）"
+                                : ""}
+                          </small>
+                        </>
+                      )}
+                    </td>
+                    <td data-label="操作">
+                      <button
+                        className="row-action"
+                        onClick={() => setSelected(r)}
+                      >
+                        查看详情 <ChevronRight size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Empty>没有符合条件的记录，请调整筛选。</Empty>
+        )}
+        {records.data && (
+          <Pager total={records.data.total} page={page} onPage={setPage} />
+        )}
+      </DataState>
+      {selected && (
+        <Drawer
+          title={actions[selected.action] || "记录详情"}
+          subtitle={date(selected.created_at)}
+          onClose={() => setSelected(null)}
+        >
+          <dl className="details">
+            <dt>{auditMode ? "操作者" : "用户"}</dt>
+            <dd>
+              {selected.display_name} · {selected.username}
+            </dd>
+            <dt>{auditMode ? "操作对象" : "产品 / 功能"}</dt>
+            <dd>
+              {auditMode
+                ? selected.target
+                : `${selected.product_name || selected.product_id} · ${selected.feature_name || "会员权益"}`}
+            </dd>
+            <dt>{auditMode ? "操作原因" : "关联请求"}</dt>
+            <dd>
+              {auditMode
+                ? selected.reason
+                : selected.business_request || selected.reference}
+            </dd>
+          </dl>
+          {auditMode ? (
+            <div className="before-after">
+              <section>
+                <h3>变更前</h3>
+                <ReadableValue value={selected.before_value} />
+              </section>
+              <section>
+                <h3>变更后</h3>
+                <ReadableValue value={selected.after_value} />
+              </section>
+            </div>
+          ) : (
+            <>
+              <h3>关联信息</h3>
+              <ReadableValue value={selected.detail} />
+              <p className="muted">
+                同一业务请求的预占、确认、返还可使用上方请求标识筛选追溯。
+              </p>
+            </>
+          )}
+        </Drawer>
+      )}
+    </>
+  );
+}
+function Admin(c: Context & { tab: string }) {
+  const [v, setV] = useState(0),
+    [page, setPage] = useState(1),
+    [editor, setEditor] = useState<Any | null>(null),
+    [selected, setSelected] = useState<Any | null>(null),
+    [revealed, setRevealed] = useState("");
+  const [filters, setFilters] = useState({
+    q: "",
+    product: "",
+    status: "",
+    membership: "",
+    data_kind: "all",
+  });
+  const cat = useData("/api/admin/catalog", v);
+  const searchText = useDebounced(filters.q);
+  const query = new URLSearchParams({
+    ...filters,
+    q: searchText,
+    paginated: "1",
+    page: String(page),
+  }).toString();
+  const users = useData("/api/admin/users?" + query, v),
+    codes = useData("/api/admin/codes?" + query, v);
   useEffect(() => {
     setEditor(null);
+    setSelected(null);
     setRevealed("");
+    setFilters({
+      q: "",
+      product: new URLSearchParams(location.search).get("product") || "",
+      status: "",
+      membership: "",
+      data_kind: "all",
+    });
+    setPage(1);
   }, [c.tab]);
   const done = () => {
     setV((v) => v + 1);
     setEditor(null);
   };
-  const cx = { ...c, done, cat: cat.data };
+  const cx = { ...c, cat: cat.data, done };
+  const productName = (id: string) =>
+    cat.data?.products.find((p: Any) => p.id === id)?.name || id;
+  const featureName = (p: string, f: string) =>
+    cat.data?.features.find((x: Any) => x.product_id === p && x.id === f)
+      ?.name || f;
+  const change = (key: string, value: string) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    setPage(1);
+  };
+  const productFilter = (
+    <Field label="产品">
+      <select
+        value={filters.product}
+        onChange={(e) => change("product", e.target.value)}
+      >
+        <option value="">全部产品</option>
+        {cat.data?.products.map((p: Any) => (
+          <option key={p.id} value={p.id}>
+            {p.name}
+          </option>
+        ))}
+      </select>
+    </Field>
+  );
+  const reset = (
+    <button
+      onClick={() => {
+        setFilters({
+          q: "",
+          product: "",
+          status: "",
+          membership: "",
+          data_kind: "all",
+        });
+        setPage(1);
+      }}
+    >
+      重置
+    </button>
+  );
   if (c.tab === "users")
     return (
       <>
         <PageTitle
           title="用户与权益"
-          description="查询消费者账号，按产品开通会员、赠送或撤销额度。身份资料在 Casdoor 中管理。"
+          description="查找账号，查看各产品会员与额度，处理开通、续期和赠送。"
         >
           <a className="button secondary" href={c.cfg.casdoor + "/users"}>
-            身份管理
-            <ArrowUpRight size={16} />
+            身份管理 <ArrowUpRight size={16} />
           </a>
         </PageTitle>
-        <form
-          className="searchbar"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSearch(q);
-          }}
-        >
-          <Search size={18} />
-          <input
-            aria-label="搜索用户"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="用户名、昵称或统一 UID"
-          />
-          <button>查询</button>
-        </form>
+        <div className="ops-toolbar">
+          <Field label="查找用户">
+            <div className="input-icon">
+              <Search size={17} />
+              <input
+                value={filters.q}
+                onChange={(e) => change("q", e.target.value)}
+                placeholder="用户名、昵称或完整 UID"
+              />
+            </div>
+          </Field>
+          {productFilter}
+          <Field label="账号状态">
+            <select
+              value={filters.status}
+              onChange={(e) => change("status", e.target.value)}
+            >
+              <option value="">全部状态</option>
+              <option value="normal">正常</option>
+              <option value="blocked">已停用 / 封禁</option>
+            </select>
+          </Field>
+          <Field label="会员状态">
+            <select
+              value={filters.membership}
+              onChange={(e) => change("membership", e.target.value)}
+            >
+              <option value="">全部会员</option>
+              <option value="active">有效会员</option>
+              <option value="expired">会员已到期</option>
+              <option value="none">未开通会员</option>
+            </select>
+          </Field>
+          <Field label="数据范围">
+            <select
+              value={filters.data_kind}
+              onChange={(e) => change("data_kind", e.target.value)}
+            >
+              <option value="all">全部账号</option>
+              <option value="business">非测试命名账号</option>
+              <option value="test">测试命名账号</option>
+            </select>
+          </Field>
+          {reset}
+        </div>
+        <div className="list-caption">
+          <span>
+            用户列表 <strong>{users.data?.total ?? "—"}</strong>
+          </span>
+          <span>额度为已入账可用次数；测试标签按本地账号命名识别</span>
+        </div>
         <DataState {...users}>
-          {users.data?.length ? (
-            <div className="table-wrap">
+          {users.data?.items.length ? (
+            <div className="table-wrap ops-table user-table">
               <table>
                 <thead>
                   <tr>
                     <th>用户</th>
-                    <th>统一 UID</th>
+                    <th>产品权益</th>
                     <th>账号状态</th>
                     <th>操作</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users.data.map((u: Any) => (
+                  {users.data.items.map((u: Any) => (
                     <tr key={u.uid}>
-                      <td>
-                        <strong>{u.display_name}</strong>
-                        <small>{u.username}</small>
+                      <td data-label="用户">
+                        <div className="user-cell">
+                          <span className="user-avatar">
+                            {u.display_name.slice(0, 1)}
+                          </span>
+                          <div>
+                            <strong>{u.display_name}</strong>
+                            <small>
+                              {u.username} {u.is_test && <Tag>测试</Tag>}
+                            </small>
+                            <CopyUid value={u.uid} />
+                          </div>
+                        </div>
                       </td>
-                      <td className="uid">{u.uid}</td>
-                      <td>
+                      <td data-label="产品权益">
+                        <div className="rights-summary">
+                          {u.rights.map((r: Any) => (
+                            <div key={r.product_id}>
+                              <span className="rights-product">
+                                {r.product_name}
+                              </span>
+                              <Tag
+                                tone={
+                                  r.active
+                                    ? "green"
+                                    : r.expires_at
+                                      ? "amber"
+                                      : "neutral"
+                                }
+                              >
+                                {r.status === "disabled"
+                                  ? "产品已停用"
+                                  : r.active
+                                    ? "会员有效"
+                                    : r.expires_at
+                                      ? "会员已到期"
+                                      : "未开通会员"}
+                              </Tag>
+                              {r.expires_at && (
+                                <small>到期 {day(r.expires_at)}</small>
+                              )}
+                              {r.quotas.length > 0 && (
+                                <small>
+                                  {r.quotas
+                                    .map(
+                                      (q: Any) => `${q.name} ${q.remaining} 次`,
+                                    )
+                                    .join(" · ")}
+                                </small>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                      <td data-label="账号状态">
                         <Tag
                           tone={
-                            u.blocked || u.casdoor_blocked ? "amber" : "green"
+                            u.blocked || u.casdoor_blocked ? "red" : "green"
                           }
                         >
                           {u.blocked
@@ -942,10 +1659,12 @@ function Admin(c: Context & { tab: string }) {
                               : "正常"}
                         </Tag>
                       </td>
-                      <td>
-                        <button onClick={() => setSelected(u)}>
-                          管理权益
-                          <ChevronRight size={14} />
+                      <td data-label="操作">
+                        <button
+                          className="row-action"
+                          onClick={() => setSelected(u)}
+                        >
+                          管理权益 <ChevronRight size={14} />
                         </button>
                       </td>
                     </tr>
@@ -954,100 +1673,220 @@ function Admin(c: Context & { tab: string }) {
               </table>
             </div>
           ) : (
-            <Empty>尚无消费者账号，可前往注册后查询。</Empty>
+            <Empty>没有符合条件的用户，请调整搜索或筛选。</Empty>
+          )}
+          {users.data && (
+            <Pager total={users.data.total} page={page} onPage={setPage} />
           )}
         </DataState>
-        {selected && (
-          <UserEditor
-            {...cx}
-            user={selected}
+        {selected && cat.data && (
+          <Drawer
+            title={selected.display_name + "的权益"}
+            subtitle={selected.username + " · " + selected.uid}
+            busy={c.busy}
+            error={c.error}
+            notice={c.notice}
             onClose={() => setSelected(null)}
-          />
+          >
+            <UserEditor
+              key={selected.uid}
+              {...cx}
+              user={selected}
+              onClose={() => setSelected(null)}
+            />
+          </Drawer>
         )}
       </>
     );
   if (["products", "features", "plans"].includes(c.tab)) {
-    const type = c.tab;
     const labels: Any = {
-      products: "产品",
-      features: "功能",
-      plans: "套餐权益",
-    };
+        products: "产品",
+        features: "功能",
+        plans: "套餐权益",
+      },
+      type = c.tab;
+    const rows = (cat.data?.[type] || []).filter(
+      (r: Any) =>
+        (!filters.product ||
+          (type === "products" ? r.id : r.product_id) === filters.product) &&
+        (!filters.q ||
+          [r.name, r.id]
+            .join(" ")
+            .toLowerCase()
+            .includes(filters.q.toLowerCase())) &&
+        (!filters.status ||
+          (filters.status === "active") ===
+            (r.status !== "disabled" && r.active !== false)),
+    );
     return (
       <>
         <PageTitle
           title={labels[type] + "管理"}
-          description={
-            type === "plans"
-              ? "配置会员天数和赠送次数；商业订阅与支付记录由 Casdoor 管理。"
-              : "产品、应用与回调需对应实际后端配置；新增产品不会自动获得调用凭据。"
-          }
+          description="按产品配置功能和套餐，让每一份权益规则清晰可查。"
         >
-          <button className="primary" onClick={() => setEditor({})}>
+          <button
+            className="primary"
+            onClick={() =>
+              setEditor({ product_id: filters.product || undefined })
+            }
+          >
             <Plus size={17} />
             新增{labels[type]}
           </button>
         </PageTitle>
+        <div className="catalog-tabs" aria-label="产品配置分类">
+          {[
+            ["products", "产品与接入"],
+            ["features", "功能规则"],
+            ["plans", "套餐权益"],
+          ].map(([id, label]) => (
+            <a
+              key={id}
+              className={type === id ? "selected" : ""}
+              href={
+                "/admin?tab=" +
+                id +
+                (filters.product
+                  ? "&product=" + encodeURIComponent(filters.product)
+                  : "")
+              }
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+        <div className="ops-toolbar">
+          <Field label="名称 / 标识">
+            <input
+              placeholder="搜索配置"
+              value={filters.q}
+              onChange={(e) => change("q", e.target.value)}
+            />
+          </Field>
+          {productFilter}
+          <Field label="状态">
+            <select
+              value={filters.status}
+              onChange={(e) => change("status", e.target.value)}
+            >
+              <option value="">全部状态</option>
+              <option value="active">启用</option>
+              <option value="disabled">停用</option>
+            </select>
+          </Field>
+          {reset}
+        </div>
         <DataState {...cat}>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>名称</th>
-                  <th>产品 / 标识</th>
-                  <th>配置</th>
-                  <th>状态</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cat.data?.[type]?.map((r: Any) => (
-                  <tr key={(r.product_id || "") + r.id}>
-                    <td>
-                      <strong>{r.name}</strong>
-                    </td>
-                    <td>
-                      {r.product_id || r.application}
-                      <small>{r.id}</small>
-                    </td>
-                    <td>
-                      {type === "products"
-                        ? r.callback_url
-                        : type === "features"
-                          ? `${r.kind === "quota" ? "计次" : "访问权限"} · ${periods[r.period]} · 免费 ${r.free_quota} 次`
-                          : `${r.days} 天 · ${Object.entries(r.quotas)
-                              .map(([k, n]) => `${k} ${n} 次`)
-                              .join("、")}`}
-                    </td>
-                    <td>
-                      <Tag
-                        tone={
-                          r.status === "disabled" || r.active === false
-                            ? "amber"
-                            : "green"
-                        }
-                      >
-                        {r.status === "disabled" || r.active === false
-                          ? "停用"
-                          : "启用"}
-                      </Tag>
-                    </td>
-                    <td>
-                      <button onClick={() => setEditor(r)}>编辑</button>
-                    </td>
+          {rows.length ? (
+            <div className="table-wrap ops-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>名称 / 标识</th>
+                    <th>{type === "products" ? "应用映射" : "所属产品"}</th>
+                    <th>{type === "products" ? "接入配置" : "权益规则"}</th>
+                    <th>状态</th>
+                    <th>操作</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {rows.slice((page - 1) * 20, page * 20).map((r: Any) => (
+                    <tr key={(r.product_id || "") + r.id}>
+                      <td data-label="名称">
+                        <strong>{r.name}</strong>
+                        <small className="mono">{r.id}</small>
+                      </td>
+                      <td data-label={type === "products" ? "应用" : "产品"}>
+                        {type === "products"
+                          ? r.application
+                          : productName(r.product_id)}
+                      </td>
+                      <td data-label="配置">
+                        {type === "products" ? (
+                          <>
+                            <span className="break-text">{r.origin}</span>
+                            <small className="truncate" title={r.callback_url}>
+                              回调：{r.callback_url}
+                            </small>
+                            <div className="inline-links">
+                              <a href={"/admin?tab=features&product=" + r.id}>
+                                功能
+                              </a>
+                              <a href={"/admin?tab=plans&product=" + r.id}>
+                                套餐
+                              </a>
+                            </div>
+                          </>
+                        ) : type === "features" ? (
+                          <>
+                            <span>
+                              {r.kind === "quota"
+                                ? `免费 ${r.free_quota} 次 · ${periods[r.period]}`
+                                : "访问权限 · 不扣次数"}
+                            </span>
+                            <small>
+                              {r.member_only
+                                ? "仅有效会员可用"
+                                : "免费用户可用"}
+                            </small>
+                          </>
+                        ) : (
+                          <>
+                            <span>会员 {r.days} 天</span>
+                            <small>
+                              {Object.entries(r.quotas)
+                                .map(
+                                  ([f, n]) =>
+                                    `${featureName(r.product_id, f)} ${n} 次`,
+                                )
+                                .join(" · ") || "不包含次数额度"}
+                            </small>
+                          </>
+                        )}
+                      </td>
+                      <td data-label="状态">
+                        <Tag
+                          tone={
+                            r.status === "disabled" || r.active === false
+                              ? "neutral"
+                              : "green"
+                          }
+                        >
+                          {r.status === "disabled" || r.active === false
+                            ? "停用"
+                            : "启用"}
+                        </Tag>
+                      </td>
+                      <td data-label="操作">
+                        <button onClick={() => setEditor(r)}>
+                          编辑 <ChevronRight size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Empty>没有符合条件的配置。</Empty>
+          )}
+          <Pager total={rows.length} page={page} onPage={setPage} />
         </DataState>
         {editor && cat.data && (
-          <CatalogEditor
-            {...cx}
-            type={type}
-            value={editor}
+          <Drawer
+            title={(editor.id ? "编辑" : "新增") + labels[type]}
             onClose={() => setEditor(null)}
-          />
+            busy={c.busy}
+            error={c.error}
+          >
+            <CatalogEditor
+              key={type + JSON.stringify(editor)}
+              {...cx}
+              type={type}
+              value={editor}
+              onClose={() => setEditor(null)}
+            />
+          </Drawer>
         )}
       </>
     );
@@ -1057,17 +1896,24 @@ function Admin(c: Context & { tab: string }) {
       <>
         <PageTitle
           title="兑换码"
-          description="按产品发放会员或次数。明文仅在创建后展示一次，系统保存不可逆摘要。"
+          description="按产品发放会员、次数或组合权益。完整兑换码仅在创建后显示一次。"
         >
-          <button className="primary" onClick={() => setEditor({})}>
+          <button
+            className="primary"
+            onClick={() => {
+              setRevealed("");
+              setEditor({});
+            }}
+          >
             <Plus size={17} />
             创建兑换码
           </button>
         </PageTitle>
         {revealed && (
           <div className="panel code-reveal">
-            <h2>请现在保存兑换码</h2>
-            <p>关闭页面后无法再次查看完整代码。</p>
+            <Tag tone="green">创建成功</Tag>
+            <h2>请保存完整兑换码</h2>
+            <p>离开此页面后无法再次查看，请妥善保管。</p>
             <code>{revealed}</code>
             <button
               onClick={() =>
@@ -1077,99 +1923,196 @@ function Admin(c: Context & { tab: string }) {
                 )
               }
             >
+              <Copy size={16} />
               复制兑换码
             </button>
+            <button onClick={() => setRevealed("")}>已保存，收起</button>
           </div>
         )}
+        <div className="ops-toolbar">
+          <Field label="兑换码尾号">
+            <input
+              value={filters.q}
+              onChange={(e) => change("q", e.target.value)}
+              placeholder="输入尾号"
+            />
+          </Field>
+          {productFilter}
+          <Field label="可用状态">
+            <select
+              value={filters.status}
+              onChange={(e) => change("status", e.target.value)}
+            >
+              <option value="">全部状态</option>
+              <option value="available">可用</option>
+              <option value="expired">已过期</option>
+              <option value="exhausted">已用尽</option>
+              <option value="disabled">已停用</option>
+            </select>
+          </Field>
+          {reset}
+        </div>
         <DataState {...codes}>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>尾号 / 产品</th>
-                  <th>权益</th>
-                  <th>领取次数</th>
-                  <th>有效期</th>
-                  <th>状态</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {codes.data?.map((r: Any) => (
-                  <tr key={r.id}>
-                    <td>
-                      …{r.hint}
-                      <small>{r.product_id}</small>
-                    </td>
-                    <td>
-                      {r.days > 0 && `${r.days} 天会员 `}
-                      {r.amount > 0 && `${r.feature_id} ${r.amount} 次`}
-                    </td>
-                    <td>
-                      {r.uses} / {r.max_uses}
-                    </td>
-                    <td>{date(r.expires_at)}</td>
-                    <td>
-                      <Tag>{r.active ? "启用" : "停用"}</Tag>
-                    </td>
-                    <td>
-                      <button onClick={() => setEditor({ statusCode: r })}>
-                        {r.active ? "停用" : "启用"}
-                      </button>
-                    </td>
+          {codes.data?.items.length ? (
+            <div className="table-wrap ops-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>兑换码 / 产品</th>
+                    <th>兑换权益</th>
+                    <th>领取进度</th>
+                    <th>截止时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {!codes.data?.length && <Empty />}
-        </DataState>
-        {editor &&
-          cat.data &&
-          (editor.statusCode ? (
-            <ReasonAction
-              title="变更兑换码状态"
-              onClose={() => setEditor(null)}
-              onSubmit={(reason) =>
-                c.perform(async () => {
-                  await api(`/api/admin/codes/${editor.statusCode.id}/status`, {
-                    active: !editor.statusCode.active,
-                    reason,
-                  });
-                  done();
-                })
-              }
-              busy={c.busy}
-            />
+                </thead>
+                <tbody>
+                  {codes.data.items.map((r: Any) => {
+                    const state = !r.active
+                      ? "已停用"
+                      : new Date(r.expires_at) <= new Date()
+                        ? "已过期"
+                        : r.uses >= r.max_uses
+                          ? "已用尽"
+                          : "可用";
+                    return (
+                      <tr key={r.id}>
+                        <td data-label="兑换码">
+                          <strong className="mono">…{r.hint}</strong>
+                          <small>{productName(r.product_id)}</small>
+                        </td>
+                        <td data-label="权益">
+                          {r.days > 0 && <div>会员 {r.days} 天</div>}
+                          {r.amount > 0 && (
+                            <div>
+                              {featureName(r.product_id, r.feature_id)}{" "}
+                              {r.amount} 次
+                            </div>
+                          )}
+                        </td>
+                        <td data-label="领取进度">
+                          {r.uses} / {r.max_uses}
+                          <progress
+                            value={r.uses}
+                            max={r.max_uses}
+                            aria-label="兑换领取进度"
+                          />
+                        </td>
+                        <td data-label="截止时间">{date(r.expires_at)}</td>
+                        <td data-label="状态">
+                          <Tag
+                            tone={
+                              state === "可用"
+                                ? "green"
+                                : state === "已过期"
+                                  ? "amber"
+                                  : "neutral"
+                            }
+                          >
+                            {state}
+                          </Tag>
+                        </td>
+                        <td data-label="操作">
+                          <button
+                            className={r.active ? "danger" : ""}
+                            onClick={() => setEditor({ statusCode: r })}
+                          >
+                            {r.active ? "停用" : "启用"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <CodeEditor
-              {...cx}
-              onClose={() => setEditor(null)}
-              onCreated={(s) => {
-                setRevealed(s);
-                done();
-              }}
-            />
-          ))}
+            <Empty>没有符合条件的兑换码。</Empty>
+          )}
+          {codes.data && (
+            <Pager total={codes.data.total} page={page} onPage={setPage} />
+          )}
+        </DataState>
+        {editor && cat.data && (
+          <Drawer
+            title={editor.statusCode ? "变更兑换码状态" : "创建兑换码"}
+            onClose={() => setEditor(null)}
+            busy={c.busy}
+            error={c.error}
+          >
+            {editor.statusCode ? (
+              <>
+                <div className="operation-preview">
+                  兑换码尾号 …{editor.statusCode.hint} ·{" "}
+                  {productName(editor.statusCode.product_id)}
+                  <p>
+                    {editor.statusCode.active
+                      ? "停用后将立即停止新的兑换，已领取权益不变。"
+                      : "启用后仍需满足有效期和剩余领取次数。"}
+                  </p>
+                </div>
+                <ReasonAction
+                  title="变更兑换码状态"
+                  onClose={() => setEditor(null)}
+                  busy={c.busy}
+                  onSubmit={(reason) =>
+                    c.perform(async () => {
+                      await api(
+                        `/api/admin/codes/${editor.statusCode.id}/status`,
+                        { active: !editor.statusCode.active, reason },
+                      );
+                      done();
+                    })
+                  }
+                />
+              </>
+            ) : (
+              <CodeEditor
+                {...cx}
+                onClose={() => setEditor(null)}
+                onCreated={(s) => {
+                  setRevealed(s);
+                  done();
+                }}
+              />
+            )}
+          </Drawer>
+        )}
       </>
     );
   if (["ledger", "audit"].includes(c.tab))
-    return (
-      <>
-        <PageTitle
-          title={c.tab === "ledger" ? "权益流水" : "管理操作记录"}
-          description="按时间倒序展示最近 100 条，详情包含关联请求及变更信息。记录只追加，不支持修改。"
-        />
-        <DataState {...records}>
-          <RecordTable rows={records.data || []} />
-        </DataState>
-      </>
-    );
+    return <OpsRecords key={c.tab} {...c} version={v} cat={cat.data} />;
+  return <Subscriptions {...c} />;
+}
+function Subscriptions(c: Context) {
+  const [v, setV] = useState(0),
+    [scope, setScope] = useState("all"),
+    [tab, setTab] = useState("subscriptions"),
+    [page, setPage] = useState(1);
+  const subs = useData("/api/admin/subscriptions", v);
+  const states: Any = {
+    Active: "生效中",
+    Suspended: "已暂停",
+    Expired: "已到期",
+    Pending: "待处理",
+    Paid: "已支付",
+    Created: "已创建",
+    Canceled: "已取消",
+    Cancelled: "已取消",
+    Error: "异常",
+    Timeout: "已超时",
+  };
+  const isTest = (r: Any) =>
+    testUser(r.user) ||
+    /dummy|测试/.test([r.name, r.plan, r.displayName].join(" "));
+  const rows = (subs.data?.[tab] || []).filter(
+    (r: Any) => scope === "all" || (scope === "test") === isTest(r),
+  );
   return (
     <>
       <PageTitle
         title="订阅与支付"
-        description="订阅和交易以 Casdoor 为事实来源。权益服务通过受信任的服务端查询进行投影与核对。"
+        description="查看商户配置、权益同步及 Casdoor 业务记录。"
       >
         <button
           disabled={c.busy}
@@ -1184,85 +2127,163 @@ function Admin(c: Context & { tab: string }) {
           重新核对
         </button>
       </PageTitle>
-      <section className="panel">
-        <Tag tone="amber">未配置真实商户 · 未启用收费</Tag>
-        <p>
-          官方 Dummy
-          仅用于本地支付测试，不产生真实交易。当前可通过管理员开通、兑换码和
-          Casdoor 订阅投影生效。
-        </p>
-        <div className="button-row">
-          {[
-            ["plans", "套餐"],
-            ["subscriptions", "订阅"],
-            ["payments", "支付记录"],
-            ["providers", "服务商配置"],
-          ].map(([p, l]) => (
-            <a
-              key={p}
-              className="button secondary"
-              href={c.cfg.casdoor + "/" + p}
-            >
-              {l}
-              <ArrowUpRight size={15} />
-            </a>
-          ))}
+      <section className="payment-banner">
+        <div className="status-symbol">
+          <CreditCard size={22} />
         </div>
+        <div>
+          <h2>
+            真实收费尚未启用 <Tag tone="amber">待配置商户</Tag>
+          </h2>
+          <p>当前可使用管理员开通和兑换码发放权益。本地测试不产生真实交易。</p>
+        </div>
+        <a className="button" href={c.cfg.casdoor + "/providers"}>
+          服务商配置 <ArrowUpRight size={15} />
+        </a>
       </section>
       <DataState {...subs}>
-        <section className="panel">
-          <h2>同步状态</h2>
-          {subs.data?.testPayment && (
-            <p>
-              本地 Dummy 测试：已验证于{" "}
-              {date(subs.data.testPayment.verified_at)}
-              ，无真实收费，测试购买入口已关闭。
-            </p>
-          )}
-          <p>
-            最近核对：
-            {subs.data?.lastRun
-              ? date(subs.data.lastRun.created_at)
-              : "尚未执行"}
-          </p>
-          <p>
-            Casdoor 订阅 {subs.data?.subscriptions.length || 0} 条，支付{" "}
-            {subs.data?.payments.length || 0} 条，权益投影{" "}
-            {subs.data?.projections.length || 0} 条。
-          </p>
-          <p className="muted">
-            自动核对间隔 5 分钟。需要付款的订阅必须对应 Casdoor Paid
-            记录；浏览器返回页不作为支付依据。
-          </p>
-        </section>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>订阅</th>
-                <th>用户</th>
-                <th>套餐</th>
-                <th>状态</th>
-                <th>到期</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subs.data?.subscriptions.map((s: Any) => (
-                <tr key={s.owner + "/" + s.name}>
-                  <td>{s.displayName || s.name}</td>
-                  <td>{s.user}</td>
-                  <td>{s.plan}</td>
-                  <td>{s.state}</td>
-                  <td>{date(s.endTime)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="stat-grid">
+          {[
+            ["身份侧订阅", subs.data?.subscriptions.length],
+            ["支付记录", subs.data?.payments.length],
+            ["权益投影", subs.data?.projections.length],
+          ].map(([label, value]) => (
+            <div className="stat-card" key={label}>
+              <span>{label}</span>
+              <strong>{value ?? "—"}</strong>
+            </div>
+          ))}
         </div>
+        <section className="panel sync-panel">
+          <div>
+            <h2>权益同步</h2>
+            <p>
+              最近核对：
+              {subs.data?.lastRun
+                ? date(subs.data.lastRun.created_at)
+                : "尚未执行"}
+            </p>
+          </div>
+          <Tag tone={subs.data?.lastRun ? "green" : "amber"}>
+            {subs.data?.lastRun ? "已有核对记录" : "待核对"}
+          </Tag>
+          <details>
+            <summary>查看同步规则与本地测试状态</summary>
+            <p>
+              每 5 分钟自动核对。需要付款的订阅以 Casdoor
+              已支付记录为依据，浏览器返回页不作为支付依据。
+            </p>
+            {subs.data?.testPayment && (
+              <p>
+                官方 Dummy 本地测试于 {date(subs.data.testPayment.verified_at)}{" "}
+                验证，测试购买入口已关闭。
+              </p>
+            )}
+          </details>
+        </section>
+        <div className="section-heading">
+          <h2>业务记录</h2>
+          <div className="inline-links">
+            <a href={c.cfg.casdoor + "/plans"}>
+              管理原生套餐 <ArrowUpRight size={14} />
+            </a>
+            <a href={c.cfg.casdoor + "/" + tab}>
+              在 Casdoor 查看 <ArrowUpRight size={14} />
+            </a>
+          </div>
+        </div>
+        <div className="catalog-tabs">
+          {[
+            ["subscriptions", "订阅"],
+            ["payments", "支付记录"],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              className={tab === id ? "selected" : ""}
+              onClick={() => {
+                setTab(id);
+                setPage(1);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="ops-toolbar">
+          <Field label="数据范围">
+            <select
+              value={scope}
+              onChange={(e) => {
+                setScope(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部记录</option>
+              <option value="business">非测试命名记录</option>
+              <option value="test">测试命名记录</option>
+            </select>
+          </Field>
+          <p className="muted">按账号及记录名称识别测试数据</p>
+        </div>
+        {rows.length ? (
+          <div className="table-wrap ops-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>{tab === "payments" ? "交易" : "订阅"}</th>
+                  <th>用户</th>
+                  <th>套餐 / 产品</th>
+                  <th>状态</th>
+                  <th>{tab === "payments" ? "金额" : "到期时间"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.slice((page - 1) * 20, page * 20).map((s: Any) => (
+                  <tr key={s.owner + "/" + s.name}>
+                    <td data-label="记录">
+                      <strong>{s.displayName || s.name}</strong>
+                      {isTest(s) && (
+                        <small>
+                          <Tag>本地测试</Tag>
+                        </small>
+                      )}
+                    </td>
+                    <td data-label="用户">{s.user || "—"}</td>
+                    <td data-label="套餐">
+                      {s.plan || s.productName || s.product || "—"}
+                    </td>
+                    <td data-label="状态">
+                      <Tag
+                        tone={
+                          ["Active", "Paid"].includes(s.state)
+                            ? "green"
+                            : "neutral"
+                        }
+                      >
+                        {states[s.state] || s.state || "—"}
+                      </Tag>
+                    </td>
+                    <td data-label={tab === "payments" ? "金额" : "到期"}>
+                      {tab === "payments"
+                        ? `${s.price ?? "—"} ${s.currency || ""}`
+                        : date(s.endTime)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Empty>
+            没有符合条件的{tab === "payments" ? "支付" : "订阅"}记录。
+          </Empty>
+        )}
+        <Pager total={rows.length} page={page} onPage={setPage} />
       </DataState>
     </>
   );
 }
+
 type EditorContext = Context & { cat: Any; done: () => void };
 function ReasonAction({
   title,
@@ -1290,9 +2311,14 @@ function ReasonAction({
         <Field label="变更原因">
           <input name="reason" required minLength={2} maxLength={500} />
         </Field>
-        <button className="primary" disabled={busy}>
-          确认变更
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={onClose} disabled={busy}>
+            取消
+          </button>
+          <button className="danger-solid" disabled={busy}>
+            {busy ? "正在提交…" : "确认变更"}
+          </button>
+        </div>
       </form>
     </section>
   );
@@ -1301,11 +2327,18 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
   const [v, setV] = useState(0),
     [status, setStatus] = useState(false);
   const rights = useData(`/api/admin/users/${c.user.uid}/entitlements`, v);
-  const [product, setProduct] = useState("beadgrid"),
-    [kind, setKind] = useState("membership");
+  const [product, setProduct] = useState(c.cat?.products[0]?.id || ""),
+    [kind, setKind] = useState("membership"),
+    [days, setDays] = useState(30),
+    [amount, setAmount] = useState(10);
+  const currentRights = rights.data?.find((r: Any) => r.product.id === product);
+  const currentEnd = currentRights?.membership.expires_at
+    ? new Date(currentRights.membership.expires_at).getTime()
+    : 0;
+  const estimate = new Date(Math.max(Date.now(), currentEnd) + days * 86400000);
   const fs =
     c.cat?.features.filter(
-      (f: Any) => f.product_id === product && f.kind === "quota",
+      (f: Any) => f.product_id === product && f.kind === "quota" && f.active,
     ) || [];
   return (
     <section className="panel editor">
@@ -1319,21 +2352,43 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
       <DataState {...rights}>
         {rights.data && (
           <div className="compact-rights">
-            {rights.data.map((e: Any) => (
-              <div key={e.product.id}>
-                <strong>{e.product.name}</strong>
-                <span>
-                  会员：{day(e.membership.expires_at)}{" "}
-                  {e.membership.active ? "（有效）" : "（未生效 / 已到期）"}
-                </span>
-                <span>
-                  {e.features
-                    .filter((f: Any) => f.kind === "quota")
-                    .map((f: Any) => `${f.name} ${f.remaining} 次`)
-                    .join(" · ")}
-                </span>
-              </div>
-            ))}
+            <div className="product-switch" aria-label="选择产品">
+              {rights.data.map((e: Any) => (
+                <button
+                  type="button"
+                  key={e.product.id}
+                  aria-pressed={product === e.product.id}
+                  className={product === e.product.id ? "selected" : ""}
+                  onClick={() => setProduct(e.product.id)}
+                >
+                  {e.product.name}
+                </button>
+              ))}
+            </div>
+            {rights.data
+              .filter((e: Any) => e.product.id === product)
+              .map((e: Any) => (
+                <div key={e.product.id}>
+                  <strong>{e.product.name}</strong>
+                  <span>
+                    <Tag tone={e.membership.active ? "green" : "neutral"}>
+                      {e.membership.active
+                        ? "有效会员"
+                        : e.membership.expires_at
+                          ? "会员已到期"
+                          : "未开通会员"}
+                    </Tag>
+                    {e.membership.expires_at &&
+                      ` 到期 ${date(e.membership.expires_at)}`}
+                  </span>
+                  <span>
+                    {e.features
+                      .filter((f: Any) => f.kind === "quota")
+                      .map((f: Any) => `${f.name} ${f.remaining} 次`)
+                      .join(" · ")}
+                  </span>
+                </div>
+              ))}
           </div>
         )}
       </DataState>
@@ -1395,7 +2450,8 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
                 min={1}
                 max={36500}
                 required
-                defaultValue={30}
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
               />
             </Field>
           )}
@@ -1419,7 +2475,8 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
                   required
                   min={1}
                   max={1000000}
-                  defaultValue={10}
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
                 />
               </Field>
               <Field
@@ -1431,6 +2488,24 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
             </>
           )}
         </div>
+        <div
+          className={
+            "operation-preview " +
+            (kind.startsWith("revoke") ? "danger-preview" : "")
+          }
+          role="status"
+        >
+          <strong>本次操作预览</strong>
+          <p>
+            {kind === "membership"
+              ? `增加 ${days || 0} 天会员，预计到期 ${date(estimate)}`
+              : kind === "quota"
+                ? `向当前产品赠送 ${amount || 0} 次额度，其他产品不受影响。`
+                : kind === "revoke_membership"
+                  ? "撤销当前产品的手工会员。存在有效订阅时，需先在 Casdoor 暂停订阅并核对。"
+                  : "撤销所选功能的当前可用次数；其他功能与产品不受影响。"}
+          </p>
+        </div>
         <Field label="操作原因">
           <input
             name="reason"
@@ -1440,9 +2515,21 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
             placeholder="填写本次开通、赠送或撤销的原因"
           />
         </Field>
-        <button className="primary" disabled={c.busy}>
-          保存权益变更
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={c.onClose} disabled={c.busy}>
+            取消
+          </button>
+          <button
+            className={kind.startsWith("revoke") ? "danger-solid" : "primary"}
+            disabled={c.busy}
+          >
+            {c.busy
+              ? "正在保存…"
+              : kind.startsWith("revoke")
+                ? "确认撤销"
+                : "保存权益变更"}
+          </button>
+        </div>
       </form>
       <div className="setting-line">
         <div>
@@ -1452,7 +2539,10 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
             身份封禁在原生身份管理页操作。
           </p>
         </div>
-        <button onClick={() => setStatus(true)}>
+        <button
+          className={c.user.blocked ? "" : "danger"}
+          onClick={() => setStatus(true)}
+        >
           {c.user.blocked ? "恢复" : "停用"}
         </button>
       </div>
@@ -1480,7 +2570,8 @@ function CatalogEditor(
   c: EditorContext & { type: string; value: Any; onClose: () => void },
 ) {
   const r = c.value;
-  const [p, setP] = useState(r.product_id || c.cat.products[0]?.id || "");
+  const [p, setP] = useState(r.product_id || c.cat.products[0]?.id || ""),
+    [featureKind, setFeatureKind] = useState(r.kind || "quota");
   return (
     <section className="panel editor">
       <div className="section-heading">
@@ -1509,10 +2600,11 @@ function CatalogEditor(
             b.active = f.get("active") === "on";
             if (c.type === "features")
               Object.assign(b, {
-                kind: f.get("kind"),
+                kind: featureKind,
                 member_only: f.get("member_only") === "on",
-                free_quota: Number(f.get("free_quota")),
-                period: f.get("period"),
+                free_quota:
+                  featureKind === "quota" ? Number(f.get("free_quota")) : 0,
+                period: featureKind === "quota" ? f.get("period") : "once",
               });
             else {
               b.days = Number(f.get("days"));
@@ -1598,29 +2690,37 @@ function CatalogEditor(
           ) : c.type === "features" ? (
             <>
               <Field label="功能类型">
-                <select name="kind" defaultValue={r.kind || "quota"}>
+                <select
+                  name="kind"
+                  value={featureKind}
+                  onChange={(e) => setFeatureKind(e.target.value)}
+                >
                   <option value="quota">次数额度</option>
                   <option value="access">访问权限（不扣次）</option>
                 </select>
               </Field>
-              <Field label="免费次数">
-                <input
-                  type="number"
-                  name="free_quota"
-                  min={0}
-                  max={1000000}
-                  defaultValue={r.free_quota || 0}
-                />
-              </Field>
-              <Field label="免费额度周期">
-                <select name="period" defaultValue={r.period || "once"}>
-                  {Object.entries(periods).map(([k, v]) => (
-                    <option value={k} key={k}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              {featureKind === "quota" && (
+                <>
+                  <Field label="免费次数">
+                    <input
+                      type="number"
+                      name="free_quota"
+                      min={0}
+                      max={1000000}
+                      defaultValue={r.free_quota || 0}
+                    />
+                  </Field>
+                  <Field label="免费额度周期">
+                    <select name="period" defaultValue={r.period || "once"}>
+                      {Object.entries(periods).map(([k, v]) => (
+                        <option value={k} key={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                </>
+              )}
               <label className="checkbox">
                 <input
                   type="checkbox"
@@ -1686,9 +2786,14 @@ function CatalogEditor(
             白名单与产品后端配置；不会向未登记的地址发送令牌。
           </p>
         )}
-        <button className="primary" disabled={c.busy}>
-          保存配置
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={c.onClose} disabled={c.busy}>
+            取消
+          </button>
+          <button className="primary" disabled={c.busy}>
+            {c.busy ? "正在保存…" : "保存配置"}
+          </button>
+        </div>
       </form>
     </section>
   );
@@ -1696,7 +2801,10 @@ function CatalogEditor(
 function CodeEditor(
   c: EditorContext & { onClose: () => void; onCreated: (s: string) => void },
 ) {
-  const [p, setP] = useState(c.cat.products[0]?.id || "");
+  const [p, setP] = useState(c.cat.products[0]?.id || ""),
+    [mode, setMode] = useState("membership"),
+    [days, setDays] = useState(30),
+    [count, setCount] = useState(10);
   return (
     <section className="panel editor">
       <div className="section-heading">
@@ -1707,11 +2815,11 @@ function CodeEditor(
         onSubmit={(e) => {
           e.preventDefault();
           const f = new FormData(e.currentTarget);
-          const amount = Number(f.get("amount"));
+          const amount = mode === "membership" ? 0 : Number(f.get("amount"));
           c.perform(async () => {
             const result = await api("/api/admin/codes", {
               product_id: p,
-              days: Number(f.get("days")),
+              days: mode === "quota" ? 0 : Number(f.get("days")),
               feature_id: amount > 0 ? f.get("feature_id") : null,
               amount,
               max_uses: Number(f.get("max_uses")),
@@ -1735,37 +2843,55 @@ function CodeEditor(
               ))}
             </select>
           </Field>
-          <Field label="会员天数（0 表示不发会员）">
-            <input
-              type="number"
-              name="days"
-              required
-              min={0}
-              max={36500}
-              defaultValue={30}
-            />
-          </Field>
-          <Field label="次数功能">
-            <select name="feature_id">
-              {c.cat.features
-                .filter((f: Any) => f.product_id === p && f.kind === "quota")
-                .map((f: Any) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
+          <Field label="发放内容">
+            <select value={mode} onChange={(e) => setMode(e.target.value)}>
+              <option value="membership">会员</option>
+              <option value="quota">次数额度</option>
+              <option value="combined">会员 + 次数额度</option>
             </select>
           </Field>
-          <Field label="赠送次数（0 表示不发次数）">
-            <input
-              type="number"
-              name="amount"
-              min={0}
-              max={1000000}
-              required
-              defaultValue={0}
-            />
-          </Field>
+          {mode !== "quota" && (
+            <Field label="会员天数">
+              <input
+                type="number"
+                name="days"
+                required
+                min={1}
+                max={36500}
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
+              />
+            </Field>
+          )}
+          {mode !== "membership" && (
+            <>
+              <Field label="次数功能">
+                <select name="feature_id">
+                  {c.cat.features
+                    .filter(
+                      (f: Any) =>
+                        f.product_id === p && f.kind === "quota" && f.active,
+                    )
+                    .map((f: Any) => (
+                      <option key={f.id} value={f.id}>
+                        {f.name}
+                      </option>
+                    ))}
+                </select>
+              </Field>
+              <Field label="赠送次数">
+                <input
+                  type="number"
+                  name="amount"
+                  min={1}
+                  max={1000000}
+                  required
+                  value={count}
+                  onChange={(e) => setCount(Number(e.target.value))}
+                />
+              </Field>
+            </>
+          )}
           <Field label="最多领取人数">
             <input
               type="number"
@@ -1790,16 +2916,33 @@ function CodeEditor(
                 .slice(0, 16)}
             />
           </Field>
-          <Field label="赠送次数的到期时间" hint="留空表示赠送次数不过期">
-            <input type="datetime-local" name="quota_expires_at" />
-          </Field>
+          {mode !== "membership" && (
+            <Field label="赠送次数的到期时间" hint="留空表示赠送次数不过期">
+              <input type="datetime-local" name="quota_expires_at" />
+            </Field>
+          )}
+        </div>
+        <div className="operation-preview">
+          <strong>
+            {c.cat.products.find((x: Any) => x.id === p)?.name} · 兑换权益
+          </strong>
+          <p>
+            {mode !== "quota" && `会员 ${days || 0} 天`}
+            {mode === "combined" && " + "}
+            {mode !== "membership" && `${count || 0} 次额度`}
+          </p>
         </div>
         <Field label="发放原因">
           <input name="reason" minLength={2} maxLength={500} required />
         </Field>
-        <button className="primary" disabled={c.busy}>
-          创建并显示完整代码
-        </button>
+        <div className="form-actions">
+          <button type="button" onClick={c.onClose} disabled={c.busy}>
+            取消
+          </button>
+          <button className="primary" disabled={c.busy}>
+            {c.busy ? "正在创建…" : "创建并显示兑换码"}
+          </button>
+        </div>
       </form>
     </section>
   );
