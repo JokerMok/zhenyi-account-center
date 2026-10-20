@@ -103,3 +103,22 @@ export async function request(
   });
   return { status: r.status, body: (await r.json()) as any };
 }
+
+// CI supplies a test administrator password privately; legacy local setups remain compatible.
+export async function testAdministrator() {
+  const users = await casdoorApi("get-users", { owner: "built-in" });
+  const admin = users.find((u: any) => u.id === config.ADMIN_SUB);
+  assert(admin, 500, "TEST_ADMIN", "未找到已固定 subject 的管理员");
+  const legacy = await readFile(".local/credentials.json", "utf8")
+    .then(JSON.parse)
+    .catch(() => null);
+  const password =
+    process.env.TEST_ADMIN_PASSWORD || legacy?.administrator?.password;
+  assert(
+    password,
+    500,
+    "TEST_ADMIN_PASSWORD_REQUIRED",
+    "测试需要私密 TEST_ADMIN_PASSWORD；日常登录与恢复无需此项",
+  );
+  return { username: admin.name, password };
+}

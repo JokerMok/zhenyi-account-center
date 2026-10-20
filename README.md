@@ -4,32 +4,33 @@
 
 ## 本地使用
 
-需要 Node.js 22+、Docker Compose、OpenSSL。当前在 macOS ARM64 验证；首次启动需要下载官方 Casdoor 发布包。
+需要 Node.js 22+、Docker Compose、OpenSSL；当前在 macOS ARM64 验证。
 
 ```sh
-git clone https://github.com/JokerMok/zhenyi-account-center.git
-cd zhenyi-account-center
 npm ci
 npm start
-# 停止，保留数据库
-npm stop
-# 查看状态 / 获取初始化管理员凭据
-npm run status
-npm run credentials
 ```
 
-`npm start` 自动生成随机密钥、启动数据库、应用迁移、初始化 Casdoor、构建页面并启动三个应用。再次运行会保留账号、配置和数据。新改动后执行 `npm run build`，再停止并启动服务。所有服务监听回环地址。
+首次启动会打印一个可点击的本机设置地址。打开它，自行设置管理员用户名（默认 `admin`）与密码，再进入 `/admin` 登录。密码至少8位，可显示／隐藏并二次确认，支持浏览器密码管理器；不要求组合大小写、数字或符号，不要求定期更换。Casdoor 当前不接受密码中的空格。
+
+以后直接 `npm start`，使用已设置的账号密码登录；重启保留账号、配置和数据。管理员在“账号与安全”打开 Casdoor 原生页面修改密码，完成后关闭新窗口回到后台，重新登录。
+
+本地忘记密码时，在项目目录的交互式终端运行：
+
+```sh
+npm run admin:reset-password
+```
+
+按提示隐藏输入新密码并确认。恢复保留原管理员 subject、身份绑定、权益与历史审计，清除旧会话；无需删除目录或修改数据库。已有版本继续使用原管理员账号，首次设置不会重新开放。
 
 | 页面 | 地址 |
 | --- | --- |
 | 消费者中心 | http://localhost:5310 |
 | 权益运营 | http://localhost:5310/admin |
-| Casdoor 原生管理 / 账号安全 | http://localhost:5300 |
-| 拼豆接入示例 | http://localhost:5311 |
-| 录屏接入示例 | http://localhost:5312 |
-| PostgreSQL（仅本机） | 127.0.0.1:5342 |
+| Casdoor | http://localhost:5300 |
+| 拼豆 / 录屏接入示例 | http://localhost:5311 / http://localhost:5312 |
 
-管理员组织为 `built-in`，消费者组织为 `consumers`。随机初始密码存放在 `.local/credentials.json`，也可通过上面的命令查看。消费者从页面自行注册。测试账号仅存在本地私密配置与数据库中，不纳入 Git。请勿将本机测试数据库直接用作生产库。
+`npm stop` 停止并保留数据，`npm run status` 查看状态。修改代码后先 `npm run build` 再重启。数据库、应用与产品机器凭据自动生成，不需要人工填写；均不得提交 Git。管理员组织为 `built-in`，消费者组织为 `consumers`。测试数据只存在本地，请勿直接用于生产。
 
 ## 运营后台
 
@@ -64,7 +65,8 @@ npm run restore -- backups/备份文件.tar.gz  # 恢复到新的独立数据库
 - 消费者权益、兑换与流水；运营用户查询、产品 / 功能 / 套餐配置、会员续期与撤销、额度赠送与撤销、兑换码及审计记录。
 - 一次性 / UTC 每日 / UTC 每月免费额度，独立赠送桶和到期时间；事务预占、确认、释放、返还与超时回收。
 - 通过 Casdoor 服务端查询投影订阅，每 5 分钟核对一次，也可手动执行。需要付款的订阅必须查到 `Paid` 支付记录。管理员开通与兑换码不伪造订阅或交易。
-- 两个独立示例后端，提供真实登录、额度查询、演示任务、重复请求处理及两种失败恢复。录屏示例生成任务文件，不进行屏幕采集。
+- 配置驱动的产品鉴权登记，独立应用与调用凭据；令牌失效后的服务端任务查询、释放、返还及审计。
+- 两个独立示例后端，提供真实登录、额度查询、持久化演示任务、结果未知恢复及幂等交付。录屏示例生成任务文件，不进行屏幕采集。
 
 ## 接入与验收
 

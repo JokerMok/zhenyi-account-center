@@ -93,7 +93,7 @@ export async function identityFromToken(
 ) {
   if (runtimeApp !== "center") {
     assert(
-      appId === runtimeApp && (appId === "beadgrid" || appId === "focustake"),
+      appId === runtimeApp && appId !== "center" && appId !== "admin",
       403,
       "WRONG_APP",
       "产品应用配置不一致",

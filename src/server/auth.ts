@@ -1,7 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Express, Request, Response, NextFunction } from "express";
 import { pool, assert, Fault } from "./db";
-import { config, appConfigs, type AppId } from "./config";
+import { config, appConfigs, productApps, type AppId } from "./config";
 import {
   discovery,
   verifyToken,
@@ -14,7 +14,7 @@ export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 export type Authenticated = Request & {
   identity?: any;
   session?: any;
-  serviceProduct?: "beadgrid" | "focustake";
+  serviceProduct?: string;
 };
 const cookie = (name: string) =>
   `${config.production ? "__Host-" : ""}zy_${name}`;
@@ -79,10 +79,7 @@ export function sessionAuth(appId: AppId) {
     }
   };
 }
-export function installAuth(
-  app: Express,
-  serverId: "center" | "beadgrid" | "focustake",
-) {
+export function installAuth(app: Express, serverId: string) {
   app.get("/auth/login", async (req, res) => {
     const appId: AppId =
       serverId === "center" && req.query.mode === "admin" ? "admin" : serverId;
@@ -254,7 +251,7 @@ export function installAuth(
       sessionAuth(appId),
       csrf(appId),
       async (req: Authenticated, res) => {
-        if (appId === "beadgrid" || appId === "focustake") {
+        if (appId !== "center" && appId !== "admin") {
           const r = await fetch(
             `${config.CENTER_URL}/api/v1/products/${appId}/logout-all`,
             {
@@ -290,7 +287,7 @@ export function installAuth(
     );
   }
 }
-export async function serviceAuth(
+export async function productBackendAuth(
   req: Authenticated,
   _res: Response,
   next: NextFunction,
@@ -304,9 +301,9 @@ export async function serviceAuth(
       "需要产品后端凭据",
     );
     const key = auth.slice(7);
-    const appId = (["beadgrid", "focustake"] as const).find((id) =>
-      equal(key, appConfigs[id].serviceKey),
-    );
+    const appId = productApps.find(
+      (a) => a.enabled && a.serviceKey.length >= 32 && equal(key, a.serviceKey),
+    )?.id;
     assert(appId, 401, "INVALID_PRODUCT_CREDENTIAL", "产品凭据无效");
     assert(
       !req.body?.uid &&
@@ -330,12 +327,26 @@ export async function serviceAuth(
         "CROSS_PRODUCT",
         "产品凭据不能操作其他产品",
       );
-    const token = String(req.headers["x-user-token"] || "");
-    assert(token, 401, "USER_TOKEN_REQUIRED", "需要当前用户的访问令牌");
-    req.identity = await identityFromToken(token, appId);
     req.serviceProduct = appId;
     next();
   } catch (e) {
     next(e);
   }
+}
+export async function serviceAuth(
+  req: Authenticated,
+  res: Response,
+  next: NextFunction,
+) {
+  await productBackendAuth(req, res, async (error?: any) => {
+    if (error) return next(error);
+    try {
+      const token = String(req.headers["x-user-token"] || "");
+      assert(token, 401, "USER_TOKEN_REQUIRED", "需要当前用户的访问令牌");
+      req.identity = await identityFromToken(token, req.serviceProduct!);
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
 }

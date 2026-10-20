@@ -23,7 +23,8 @@
     "reconcile": "tsx scripts/reconcile.ts",
     "backup": "node scripts/backup.mjs",
     "restore": "node scripts/backup.mjs restore",
-    "credentials": "node scripts/credentials.mjs"
+    "admin:reset-password": "tsx scripts/admin-reset-password.ts",
+    "demo:recover": "tsx scripts/recover-demo.ts"
   },
   "dependencies": {
     "bcryptjs": "3.0.2",

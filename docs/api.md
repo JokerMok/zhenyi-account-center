@@ -70,3 +70,16 @@ Content-Type: application/json
 兑换码支持 `q`（尾号）、`product`、`status=available|expired|exhausted|disabled`；状态优先级是停用、过期、用尽、可用。流水与审计支持 `q`、`product`、`action`、`from`、`to`（UTC 日期，含截止日）、`data_kind`；流水另支持 `reconcile=hide` 排除核对记录。流水可按实际业务 request_id 或预占 reference 追溯；审计搜索包含操作者、目标用户和原因。审计数据范围筛选针对操作者。
 
 测试账号标签按 `test_`、`dummy_test_`、`probe_`、`qa_` 命名前缀识别，仅用于本地展示与筛选，不参与授权或安全隔离。所有新版查询仍要求独立管理员会话。
+
+## 产品后端任务恢复（本次新增）
+
+正常预占、确认和用户查询继续要求 Bearer 产品凭据及 `X-User-Token`。以下独立入口只允许可信产品后端查询和恢复本产品已有任务，不要求已过期／退出／封禁用户重新登录：
+
+|方法|地址|参数|
+|---|---|---|
+|GET|`/api/v1/products/:product/recovery/reservations`|`reservation_id` 或 `request_id`，只能选一个|
+|POST|`/api/v1/products/:product/recovery`|定位参数加 `action: cancel/refund`、`reason`|
+
+恢复不支持 confirm、reserve、grant；不接受 uid/user_id。跨产品URI拒绝403，其他产品预占ID返回404，歧义请求号返回409 `AMBIGUOUS_REQUEST`。重复恢复返回既有终态，不增加第二笔流水／恢复审计。已超时的 reserved 可转 expired 并释放；已确认消费只能按原预占部件返还，不创建新额度。
+
+网络断开、响应丢失或5xx必须视为 unknown；先按原请求号／预占ID查询，或使用原请求号幂等重试。示例客户端提供 `status`、`recover` 和 `confirmKnown`。确认已入账时依真实业务任务交付或返还；无法核实则保留 `pending_recovery`。示例HTTP接口对此返回202，不返回“确定失败”。详见接入文档中的持久化任务例子。

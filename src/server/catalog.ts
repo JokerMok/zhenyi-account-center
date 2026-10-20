@@ -7,7 +7,7 @@ import {
   grantSchema,
   grant,
 } from "./entitlements";
-import { appConfigs } from "./config";
+import { appConfigs, productApps } from "./config";
 const httpUrl = z
   .url()
   .refine(
@@ -64,7 +64,20 @@ export async function catalog() {
     ),
   );
   return {
-    products: products.rows,
+    products: products.rows.map((p) => {
+      const a = productApps.find((a) => a.id === p.id);
+      return {
+        ...p,
+        integration_status: !a
+          ? "未登记鉴权"
+          : !a.enabled
+            ? "鉴权已停用"
+            : a.application !== p.application ||
+                a.url + "/auth/callback/" + a.id !== p.callback_url
+              ? "登记不一致"
+              : "鉴权已配置，待产品验收",
+      };
+    }),
     features: features.rows,
     plans: plans.rows,
   };
@@ -142,6 +155,7 @@ export async function seedCatalog() {
   await tx(async (db) => {
     for (const id of ["beadgrid", "focustake"] as const) {
       const a = appConfigs[id];
+      if (!a) continue;
       await db.query(
         "INSERT INTO products(id,name,application,callback_url,origin) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
         [id, a.name, a.application, a.url + `/auth/callback/${id}`, a.url],

@@ -49,6 +49,8 @@ for (const id of ["beadgrid", "focustake"]) {
   const keys = [
     "NODE_ENV",
     "HOST",
+    "CENTER_PORT",
+    "PRODUCTS_CONFIG",
     "CASDOOR_URL",
     "CENTER_URL",
     "BEADGRID_URL",
@@ -58,10 +60,12 @@ for (const id of ["beadgrid", "focustake"]) {
     id.toUpperCase() + "_SERVICE_KEY",
   ];
   const data = Object.fromEntries(keys.map((k) => [k, env[k]]));
+  data.PORT = String(id === "beadgrid" ? 5311 : 5312);
   data.DATABASE_URL = `postgresql://${id}_backend:${env[id.toUpperCase() + "_DB_PASSWORD"]}@127.0.0.1:5342/entitlements`;
   writeFileSync(
     ".local/" + id + ".env",
     Object.entries(data)
+      .filter(([, v]) => v !== undefined)
       .map(([k, v]) => `${k}=${v}`)
       .join("\n") + "\n",
     { mode: 0o600 },

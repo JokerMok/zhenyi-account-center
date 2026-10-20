@@ -261,6 +261,7 @@ export async function transition(
   product: string,
   reservationId: string,
   action: "confirm" | "cancel" | "refund" | "expire",
+  recovery?: { product: string; reason: string },
 ) {
   return tx(async (db) => {
     await lock(db, `quota:${uid}:${product}`);
@@ -331,8 +332,25 @@ export async function transition(
       target,
       target === "confirmed" ? 0 : r.amount,
       r.id,
-      { request_id: r.request_id },
+      {
+        request_id: r.request_id,
+        ...(recovery
+          ? { recovery: { product: recovery.product, reason: recovery.reason } }
+          : {}),
+      },
     );
+    if (recovery) {
+      assert(
+        recovery.product === product && ["cancel", "refund"].includes(action),
+        403,
+        "RECOVERY_FORBIDDEN",
+        "恢复只允许释放或返还本产品已有任务",
+      );
+      await db.query(
+        "INSERT INTO task_recovery_audit(product_id,reservation_id,uid,action,reason,before_status,after_status) VALUES($1,$2,$3,$4,$5,$6,$7)",
+        [product, r.id, uid, action, recovery.reason, r.status, target],
+      );
+    }
     return changed;
   });
 }

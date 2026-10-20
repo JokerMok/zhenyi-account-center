@@ -17,6 +17,7 @@ import {
   sessionAuth,
   csrf,
   serviceAuth,
+  productBackendAuth,
   type Authenticated,
 } from "./auth";
 import { casdoorApi, reconcile, upstreamLogout } from "./casdoor";
@@ -38,12 +39,17 @@ import {
   ident,
 } from "./entitlements";
 
-const serverId = (process.env.APP_ID || "center") as
-  | "center"
-  | "beadgrid"
-  | "focustake";
+import {
+  lookupSchema,
+  recoverySchema,
+  locateReservation,
+  reservationStatus,
+  recoverReservation,
+} from "./recovery";
+import { runDemoJob, recoverDemoJobs } from "./demo-runner";
+const serverId = process.env.APP_ID || "center";
 assert(
-  ["center", "beadgrid", "focustake"].includes(serverId),
+  serverId !== "admin" && appConfigs[serverId]?.enabled,
   500,
   "APP_CONFIG",
   "APP_ID 配置错误",
@@ -110,11 +116,13 @@ if (serverId === "center") {
   app.get(
     "/api/v1/products/:product/identity",
     serviceAuth,
+    productBackendAuth,
     (req: Authenticated, res) => res.json({ user: req.identity }),
   );
   app.post(
     "/api/v1/products/:product/logout-all",
     serviceAuth,
+    productBackendAuth,
     async (req: Authenticated, res) => {
       z.object({}).strict().parse(req.body);
       await pool.query("DELETE FROM sessions WHERE uid=$1", [req.identity.uid]);
@@ -125,12 +133,14 @@ if (serverId === "center") {
   app.get(
     "/api/v1/products/:product/entitlements",
     serviceAuth,
+    productBackendAuth,
     async (req: Authenticated, res) =>
       res.json(await overview(req.identity.uid, req.serviceProduct!)),
   );
   app.post(
     "/api/v1/products/:product/check",
     serviceAuth,
+    productBackendAuth,
     async (req: Authenticated, res) => {
       const b = z.object({ feature_id: z.string() }).strict().parse(req.body);
       res.json(
@@ -141,6 +151,7 @@ if (serverId === "center") {
   app.post(
     "/api/v1/products/:product/reservations",
     serviceAuth,
+    productBackendAuth,
     async (req: Authenticated, res) =>
       res.json(
         await reserve(
@@ -153,6 +164,7 @@ if (serverId === "center") {
   app.post(
     "/api/v1/products/:product/reservations/:id/:action",
     serviceAuth,
+    productBackendAuth,
     async (req: Authenticated, res) => {
       z.object({}).strict().parse(req.body);
       const id = ident.parse(req.params.id),
@@ -164,9 +176,40 @@ if (serverId === "center") {
       );
     },
   );
+  app.get(
+    "/api/v1/products/:product/recovery/reservations",
+    productBackendAuth,
+    async (req: Authenticated, res) => {
+      res.json(
+        reservationStatus(
+          await locateReservation(
+            req.serviceProduct!,
+            lookupSchema.parse(req.query),
+          ),
+        ),
+      );
+    },
+  );
+  app.post(
+    "/api/v1/products/:product/recovery",
+    productBackendAuth,
+    async (req: Authenticated, res) => {
+      res.json(
+        await recoverReservation(
+          req.serviceProduct!,
+          recoverySchema.parse(req.body),
+        ),
+      );
+    },
+  );
   app.use("/api/admin", sessionAuth("admin"), csrf("admin"));
   app.get("/api/admin/me", (req: Authenticated, res) =>
-    res.json({ user: req.identity, csrf: req.session.csrf, isAdmin: true }),
+    res.json({
+      user: req.identity,
+      csrf: req.session.csrf,
+      isAdmin: true,
+      profileUrl: "/auth/login?mode=admin&account=1",
+    }),
   );
   app.get("/api/admin/catalog", async (_req, res) => res.json(await catalog()));
   app.put("/api/admin/catalog/:type", async (req: Authenticated, res) =>
@@ -639,7 +682,7 @@ if (serverId === "center") {
     res.json({
       jobs: (
         await pool.query(
-          "SELECT request_id,mode,result,created_at FROM demo_jobs WHERE app_id=$1 AND uid=$2 ORDER BY created_at DESC LIMIT 50",
+          "SELECT request_id,mode,result,stage,created_at FROM demo_jobs WHERE app_id=$1 AND uid=$2 ORDER BY created_at DESC LIMIT 50",
           [serverId, req.identity.uid],
         )
       ).rows,
@@ -656,105 +699,28 @@ if (serverId === "center") {
       })
       .strict()
       .parse(req.body);
-    const output = await tx(async (db) => {
-      await lock(db, `demo:${serverId}:${req.identity.uid}:${b.request_id}`);
-      const old = (
-        await db.query(
-          "SELECT * FROM demo_jobs WHERE app_id=$1 AND uid=$2 AND request_id=$3",
-          [serverId, req.identity.uid, b.request_id],
-        )
-      ).rows[0];
-      if (old) {
-        assert(
-          old.mode === b.mode,
-          409,
-          "IDEMPOTENCY_CONFLICT",
-          "同一任务不能更换执行方式",
-        );
-        return { ...old.result, repeated: true };
-      }
-      const hold = await center(req, "/reservations", {
-        request_id: b.request_id,
-        feature_id: "export",
-        amount: 1,
-      });
-      assert(
-        ["reserved", "confirmed"].includes(hold.status),
-        409,
-        "TERMINAL_REQUEST",
-        "此任务已终止，请使用新的请求号",
-      );
-      let result: any;
-      if (b.mode === "fail_before") {
-        await center(req, `/reservations/${hold.id}/cancel`, {});
-        result = {
-          ok: false,
-          status: "cancelled",
-          message: "模拟生成失败，已取消预占，次数完整释放",
-          request_id: b.request_id,
-        };
-      } else {
-        const confirmed = await center(
-          req,
-          `/reservations/${hold.id}/confirm`,
-          {},
-        );
-        assert(
-          confirmed.status === "confirmed",
-          409,
-          "HOLD_EXPIRED",
-          "预占超时，任务未执行",
-        );
-        if (b.mode === "fail_after") {
-          await center(req, `/reservations/${hold.id}/refund`, {});
-          result = {
-            ok: false,
-            status: "refunded",
-            message: "模拟交付失败，已返还消费次数",
-            request_id: b.request_id,
-          };
-        } else {
-          result = {
-            ok: true,
-            status: "confirmed",
-            request_id: b.request_id,
-            message:
-              serverId === "beadgrid"
-                ? "图纸已在后端生成，消耗 1 次"
-                : "演示任务已在后端完成，消耗 1 次",
-            artifact:
-              serverId === "beadgrid"
-                ? {
-                    name: "beadgrid-pattern.svg",
-                    mime: "image/svg+xml",
-                    content:
-                      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f6f5f1"/><path d="M40 40h40v40H40zM80 80h40v40H80zM120 40h40v40h-40zM40 120h40v40H40zM120 120h40v40h-40z" fill="#236650"/></svg>',
-                  }
-                : {
-                    name: "focustake-demo.json",
-                    mime: "application/json",
-                    content: JSON.stringify(
-                      {
-                        kind: "server-generated-demo",
-                        duration_seconds: 10,
-                        created_at: new Date().toISOString(),
-                        request_id: b.request_id,
-                      },
-                      null,
-                      2,
-                    ),
-                  },
-          };
-        }
-      }
-      await db.query(
-        "INSERT INTO demo_jobs(app_id,uid,request_id,mode,result) VALUES($1,$2,$3,$4,$5)",
-        [serverId, req.identity.uid, b.request_id, b.mode, result],
-      );
-      return result;
-    });
-    res.json(output);
+    const output = await runDemoJob(
+      serverId,
+      req.identity.uid,
+      b,
+      req.session.access_token,
+    );
+
+    res.status(output.status === "pending_recovery" ? 202 : 200).json(output);
   });
+  let recovering = false;
+  const recoveryWorker = setInterval(async () => {
+    if (recovering) return;
+    recovering = true;
+    try {
+      await recoverDemoJobs(serverId);
+    } catch (e: any) {
+      console.error("示例任务待恢复", e.message);
+    } finally {
+      recovering = false;
+    }
+  }, 30000);
+  recoveryWorker.unref();
 }
 app.use("/api", (_req, res) =>
   res.status(404).json({ error: "接口不存在", code: "NOT_FOUND" }),
@@ -792,7 +758,7 @@ app.use((e: any, req: Request, res: Response, _next: NextFunction) => {
       );
   else res.status(status).json({ error: message, code });
 });
-const port = Number(new URL(appConfigs[serverId].url).port) || 80;
+const port = config.port;
 const server = app.listen(port, config.host, () =>
   console.log(`${appConfigs[serverId].name} ${appConfigs[serverId].url}`),
 );

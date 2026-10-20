@@ -1,0 +1,26 @@
+[
+  {
+    "id": "beadgrid",
+    "name": "拼豆工坊",
+    "url": "http://localhost:5311",
+    "urlEnv": "BEADGRID_URL",
+    "application": "zhenyi-beadgrid",
+    "clientIdEnv": "CASDOOR_BEADGRID_CLIENT_ID",
+    "clientSecretEnv": "CASDOOR_BEADGRID_CLIENT_SECRET",
+    "serviceKeyEnv": "BEADGRID_SERVICE_KEY",
+    "enabled": true,
+    "port": 5311
+  },
+  {
+    "id": "focustake",
+    "name": "专注录屏",
+    "url": "http://localhost:5312",
+    "urlEnv": "FOCUSTAKE_URL",
+    "application": "zhenyi-focustake",
+    "clientIdEnv": "CASDOOR_FOCUSTAKE_CLIENT_ID",
+    "clientSecretEnv": "CASDOOR_FOCUSTAKE_CLIENT_SECRET",
+    "serviceKeyEnv": "FOCUSTAKE_SERVICE_KEY",
+    "enabled": true,
+    "port": 5312
+  }
+]

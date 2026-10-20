@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { SignJWT, generateKeyPair, importPKCS8 } from "jose";
 import pg from "pg";
 import dotenv from "dotenv";
-import { login, request } from "./helpers";
+import { login, request, testAdministrator } from "./helpers";
 import { pool } from "../src/server/db";
 import { casdoorApi } from "../src/server/casdoor";
 import { config, appConfigs } from "../src/server/config";
@@ -76,10 +76,8 @@ before(async () => {
         isAdmin: false,
       },
     );
-  const credentials = JSON.parse(
-    await readFile(".local/credentials.json", "utf8"),
-  );
-  admin = await login("admin", "admin", credentials.administrator.password);
+  const credentials = await testAdministrator();
+  admin = await login("admin", credentials.username, credentials.password);
   center = await login("center", usernameA, passwordA);
   a = await login("beadgrid", usernameA, passwordA);
   b = await login("beadgrid", usernameB, passwordB);

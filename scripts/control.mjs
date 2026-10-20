@@ -30,9 +30,11 @@ function alive(name) {
     const comm = execFileSync("ps", ["-p", String(pid), "-o", "command="], {
       encoding: "utf8",
     });
-    return name === "casdoor"
-      ? comm.includes("./casdoor")
-      : comm.includes("src/server/main.ts");
+    return name === "setup"
+      ? comm.includes("scripts/admin-setup.ts")
+      : name === "casdoor"
+        ? comm.includes("./casdoor")
+        : comm.includes("src/server/main.ts");
   } catch {
     return false;
   }
@@ -114,8 +116,30 @@ async function downloadCasdoor() {
   run("tar", ["-xzf", archive, "-C", ".local/casdoor", "--exclude", "conf"]);
 }
 if (command === "start") {
-  if (!existsSync(".env")) {
-    run(process.execPath, ["--import", "tsx", "scripts/setup.ts"]);
+  run(process.execPath, ["--import", "tsx", "scripts/setup.ts"]);
+  if (existsSync(".local/admin-setup.json")) {
+    const setup = JSON.parse(readFileSync(".local/admin-setup.json"));
+    if (setup.status === "pending") {
+      if (
+        existsSync(".local/casdoor/initialized") ||
+        existsSync(".local/admin-subject.confirmed")
+      )
+        throw Error(
+          "管理员已初始化，拒绝重新开放设置。请使用 admin:reset-password 恢复。",
+        );
+      const child = spawn(
+        process.execPath,
+        ["--import", "tsx", "scripts/admin-setup.ts"],
+        { cwd: root, stdio: "inherit" },
+      );
+      child.unref();
+      while (!existsSync(".local/admin-bootstrap.json")) {
+        if (child.exitCode !== null)
+          throw Error("本机设置服务已退出，请重新运行 npm start");
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      run(process.execPath, ["--import", "tsx", "scripts/setup.ts"]);
+    }
   }
   Object.assign(process.env, dotenv.parse(readFileSync(".env")));
   await downloadCasdoor();
@@ -123,7 +147,10 @@ if (command === "start") {
   run(process.execPath, ["scripts/roles.mjs"]);
   run(process.execPath, ["--import", "tsx", "scripts/migrate.ts"]);
   launch("casdoor", "./casdoor", [], resolve(".local/casdoor"));
-  await ready(process.env.CASDOOR_URL + "/api/health", "casdoor");
+  await ready(
+    "http://127.0.0.1:" + (process.env.CASDOOR_PORT || 5300) + "/api/health",
+    "casdoor",
+  );
   if (!existsSync(".local/casdoor/initialized")) {
     // The initializer must never run again after successful first import: preserve admin edits across restarts.
     if (existsSync(".local/casdoor/init_data.json"))
@@ -147,14 +174,32 @@ if (command === "start") {
       { APP_ID: name },
     );
     await ready(
-      {
-        center: process.env.CENTER_URL,
-        beadgrid: process.env.BEADGRID_URL,
-        focustake: process.env.FOCUSTAKE_URL,
-      }[name] + "/api/health",
+      "http://127.0.0.1:" +
+        {
+          center: process.env.PORT || process.env.CENTER_PORT || 5310,
+          beadgrid: 5311,
+          focustake: 5312,
+        }[name] +
+        "/api/health",
       name,
     );
   }
+  if (existsSync(".local/admin-setup.json")) {
+    writeFileSync(
+      ".local/admin-setup.json",
+      JSON.stringify({ status: "complete" }),
+      { mode: 0o600 },
+    );
+    if (existsSync(".local/admin-bootstrap.json"))
+      unlinkSync(".local/admin-bootstrap.json");
+    const applied = ".local/casdoor/init_data.applied.json";
+    if (existsSync(applied)) {
+      const d = JSON.parse(readFileSync(applied));
+      for (const user of d.users || []) delete user.password;
+      writeFileSync(applied, JSON.stringify(d), { mode: 0o600 });
+    }
+  }
+
   console.log(
     "本地服务可访问：\n" +
       process.env.CENTER_URL +
@@ -164,7 +209,7 @@ if (command === "start") {
       process.env.FOCUSTAKE_URL +
       "\n" +
       process.env.CASDOOR_URL +
-      "\n管理员凭据：npm run credentials",
+      "\n管理员：使用首次设置的账号密码登录 /admin；忘记密码运行 npm run admin:reset-password",
   );
 } else if (command === "stop") {
   for (const name of ["beadgrid", "focustake", "center", "casdoor"]) {

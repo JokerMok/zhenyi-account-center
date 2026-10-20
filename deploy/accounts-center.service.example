@@ -10,6 +10,8 @@ Group=zhenyi
 WorkingDirectory=/opt/zhenyi-accounts
 EnvironmentFile=/opt/zhenyi-accounts/.env
 Environment=APP_ID=center
+Environment=HOST=127.0.0.1
+Environment=PORT=5310
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node --import tsx src/server/main.ts
 Restart=on-failure

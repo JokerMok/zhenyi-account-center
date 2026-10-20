@@ -6,7 +6,7 @@ import { pool } from "../src/server/db";
 import { casdoorApi, reconcile } from "../src/server/casdoor";
 import { overview } from "../src/server/entitlements";
 import { saveCatalog } from "../src/server/catalog";
-import { login } from "../tests/helpers";
+import { login, testAdministrator } from "../tests/helpers";
 
 assert(!config.production, "禁止在生产环境启用测试支付");
 for (const address of [config.CASDOOR_URL, config.CENTER_URL])
@@ -14,10 +14,8 @@ for (const address of [config.CASDOOR_URL, config.CENTER_URL])
     ["localhost", "127.0.0.1", "[::1]"].includes(new URL(address).hostname),
     "测试支付只允许本机回环地址",
   );
-const credentials = JSON.parse(
-  await readFile(".local/credentials.json", "utf8"),
-);
-const admin = await login("admin", "admin", credentials.administrator.password);
+const credentials = await testAdministrator();
+const admin = await login("admin", credentials.username, credentials.password);
 const suffix = randomBytes(4).toString("hex"),
   planName = "local-dummy-" + suffix,
   pricingName = "local-dummy-pricing-" + suffix,

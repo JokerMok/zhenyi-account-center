@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile, access, chmod } from "node:fs/promises";
 import { randomBytes, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import dotenv from "dotenv";
+import { readProductRegistry } from "../src/server/product-registry";
 const exists = async (p: string) =>
   access(p).then(
     () => true,
@@ -18,6 +19,8 @@ if (await exists(".env")) {
   env = {
     NODE_ENV: "development",
     HOST: "127.0.0.1",
+    CENTER_PORT: "5310",
+    PORT: "5310",
     CASDOOR_URL: "http://localhost:5300",
     CENTER_URL: "http://localhost:5310",
     BEADGRID_URL: "http://localhost:5311",
@@ -42,21 +45,29 @@ if (await exists(".env")) {
       .join("\n") + "\n",
     { mode: 0o600, flag: "wx" },
   );
-  const credentials = {
-    administrator: {
-      organization: "built-in",
-      username: "admin",
-      password: "Aa7!" + secret().slice(0, 24),
-    },
-    created_at: new Date().toISOString(),
-  };
   await writeFile(
-    ".local/credentials.json",
-    JSON.stringify(credentials, null, 2),
+    ".local/admin-setup.json",
+    JSON.stringify({ status: "pending", token: secret() }),
     { mode: 0o600, flag: "wx" },
   );
-  console.log("已随机生成私密凭据：.local/credentials.json（不纳入 Git）");
+  console.log("机器凭据已自动生成；首次启动将提供本机管理员设置页面。");
 }
+for (const product of readProductRegistry(
+  env.PRODUCTS_CONFIG || process.env.PRODUCTS_CONFIG,
+)) {
+  if (!product.enabled) continue;
+  env[product.clientIdEnv] ||= randomBytes(12).toString("hex");
+  env[product.clientSecretEnv] ||= secret();
+  env[product.serviceKeyEnv] ||= secret();
+}
+env.CENTER_PORT ||= "5310";
+await writeFile(
+  ".env",
+  Object.entries(env)
+    .map(([k, v]) => `${k}=${v}`)
+    .join("\n") + "\n",
+  { mode: 0o600 },
+);
 await mkdir(".local/casdoor/conf", { recursive: true });
 await mkdir(".local/casdoor/logs", { recursive: true });
 if (!(await exists(".local/casdoor/cert.pem"))) {
@@ -81,9 +92,14 @@ if (!(await exists(".local/casdoor/cert.pem"))) {
   );
   await chmod(".local/casdoor/key.pem", 0o600);
 }
-const credentials = JSON.parse(
-  await readFile(".local/credentials.json", "utf8"),
-);
+const chosen = await readFile(".local/admin-bootstrap.json", "utf8")
+  .then(JSON.parse)
+  .catch(() => null);
+const legacy = await readFile(".local/credentials.json", "utf8")
+  .then(JSON.parse)
+  .catch(() => null);
+const administrator = chosen ||
+  legacy?.administrator || { username: "admin", password: secret() };
 const baseConf = `appname = casdoor
 httpport = 5300
 httpaddr = 127.0.0.1
@@ -100,7 +116,7 @@ isDemoMode = false
 radiusServerPort = -1
 radiusSecret = ${secret()}
 radiusDefaultOrganization = disabled
-initAdminPassword = ${credentials.administrator.password}
+initAdminPassword = ${secret()}
 initDataFile = ./init_data.json
 initDataNewOnly = false
 defaultApplication = app-built-in
@@ -126,7 +142,8 @@ if (!(await exists(".local/casdoor/initialized"))) {
     name,
     displayName,
     createdTime: now,
-    passwordOptions: ["AtLeast8", "Aa123"],
+    passwordOptions: name === "built-in" ? ["AtLeast8"] : ["AtLeast8", "Aa123"],
+    hasPrivilegeConsent: name === "built-in",
     languages: ["zh", "en"],
     countryCodes: ["CN"],
     isProfilePublic: false,
@@ -230,10 +247,10 @@ if (!(await exists(".local/casdoor/initialized"))) {
   const admin = {
     ...template.users[0],
     owner: "built-in",
-    name: "admin",
+    name: administrator.username,
     id: env.ADMIN_SUB,
     displayName: "臻一管理员",
-    password: credentials.administrator.password,
+    password: administrator.password,
     isAdmin: true,
     createdTime: now,
     signupApplication: "app-built-in",

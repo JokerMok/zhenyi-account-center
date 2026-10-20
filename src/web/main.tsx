@@ -196,6 +196,7 @@ function App() {
         ["ledger", "权益流水", History],
         ["audit", "操作记录", ShieldCheck],
         ["subscriptions", "订阅与支付", CreditCard],
+        ["security", "账号与安全", ShieldCheck],
       ]
     : isDemo
       ? [
@@ -342,7 +343,7 @@ function App() {
             </Empty>
           ) : !me ? (
             <Welcome cfg={cfg} admin={admin} />
-          ) : admin ? (
+          ) : admin && tab !== "security" ? (
             <Admin {...context} tab={tab} />
           ) : cfg.id === "center" || tab === "security" ? (
             <Consumer {...context} tab={tab} />
@@ -423,7 +424,7 @@ function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
       </div>
       <div className="fineprint">
         短信、邮件、微信登录暂未配置。当前可使用用户名和密码。
-        {admin && " 初始化凭据保存在本机私密目录，请按 README 获取。"}
+        {admin && " 使用已设置的管理员账号密码；本机忘记密码可按 README 恢复。"}
       </div>
     </section>
   );
@@ -524,10 +525,17 @@ function Consumer(c: Context & { tab: string }) {
   const [code, setCode] = useState(""),
     [localVersion, setLocalVersion] = useState(0);
   const { data, error } = useData(
-    c.tab === "records" ? "/api/records" : "/api/entitlements",
+    c.me.isAdmin
+      ? "/api/admin/me"
+      : c.tab === "records"
+        ? "/api/records"
+        : "/api/entitlements",
     c.version + localVersion,
   );
-  const records = useData("/api/records", localVersion);
+  const records = useData(
+    c.me.isAdmin ? "/api/admin/me" : "/api/records",
+    localVersion,
+  );
   if (c.tab === "security")
     return (
       <>
@@ -550,10 +558,18 @@ function Consumer(c: Context & { tab: string }) {
           <div className="setting-line">
             <div>
               <h3>个人资料与密码</h3>
-              <p>重新验证身份后前往统一账号页面，修改资料、密码及安全设置。</p>
+              <p>
+                在新窗口重新验证身份，使用 Casdoor
+                原生页面修改密码。完成后关闭该窗口，返回此页；密码变更后请重新登录。
+              </p>
             </div>
-            <a className="button secondary" href={c.me.profileUrl}>
-              管理账号
+            <a
+              className="button secondary"
+              href={c.me.profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              打开账号安全
               <ArrowUpRight size={16} />
             </a>
           </div>
@@ -562,7 +578,14 @@ function Consumer(c: Context & { tab: string }) {
               <h3>切换账号</h3>
               <p>重新进行身份验证，当前页面不会保留上一账号的数据。</p>
             </div>
-            <a className="button secondary" href="/auth/login?switch=1">
+            <a
+              className="button secondary"
+              href={
+                c.me.isAdmin
+                  ? "/auth/login?mode=admin&switch=1"
+                  : "/auth/login?switch=1"
+              }
+            >
               切换账号
             </a>
           </div>
@@ -754,11 +777,43 @@ function Demo(c: Context & { tab: string }) {
   const { data, error } = useData("/api/entitlements", v);
   const records = useData("/api/records", v);
   const [request, setRequest] = useState<string>(() => crypto.randomUUID());
+  const [activeMode, setActiveMode] = useState("success");
+  const pending = result?.status === "pending_recovery";
+  useEffect(() => {
+    const jobs = records.data?.jobs || [],
+      waiting = jobs.find((j: Any) => j.stage !== "complete");
+    if (waiting) {
+      setRequest(waiting.request_id);
+      setActiveMode(waiting.mode);
+      setResult(waiting.result);
+    } else if (result?.status === "pending_recovery") {
+      const done = jobs.find((j: Any) => j.request_id === request);
+      if (done) setResult(done.result);
+    }
+  }, [records.data]);
+  useEffect(() => {
+    if (!pending) return;
+    const timer = setInterval(() => setV((n) => n + 1), 3000);
+    return () => clearInterval(timer);
+  }, [pending]);
+
   async function run(mode: string) {
+    setActiveMode(mode);
     await c.perform(async () => {
-      const r = await api("/api/demo", { mode, request_id: request });
-      setResult(r);
-      setV((v) => v + 1);
+      try {
+        const r = await api("/api/demo", { mode, request_id: request });
+        setResult(r);
+      } catch (e: any) {
+        if (!e.status || e.status >= 500)
+          setResult({
+            status: "pending_recovery",
+            request_id: request,
+            message: "响应结果未知，保留原任务核实；重试沿用此请求号",
+          });
+        throw e;
+      } finally {
+        setV((v) => v + 1);
+      }
     }, "任务结果已更新");
   }
   function download() {
@@ -816,6 +871,7 @@ function Demo(c: Context & { tab: string }) {
         >
           <input
             value={request}
+            disabled={pending || !records.data}
             onChange={(e) => setRequest(e.target.value)}
             minLength={8}
             maxLength={128}
@@ -824,19 +880,35 @@ function Demo(c: Context & { tab: string }) {
         <div className="button-row">
           <button
             className="primary"
-            disabled={c.busy}
+            disabled={
+              c.busy || !records.data || (pending && activeMode !== "success")
+            }
             onClick={() => run("success")}
           >
             执行演示功能
           </button>
-          <button disabled={c.busy} onClick={() => run("fail_before")}>
+          <button
+            disabled={
+              c.busy ||
+              !records.data ||
+              (pending && activeMode !== "fail_before")
+            }
+            onClick={() => run("fail_before")}
+          >
             模拟预占后失败
           </button>
-          <button disabled={c.busy} onClick={() => run("fail_after")}>
+          <button
+            disabled={
+              c.busy ||
+              !records.data ||
+              (pending && activeMode !== "fail_after")
+            }
+            onClick={() => run("fail_after")}
+          >
             模拟消费后返还
           </button>
           <button
-            disabled={c.busy}
+            disabled={c.busy || pending || !records.data}
             onClick={() => {
               setRequest(crypto.randomUUID());
               setResult(null);
@@ -884,7 +956,14 @@ function Demo(c: Context & { tab: string }) {
           <RecordTable rows={records.data?.jobs || []} />
         </DataState>
       </section>
-      <a href="/auth/login?switch=1" className="text-link">
+      <a
+        href={
+          c.me.isAdmin
+            ? "/auth/login?mode=admin&switch=1"
+            : "/auth/login?switch=1"
+        }
+        className="text-link"
+      >
         切换账号
       </a>
       <span className="muted"> · </span>
@@ -1808,6 +1887,7 @@ function Admin(c: Context & { tab: string }) {
                             <small className="truncate" title={r.callback_url}>
                               回调：{r.callback_url}
                             </small>
+                            <small>{r.integration_status}</small>
                             <div className="inline-links">
                               <a href={"/admin?tab=features&product=" + r.id}>
                                 功能
