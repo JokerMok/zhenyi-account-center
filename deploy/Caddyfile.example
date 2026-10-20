@@ -1,0 +1,13 @@
+# Template only: no DNS, certificate requests or server changes were performed in this task.
+# Replace the identity hostname and product hostnames with the approved deployment plan.
+accounts.shizibandu.icu {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:5310
+}
+identity.accounts.shizibandu.icu {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:5300
+}
+# Independent example product origins; do not expose these synthetic tests in production.
+# beadgrid-demo.example.com { reverse_proxy 127.0.0.1:5311 }
+# focustake-demo.example.com { reverse_proxy 127.0.0.1:5312 }

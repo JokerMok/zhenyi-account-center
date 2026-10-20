@@ -1,0 +1,24 @@
+{
+  "casdoor": {
+    "version": "v4.22.0",
+    "release": "https://github.com/casdoor/casdoor/releases/tag/v4.22.0",
+    "release_date": "2026-10-19",
+    "commit_short": "f11d6ac",
+    "source": "https://github.com/casdoor/casdoor/tree/v4.22.0",
+    "darwin_arm64": {
+      "url": "https://github.com/casdoor/casdoor/releases/download/v4.22.0/casdoor_Darwin_arm64.tar.gz",
+      "sha256": "2f867132329ab1ef82026fbcaa9ecefd8c6d28e68f7d44396acbd78c4270623a",
+      "local_verified": true
+    },
+    "linux_arm64": {"asset":"casdoor_Linux_arm64.tar.gz","sha256":"9039df7a25b9bfb867977dd1792551dd2c6f42baa051cc6753f902f3a33d0ffb"},
+    "linux_amd64": {"asset":"casdoor_Linux_x86_64.tar.gz","sha256":"c84c76f413ccd6008a84c3d05df08a276cbff9444da935eae301cfd61bf6dafe"},
+    "docker_tag": "casbin/casdoor:v4.22.0",
+    "docker_local_verified": false,
+    "reason": "Docker Hub/ghcr registry requests failed with EOF; mirrors returned 403/not found. Official checksum-verified native release used instead; no upstream patches."
+  },
+  "postgres": {
+    "image": "postgres:17-alpine@sha256:0b2882c46a2b8d8e148431b333394348cf4d7f15aec6df7f17d51dc641e56cfa",
+    "local_architecture": "arm64",
+    "local_verified": true
+  }
+}

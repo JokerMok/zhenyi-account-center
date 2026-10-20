@@ -1,0 +1,24 @@
+[Unit]
+Description=Zhenyi account and entitlement center
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zhenyi
+Group=zhenyi
+WorkingDirectory=/opt/zhenyi-accounts
+EnvironmentFile=/opt/zhenyi-accounts/.env
+Environment=APP_ID=center
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --import tsx src/server/main.ts
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/zhenyi-accounts/.local
+
+[Install]
+WantedBy=multi-user.target

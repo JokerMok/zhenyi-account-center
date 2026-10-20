@@ -1,0 +1,55 @@
+{
+  "name": "zhenyi-account-center",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup": "tsx scripts/setup.ts",
+    "start": "node scripts/control.mjs start",
+    "stop": "node scripts/control.mjs stop",
+    "status": "node scripts/control.mjs status",
+    "dev": "tsx watch src/server/main.ts",
+    "dev:beadgrid": "APP_ID=beadgrid tsx watch src/server/main.ts",
+    "dev:focustake": "APP_ID=focustake tsx watch src/server/main.ts",
+    "dev:web": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "migrate": "tsx scripts/migrate.ts",
+    "test": "tsx --test --test-concurrency=1 tests/*.test.ts",
+    "test:payment": "tsx scripts/test-payment.ts",
+    "release-holds": "tsx scripts/release.ts",
+    "reconcile": "tsx scripts/reconcile.ts",
+    "backup": "node scripts/backup.mjs",
+    "restore": "node scripts/backup.mjs restore",
+    "credentials": "node scripts/credentials.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.2",
+    "cookie-parser": "1.4.7",
+    "dotenv": "17.2.3",
+    "express": "5.1.0",
+    "express-rate-limit": "8.1.0",
+    "helmet": "8.1.0",
+    "jose": "6.1.0",
+    "lucide-react": "0.468.0",
+    "pg": "8.16.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "1.4.9",
+    "@types/express": "5.0.3",
+    "@types/node": "24.10.0",
+    "@types/pg": "8.15.6",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.0.4",
+    "prettier": "3.6.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vite": "7.1.12"
+  }
+}
