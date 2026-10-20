@@ -7,6 +7,8 @@
 需要 Node.js 22+、Docker Compose、OpenSSL。当前在 macOS ARM64 验证；首次启动需要下载官方 Casdoor 发布包。
 
 ```sh
+git clone https://github.com/JokerMok/zhenyi-account-center.git
+cd zhenyi-account-center
 npm ci
 npm start
 # 停止，保留数据库
