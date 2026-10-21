@@ -28,7 +28,7 @@ if (!confirmed) {
   await writeFile(".local/admin-subject.confirmed", admin.id, { mode: 0o600 });
 } else if (admin.id !== config.ADMIN_SUB)
   throw new Error("管理员 subject 与已确认配置不一致，请核查身份初始化");
-await applyAdminPasswordPolicy();
+if (!confirmed || chosen) await applyAdminPasswordPolicy();
 if (chosen) {
   const org = await casdoorApi("get-organization", { id: "admin/built-in" });
   await casdoorApi(
@@ -36,6 +36,39 @@ if (chosen) {
     { id: "admin/built-in" },
     { ...org, hasPrivilegeConsent: false },
   );
+}
+for (const name of ["built-in", "consumers"]) {
+  const org = await casdoorApi("get-organization", { id: "admin/" + name });
+  if (!org.logo)
+    await casdoorApi(
+      "update-organization",
+      { id: "admin/" + name },
+      {
+        ...org,
+        logo: config.CENTER_URL + "/brand.svg",
+        logoDark: config.CENTER_URL + "/brand.svg",
+      },
+    );
+}
+const workerConfig = {
+  owner: "built-in",
+  organization: "built-in",
+  name: "zhenyi-worker-bootstrap",
+  url: "http://127.0.0.1/disabled",
+  method: "POST",
+  contentType: "application/json",
+  events: [],
+  singleOrgOnly: true,
+  isEnabled: false,
+  createdTime: new Date().toISOString(),
+};
+if (
+  !(await casdoorApi("get-webhook", { id: "built-in/" + workerConfig.name }))
+) {
+  await casdoorApi("add-webhook", {}, workerConfig);
+  await writeFile(".local/restart-native-worker", "首次初始化Webhook投递任务", {
+    mode: 0o600,
+  });
 }
 const template = await casdoorApi("get-application", {
   id: "admin/zhenyi-center",

@@ -1905,3 +1905,4 @@ progress::-webkit-progress-value {
     transition: none !important;
   }
 }
+.native-navigation{border-top:1px solid var(--border,#e2e7e3);padding:14px 8px;font-size:13px}.native-navigation>p{font-weight:600;color:#50685d}.native-navigation summary{cursor:pointer;padding:10px 4px}.native-navigation a{display:block;padding:9px 12px;border-radius:6px}.native-navigation a:hover{background:#edf3ef}.ops-shell .sidebar{overflow-y:auto}.quota-sources{margin:8px 0;font-size:12px;color:#53665c}.quota-sources summary{cursor:pointer;font-weight:500}.quota-sources p{margin:6px 0;overflow-wrap:anywhere}.setting-line>div{min-width:0}.setting-line small{display:block;overflow-wrap:anywhere}.setting-line p{overflow-wrap:anywhere}@media(max-width:760px){.native-navigation{display:block}.native-navigation>details{border-bottom:1px solid #e1e7e3}.native-navigation a{min-height:44px}.setting-line{flex-wrap:wrap;gap:12px}.quota-sources{font-size:13px}}

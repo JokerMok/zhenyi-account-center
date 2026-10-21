@@ -7,13 +7,16 @@ export async function casdoorApi(
   path: string,
   params: Record<string, string> = {},
   body?: unknown,
+  accessToken?: string,
 ) {
   const url = new URL(`/api/${path}`, config.CASDOOR_URL);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   const response = await fetch(url, {
     method: body === undefined ? "GET" : "POST",
     headers: {
-      Authorization: `Basic ${Buffer.from(appConfigs.admin.clientId + ":" + appConfigs.admin.secret).toString("base64")}`,
+      Authorization: accessToken
+        ? `Bearer ${accessToken}`
+        : `Basic ${Buffer.from(appConfigs.admin.clientId + ":" + appConfigs.admin.secret).toString("base64")}`,
       "Content-Type": "application/json",
     },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -204,7 +207,7 @@ export async function upstreamLogout(accessToken: string) {
     "统一身份退出失败，请重试",
   );
 }
-export async function reconcile(actor?: string) {
+async function reconcileCore(actor?: string) {
   // Only server-to-server reads are trusted. No browser return page or unverified webhook grants rights.
   const [subscriptions, payments] = await Promise.all([
     casdoorApi("get-subscriptions", { owner: "consumers" }),
@@ -333,4 +336,44 @@ export async function reconcile(actor?: string) {
       );
   });
   return result;
+}
+
+export async function reconcile(actor?: string) {
+  // A failed upstream read never runs the projection transaction or removes existing rights.
+  await pool.query(
+    "UPDATE sync_attempts SET status='failed',finished_at=now(),result='{\"error\":\"上次同步进程中断\"}'::jsonb WHERE status='processing' AND started_at<now()-interval '10 minutes'",
+  );
+  let attempt: any;
+  try {
+    attempt = (
+      await pool.query(
+        "INSERT INTO sync_attempts(actor_uid,status) VALUES($1,'processing') RETURNING id",
+        [actor || null],
+      )
+    ).rows[0];
+  } catch (e: any) {
+    if (e.code === "23505")
+      throw new Fault(409, "SYNC_BUSY", "订阅权益正在同步，请稍后查看结果");
+    throw e;
+  }
+  try {
+    const result = await reconcileCore(actor);
+    await pool.query(
+      "UPDATE sync_attempts SET status=$2,result=$3,finished_at=now() WHERE id=$1",
+      [attempt.id, result.errors.length ? "partial" : "success", result],
+    );
+    return result;
+  } catch (e: any) {
+    await pool.query(
+      "UPDATE sync_attempts SET status='failed',result=$2,finished_at=now() WHERE id=$1",
+      [
+        attempt.id,
+        {
+          error: e.code || "UPSTREAM_UNAVAILABLE",
+          message: "同步失败，原有权益已保留。请检查身份服务连接和套餐映射。",
+        },
+      ],
+    );
+    throw e;
+  }
 }

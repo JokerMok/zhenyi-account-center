@@ -47,6 +47,13 @@ import {
   recoverReservation,
 } from "./recovery";
 import { runDemoJob, recoverDemoJobs } from "./demo-runner";
+import {
+  managementState,
+  serviceReadiness,
+  checkProduct,
+  taskTrace,
+  setTestFlag,
+} from "./management";
 const serverId = process.env.APP_ID || "center";
 assert(
   serverId !== "admin" && appConfigs[serverId]?.enabled,
@@ -92,7 +99,9 @@ app.get("/api/health", async (_req, res) => {
   await pool.query("SELECT 1");
   res.json({ ok: true, app: serverId });
 });
-app.get("/api/config", (_req, res) =>
+app.get("/api/config", async (_req, res) => {
+  const state =
+    serverId === "center" ? await serviceReadiness().catch(() => null) : null;
   res.json({
     id: serverId,
     name: appConfigs[serverId].name,
@@ -102,14 +111,18 @@ app.get("/api/config", (_req, res) =>
     focustake: config.FOCUSTAKE_URL,
     login: "/auth/login",
     signup: `${config.CASDOOR_URL}/signup/${appConfigs[serverId].application}`,
-    services: {
-      sms: "未配置",
-      email: "未配置",
-      wechat: "未配置",
-      payments: "未配置真实商户；未启用收费",
-    },
-  }),
-);
+    services: state
+      ? Object.fromEntries(
+          Object.entries(state).map(([k, v]: any) => [k, v.status]),
+        )
+      : {
+          sms: "配置状态暂不可用",
+          email: "配置状态暂不可用",
+          wechat: "配置状态暂不可用",
+          payments: "配置状态暂不可用",
+        },
+  });
+});
 installAuth(app, serverId);
 
 if (serverId === "center") {
@@ -211,6 +224,32 @@ if (serverId === "center") {
       profileUrl: "/auth/login?mode=admin&account=1",
     }),
   );
+  app.get("/api/admin/management", async (req: Authenticated, res) =>
+    res.json(await managementState(req.session.access_token)),
+  );
+  app.post("/api/admin/products/:id/check", async (req: Authenticated, res) =>
+    res.json(await checkProduct(String(req.params.id), req.identity.uid)),
+  );
+  app.get("/api/admin/tasks", async (req, res) =>
+    res.json(await taskTrace(String(req.query.q || ""))),
+  );
+  app.post(
+    "/api/admin/users/:uid/test-flag",
+    async (req: Authenticated, res) => {
+      const b = z
+        .object({ is_test: z.boolean(), reason: reasonSchema })
+        .strict()
+        .parse(req.body);
+      res.json(
+        await setTestFlag(
+          ident.parse(req.params.uid),
+          b.is_test,
+          b.reason,
+          req.identity.uid,
+        ),
+      );
+    },
+  );
   app.get("/api/admin/catalog", async (_req, res) => res.json(await catalog()));
   app.put("/api/admin/catalog/:type", async (req: Authenticated, res) =>
     res.json(
@@ -271,7 +310,7 @@ if (serverId === "center") {
         ) m GROUP BY uid,product_id
       ), source AS (
         SELECT i.*, i.subject = ANY($4::text[]) AS casdoor_blocked,
-          i.username ~ '^(test_|dummy_test_|probe_|qa_)' AS is_test,
+          i.username ~ '^(test_|dummy_test_|probe_|qa_)' AS legacy_test_hint,
           COALESCE((SELECT jsonb_agg(jsonb_build_object('product_id',p.id,'product_name',p.name,'status',p.status,
             'expires_at',m.expires_at,'active',COALESCE(m.expires_at>now(),false),
             'quotas',COALESCE((SELECT jsonb_agg(jsonb_build_object('name',f.name,'remaining',b.remaining))
@@ -318,16 +357,21 @@ if (serverId === "center") {
   });
   app.get("/api/admin/users/:uid/entitlements", async (req, res) => {
     const uid = ident.parse(req.params.uid);
-    const p = (
-      await pool.query("SELECT id FROM products WHERE status='active'")
-    ).rows;
-    res.json(await Promise.all(p.map((p) => overview(uid, p.id))));
+    const p = (await pool.query("SELECT id FROM products")).rows;
+    res.json(
+      await Promise.all(p.map((p) => overview(uid, p.id, { readOnly: true }))),
+    );
   });
-  app.post("/api/admin/grants", async (req: Authenticated, res) =>
+  app.post("/api/admin/grants", async (req: Authenticated, res) => {
+    const body = grantSchema.parse(req.body);
+    const result = await grant(req.identity.uid, body);
     res.json({
-      result: await grant(req.identity.uid, grantSchema.parse(req.body)),
-    }),
-  );
+      result,
+      entitlement: await overview(body.uid, body.product_id, {
+        readOnly: true,
+      }),
+    });
+  });
   app.post("/api/admin/users/:uid/status", async (req: Authenticated, res) => {
     const uid = ident.parse(req.params.uid);
     const b = z
@@ -501,10 +545,8 @@ if (serverId === "center") {
         }
       if (type === "ledger" && req.query.reconcile === "hide")
         clauses.push("r.action<>'subscription_reconcile'");
-      if (req.query.data_kind === "test")
-        clauses.push("i.username ~ '^(test_|dummy_test_|probe_|qa_)'");
-      if (req.query.data_kind === "business")
-        clauses.push("i.username !~ '^(test_|dummy_test_|probe_|qa_)'");
+      if (req.query.data_kind === "test") clauses.push("i.is_test");
+      if (req.query.data_kind === "business") clauses.push("NOT i.is_test");
       const join = ` FROM ${type} r LEFT JOIN identities i ON i.uid=r.${type === "audit" ? "actor_uid" : "uid"} ${type === "audit" ? "LEFT JOIN identities subject_identity ON subject_identity.uid::text=split_part(r.target,'/',1) LEFT JOIN redemption_codes rc ON rc.id::text=r.target" : "LEFT JOIN products p ON p.id=r.product_id LEFT JOIN features f ON f.product_id=r.product_id AND f.id=r.feature_id LEFT JOIN reservations rs ON rs.id::text=r.reference"} ${clauses.length ? "WHERE " + clauses.join(" AND ") : ""}`;
       const total = Number(
         (await pool.query("SELECT count(*)" + join, values)).rows[0].count,
@@ -551,9 +593,26 @@ if (serverId === "center") {
     )
       .then((s) => JSON.parse(s))
       .catch(() => null);
+    const testAccounts = (
+      await pool.query(
+        "SELECT organization,username FROM identities WHERE is_test",
+      )
+    ).rows;
+    const testNames = new Set(
+      testAccounts.flatMap((r) => [
+        r.organization + "/" + r.username,
+        r.username,
+      ]),
+    );
     res.json({
-      subscriptions,
-      payments,
+      subscriptions: subscriptions.map((s: any) => ({
+        ...s,
+        is_test: testNames.has(s.user),
+      })),
+      payments: payments.map((p: any) => ({
+        ...p,
+        is_test: testNames.has(p.user),
+      })),
       plans,
       testPayment,
       paymentProviders: [...providers, ...consumerProviders]
@@ -571,6 +630,18 @@ if (serverId === "center") {
           )
         ).rows[0] || null,
       chargingEnabled: false,
+      lastAttempt:
+        (
+          await pool.query(
+            "SELECT * FROM sync_attempts ORDER BY id DESC LIMIT 1",
+          )
+        ).rows[0] || null,
+      lastSuccess:
+        (
+          await pool.query(
+            "SELECT * FROM sync_attempts WHERE status='success' ORDER BY id DESC LIMIT 1",
+          )
+        ).rows[0] || null,
     });
   });
   app.post("/api/admin/reconcile", async (req: Authenticated, res) =>
@@ -580,6 +651,69 @@ if (serverId === "center") {
     if (req.query.uid || req.query.user_id)
       throw new Fault(403, "CROSS_USER", "不能指定其他用户的身份");
     next();
+  });
+  app.post(
+    "/api/subscriptions/refresh",
+    rateLimit({
+      windowMs: 60000,
+      limit: 5,
+      standardHeaders: "draft-8",
+      legacyHeaders: false,
+    }),
+    async (req: Authenticated, res) => {
+      z.object({}).strict().parse(req.body);
+      await reconcile(req.identity.uid);
+      res.json({ ok: true });
+    },
+  );
+  app.get("/api/offers", async (req: Authenticated, res) => {
+    const [pricings, plans, providers] = await Promise.all([
+      casdoorApi("get-pricings", { owner: "consumers" }),
+      casdoorApi("get-plans", { owner: "consumers" }),
+      casdoorApi("get-providers", { owner: "consumers" }),
+    ]);
+    const local =
+      !config.production &&
+      ["localhost", "127.0.0.1"].includes(new URL(config.CASDOOR_URL).hostname);
+    res.json(
+      pricings
+        .filter((p: any) => p.isEnabled)
+        .flatMap((pricing: any) =>
+          (pricing.plans || []).flatMap((name: string) => {
+            const p = plans.find((x: any) => x.name === name && x.isEnabled);
+            if (!p) return [];
+            const ps = (p.paymentProviders || [])
+              .map((n: string) =>
+                providers.find(
+                  (x: any) => x.name === n || x.owner + "/" + x.name === n,
+                ),
+              )
+              .filter(Boolean);
+            const dummy =
+              ps.length > 0 && ps.every((x: any) => x.type === "Dummy");
+            return [
+              {
+                name: p.displayName || p.name,
+                pricing: pricing.displayName || pricing.name,
+                price: p.price,
+                currency: p.currency,
+                local_test: dummy,
+                available: dummy && local && req.identity.is_test === true,
+                url:
+                  dummy && local && req.identity.is_test === true
+                    ? config.CASDOOR_URL +
+                      "/select-plan/consumers/" +
+                      encodeURIComponent(pricing.name)
+                    : null,
+                status:
+                  dummy && local
+                    ? "本机模拟支付，不产生真实资金"
+                    : "真实收费尚未启用",
+              },
+            ];
+          }),
+        ),
+    );
   });
   app.get("/api/me", (req: Authenticated, res) =>
     res.json({
@@ -754,7 +888,7 @@ app.use((e: any, req: Request, res: Response, _next: NextFunction) => {
       .status(status)
       .type("html")
       .send(
-        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="/auth/login">重新登录</a></body></html>`,
+        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="/auth/login?switch=1">重新登录 / 切换账号</a></body></html>`,
       );
   else res.status(status).json({ error: message, code });
 });

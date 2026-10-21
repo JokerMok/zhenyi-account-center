@@ -12,7 +12,7 @@
 
 优先使用官方 `casbin/casdoor:v4.22.0`，拉取后确认目标架构和 RepoDigest，将摘要写入部署配置。本机由于 registry EOF 未完成镜像验收，`docker-casdoor` profile 仅为模板：需生成 `.local/casdoor-docker/app.conf`（容器内监听 8000、数据库主机 postgres / 5432）和初始化文件。首次导入后应移除初始化挂载，以保留后续管理修改。不要直接启用无初始化凭据的默认配置。
 
-若镜像渠道仍不可用，可使用已锁定的官方 Linux 发布包，流程与本机原生运行一致。根据主机选择 `casdoor_Linux_arm64.tar.gz` 或 `casdoor_Linux_x86_64.tar.gz`，从固定 release 下载并按 `upstream-lock.json` 核对哈希，再解压二进制和 `web/build`。本轮未执行 Linux 发布包或 systemd 启动验证。
+若镜像渠道仍不可用，可使用已锁定的官方 Linux 发布包，流程与本机原生运行一致。根据主机选择 `casdoor_Linux_arm64.tar.gz` 或 `casdoor_Linux_x86_64.tar.gz`，从固定 release 下载并按 `upstream-lock.json` 核对哈希，再解压二进制和 `web/build`。本轮在隔离容器验证了校验后的Linux ARM64原生包及LDAP／LDAPS／RADIUS；真实Linux主机、x86_64包和systemd启动仍未验收。完整前端还需按`npm run native:build`生成；不把本机容器测试当作生产验收。
 
 `deploy/casdoor.service.example` 为原生运行的 systemd 模板；`deploy/accounts-center.service.example` 为业务服务模板。真实产品后端单独管理，不部署本地测试示例或测试账号。
 

@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { pool, tx, lock, assert, type DB } from "./db";
-import { config } from "./config";
+import { config, productApps } from "./config";
 
 export const ident = z.uuid();
 export const reasonSchema = z.string().trim().min(2).max(500);
@@ -137,17 +137,32 @@ async function featureContext(
   await ensureFree(db, uid, product, f);
   return f;
 }
-export async function overview(uid: string, product: string) {
+export async function overview(
+  uid: string,
+  product: string,
+  options: { readOnly?: boolean } = {},
+) {
   return tx(async (db) => {
-    const { p } = await activeContext(db, uid, product);
+    const { p } = options.readOnly
+      ? {
+          p: (await db.query("SELECT * FROM products WHERE id=$1", [product]))
+            .rows[0],
+        }
+      : await activeContext(db, uid, product);
+    assert(p, 404, "PRODUCT_NOT_FOUND", "产品不存在");
+    const identity = (
+      await db.query("SELECT blocked FROM identities WHERE uid=$1", [uid])
+    ).rows[0];
+    assert(identity, 404, "USER_NOT_FOUND", "用户不存在");
     await lock(db, `quota:${uid}:${product}`);
     const fs = (
       await db.query(
-        "SELECT * FROM features WHERE product_id=$1 AND active ORDER BY id",
+        `SELECT * FROM features WHERE product_id=$1 ${options.readOnly ? "" : "AND active"} ORDER BY id`,
         [product],
       )
     ).rows;
-    for (const f of fs) if (f.active) await ensureFree(db, uid, product, f);
+    for (const f of fs)
+      if (f.active && !options.readOnly) await ensureFree(db, uid, product, f);
     const until = await memberUntil(db, uid, product);
     const member = !!until && new Date(until) > new Date();
     const qs = (
@@ -157,13 +172,42 @@ export async function overview(uid: string, product: string) {
         [uid, product],
       )
     ).rows;
+    const buckets = (
+      await db.query(
+        "SELECT id,feature_id,source,remaining,held,expires_at,created_at FROM quota_buckets WHERE uid=$1 AND product_id=$2 ORDER BY created_at,id",
+        [uid, product],
+      )
+    ).rows;
     return {
-      product: p,
+      read_only: !!options.readOnly,
+      product: {
+        ...p,
+        integration_ready: productApps.some(
+          (a) =>
+            a.id === p.id &&
+            a.enabled &&
+            a.application === p.application &&
+            a.url === p.origin &&
+            a.url + "/auth/callback/" + a.id === p.callback_url,
+        ),
+      },
       membership: { active: member, expires_at: until },
       features: fs.map((f) => ({
         ...f,
         ...(qs.find((q) => q.feature_id === f.id) || { remaining: 0, held: 0 }),
-        allowed: f.active && (!f.member_only || member),
+        buckets: buckets
+          .filter((b) => b.feature_id === f.id)
+          .map((b) => ({
+            ...b,
+            expired: !!b.expires_at && new Date(b.expires_at) <= new Date(),
+          })),
+        next_free_reset_at:
+          f.period === "once" ? null : periodInfo(f.period).expires,
+        allowed:
+          !identity.blocked &&
+          p.status === "active" &&
+          f.active &&
+          (!f.member_only || member),
       })),
     };
   });

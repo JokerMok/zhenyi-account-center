@@ -30,6 +30,13 @@ import {
   Copy,
 } from "lucide-react";
 import "./style.css";
+import {
+  NativeNavigation,
+  CompleteManagement,
+  TaskTrace,
+  QuotaSources,
+  Offers,
+} from "./management";
 
 type Any = Record<string, any>;
 let csrf = "";
@@ -142,6 +149,12 @@ function App() {
     ])
       .then(([c, u]) => {
         if (current) {
+          const previous = sessionStorage.getItem("zy-last-identity");
+          const currentId = u?.user?.uid;
+          if (currentId && previous && previous !== currentId)
+            for (const k of Object.keys(sessionStorage))
+              if (k.startsWith("zy-ops:")) sessionStorage.removeItem(k);
+          if (currentId) sessionStorage.setItem("zy-last-identity", currentId);
           setCfg(c);
           setMe(u);
           csrf = u?.csrf || "";
@@ -188,6 +201,8 @@ function App() {
   const isDemo = cfg?.id && cfg.id !== "center";
   const nav = admin
     ? [
+        ["console", "完整管理", Blocks],
+        ["tasks", "消费与任务恢复", History],
         ["users", "用户与权益", UserRound],
         ["products", "产品管理", Blocks],
         ["features", "功能配置", Settings2],
@@ -216,10 +231,17 @@ function App() {
       admin && nav.some((x) => x[0] === requested)
         ? requested!
         : admin
-          ? "users"
-          : "overview",
+          ? "console"
+          : requested && nav.some((x) => x[0] === requested)
+            ? requested
+            : "overview",
     );
   }, [admin]);
+  useEffect(() => {
+    const back = () => location.reload();
+    window.addEventListener("popstate", back);
+    return () => window.removeEventListener("popstate", back);
+  }, []);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [tab]);
@@ -267,8 +289,12 @@ function App() {
                 aria-current={tab === id ? "page" : undefined}
                 className={tab === id ? "selected" : ""}
                 onClick={() => {
+                  if (admin) {
+                    location.assign("/admin?tab=" + id);
+                    return;
+                  }
+                  history.pushState(null, "", "?tab=" + id);
                   setTab(id as string);
-                  if (admin) history.replaceState(null, "", "/admin?tab=" + id);
                   setError("");
                   setNotice("");
                 }}
@@ -280,6 +306,7 @@ function App() {
             );
           })}
         </nav>
+        {admin && cfg && me && <NativeNavigation url={cfg.casdoor} />}
         <div className="sidebar-bottom">
           <a href={admin ? "/" : (cfg?.center || "") + "/admin"}>
             <ShieldCheck size={17} />
@@ -380,7 +407,7 @@ function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
       </div>
       <h1>
         {admin
-          ? "管理每一份权益"
+          ? "登录运营后台"
           : cfg.id === "center"
             ? "欢迎来到臻一"
             : `欢迎来到${cfg.name}`}
@@ -423,13 +450,14 @@ function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
         )}
       </div>
       <div className="fineprint">
-        短信、邮件、微信登录暂未配置。当前可使用用户名和密码。
+        可用登录方式以统一登录页为准。第三方服务的配置状态可在账号与安全中查看。
         {admin && " 使用已设置的管理员账号密码；本机忘记密码可按 README 恢复。"}
       </div>
     </section>
   );
 }
 function useData(path: string, version = 0) {
+  const [retryVersion, retry] = useState(0);
   const [data, setData] = useState<any>(null),
     [error, setError] = useState("");
   useEffect(() => {
@@ -446,21 +474,32 @@ function useData(path: string, version = 0) {
     return () => {
       alive = false;
     };
-  }, [path, version]);
-  return { data, error };
+  }, [path, version, retryVersion]);
+  return { data, error, onRetry: () => retry((v) => v + 1) };
 }
 function DataState({
   data,
   error,
   children,
+  onRetry,
 }: {
+  onRetry?: () => void;
   data: any;
   error: string;
   children: React.ReactNode;
 }) {
   return error ? (
     <div role="alert" className="message error">
-      {error}
+      {error}{" "}
+      <button onClick={onRetry || (() => location.reload())}>重试</button>{" "}
+      <a
+        href={
+          "/auth/login" +
+          (location.pathname.startsWith("/admin") ? "?mode=admin" : "")
+        }
+      >
+        重新登录
+      </a>
     </div>
   ) : data === null ? (
     <div className="loading" role="status">
@@ -482,7 +521,11 @@ function EntitlementList({ items }: { items: Any[] }) {
             <div className="product-heading">
               <h2>{e.product.name}</h2>
               <Tag tone={e.membership.active ? "green" : "neutral"}>
-                {e.membership.active ? "会员生效中" : "免费账号"}
+                {e.membership.active
+                  ? "会员生效中"
+                  : e.membership.expires_at
+                    ? "会员已到期"
+                    : "未开通会员"}
               </Tag>
             </div>
             <p>
@@ -501,6 +544,10 @@ function EntitlementList({ items }: { items: Any[] }) {
                         ? "可使用"
                         : "需有效会员"}
                   </strong>
+                  {f.kind === "quota" && !f.allowed && (
+                    <small>当前不可使用，请查看会员与产品状态。</small>
+                  )}
+                  {f.kind === "quota" && <QuotaSources feature={f} />}
                   {f.kind === "quota" && (
                     <small>
                       {f.held > 0 ? `${f.held} 次预占中 · ` : ""}
@@ -511,10 +558,14 @@ function EntitlementList({ items }: { items: Any[] }) {
               ))}
             </div>
           </div>
-          <a className="button secondary" href={e.product.origin}>
-            打开产品
-            <ArrowUpRight size={15} />
-          </a>
+          {e.product.integration_ready ? (
+            <a className="button secondary" href={e.product.origin}>
+              打开产品
+              <ArrowUpRight size={15} />
+            </a>
+          ) : (
+            <span className="muted">产品接入配置待完成</span>
+          )}
         </article>
       ))}
       {!items.length && <Empty>尚无可用产品</Empty>}
@@ -536,6 +587,20 @@ function Consumer(c: Context & { tab: string }) {
     c.me.isAdmin ? "/api/admin/me" : "/api/records",
     localVersion,
   );
+  useEffect(() => {
+    if (
+      new URLSearchParams(location.search).get("purchase") !== "return" ||
+      c.me.isAdmin
+    )
+      return;
+    const u = new URL(location.href);
+    u.searchParams.delete("purchase");
+    history.replaceState(null, "", u);
+    c.perform(async () => {
+      await api("/api/subscriptions/refresh", {});
+      setLocalVersion((v) => v + 1);
+    }, "已从身份服务核实订阅并同步权益");
+  }, []);
   if (c.tab === "security")
     return (
       <>
@@ -548,7 +613,7 @@ function Consumer(c: Context & { tab: string }) {
           <dl className="details">
             <dt>用户名</dt>
             <dd>{c.me.user.username}</dd>
-            <dt>统一 UID</dt>
+            <dt>账号 ID</dt>
             <dd className="uid">{c.me.user.uid}</dd>
             <dt>账号状态</dt>
             <dd>
@@ -569,7 +634,7 @@ function Consumer(c: Context & { tab: string }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              打开账号安全
+              修改密码与个人资料（新窗口）
               <ArrowUpRight size={16} />
             </a>
           </div>
@@ -592,7 +657,9 @@ function Consumer(c: Context & { tab: string }) {
           <div className="setting-line">
             <div>
               <h3>退出全部产品</h3>
-              <p>终止账号中心、两个示例产品与统一身份服务的全部会话。</p>
+              <p>
+                退出账号中心、已适配的示例产品及统一身份服务。其他产品的独立会话按其接入实现撤销。
+              </p>
             </div>
             <button
               className="danger"
@@ -631,7 +698,7 @@ function Consumer(c: Context & { tab: string }) {
     return (
       <>
         <PageTitle
-          title="兑换一份新可能"
+          title="兑换会员或次数"
           description="兑换码用于领取产品会员或次数，不可用于登录。每个账号对同一码仅可领取一次。"
         />
         <section className="panel redeem-panel">
@@ -698,6 +765,7 @@ function Consumer(c: Context & { tab: string }) {
       </div>
       <DataState data={data} error={error}>
         <EntitlementList items={data || []} />
+        <Offers request={api} />
       </DataState>
       <div className="account-note">
         <ShieldCheck size={24} />
@@ -1107,7 +1175,7 @@ function CopyUid({ value }: { value: string }) {
     <button
       className="copy-uid"
       title={value}
-      aria-label="复制完整统一 UID"
+      aria-label="复制完整账号 ID"
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -1202,16 +1270,26 @@ function ReadableValue({ value }: { value: any }): React.ReactNode {
   );
 }
 function OpsRecords(c: Context & { tab: string; cat: Any }) {
-  const [filters, setFilters] = useState({
-      q: "",
-      product: "",
-      action: "",
-      from: "",
-      to: "",
-      data_kind: "all",
-      reconcile: "hide",
-    }),
-    [page, setPage] = useState(1),
+  const recordsKey = "zy-ops:" + c.me.user.uid + ":" + c.tab;
+  const saved = (() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(recordsKey) || "null");
+    } catch {
+      return null;
+    }
+  })();
+  const [filters, setFilters] = useState(
+      saved?.filters || {
+        q: "",
+        product: "",
+        action: "",
+        from: "",
+        to: "",
+        data_kind: "all",
+        reconcile: "hide",
+      },
+    ),
+    [page, setPage] = useState(saved?.page || 1),
     [selected, setSelected] = useState<Any | null>(null);
   const searchText = useDebounced(filters.q);
   const records = useData(
@@ -1227,9 +1305,12 @@ function OpsRecords(c: Context & { tab: string; cat: Any }) {
     c.version,
   );
   const change = (key: string, value: string) => {
-    setFilters((f) => ({ ...f, [key]: value }));
+    setFilters((f: Any) => ({ ...f, [key]: value }));
     setPage(1);
   };
+  useEffect(() => {
+    sessionStorage.setItem(recordsKey, JSON.stringify({ filters, page }));
+  }, [filters, page, recordsKey]);
   const auditMode = c.tab === "audit";
   const choices = auditMode
     ? [
@@ -1296,7 +1377,7 @@ function OpsRecords(c: Context & { tab: string; cat: Any }) {
             onChange={(e) => {
               change("action", e.target.value);
               if (e.target.value === "subscription_reconcile")
-                setFilters((f) => ({ ...f, reconcile: "show" }));
+                setFilters((f: Any) => ({ ...f, reconcile: "show" }));
             }}
           >
             <option value="">全部类型</option>
@@ -1329,10 +1410,10 @@ function OpsRecords(c: Context & { tab: string; cat: Any }) {
           >
             <option value="all">{auditMode ? "全部操作者" : "全部账号"}</option>
             <option value="business">
-              {auditMode ? "非测试命名操作者" : "非测试命名账号"}
+              {auditMode ? "非测试命名操作者" : "非测试账号"}
             </option>
             <option value="test">
-              {auditMode ? "测试命名操作者" : "测试命名账号"}
+              {auditMode ? "测试命名操作者" : "已标记测试账号"}
             </option>
           </select>
         </Field>
@@ -1514,18 +1595,34 @@ function OpsRecords(c: Context & { tab: string; cat: Any }) {
   );
 }
 function Admin(c: Context & { tab: string }) {
+  if (c.tab === "console")
+    return <CompleteManagement request={api} casdoor={c.cfg.casdoor} />;
+  if (c.tab === "tasks") return <TaskTrace request={api} />;
+  return <BusinessAdmin {...c} />;
+}
+function BusinessAdmin(c: Context & { tab: string }) {
+  const storageKey = "zy-ops:" + c.me.user.uid + ":" + c.tab;
+  const stored = (() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(storageKey) || "null");
+    } catch {
+      return null;
+    }
+  })();
   const [v, setV] = useState(0),
-    [page, setPage] = useState(1),
+    [page, setPage] = useState(stored?.page || 1),
     [editor, setEditor] = useState<Any | null>(null),
     [selected, setSelected] = useState<Any | null>(null),
     [revealed, setRevealed] = useState("");
-  const [filters, setFilters] = useState({
-    q: "",
-    product: "",
-    status: "",
-    membership: "",
-    data_kind: "all",
-  });
+  const [filters, setFilters] = useState(
+    stored?.filters || {
+      q: "",
+      product: "",
+      status: "",
+      membership: "",
+      data_kind: "all",
+    },
+  );
   const cat = useData("/api/admin/catalog", v);
   const searchText = useDebounced(filters.q);
   const query = new URLSearchParams({
@@ -1540,15 +1637,27 @@ function Admin(c: Context & { tab: string }) {
     setEditor(null);
     setSelected(null);
     setRevealed("");
-    setFilters({
-      q: "",
-      product: new URLSearchParams(location.search).get("product") || "",
-      status: "",
-      membership: "",
-      data_kind: "all",
-    });
-    setPage(1);
+    setFilters(
+      stored?.filters || {
+        q: "",
+        product: new URLSearchParams(location.search).get("product") || "",
+        status: "",
+        membership: "",
+        data_kind: "all",
+      },
+    );
+    setPage(stored?.page || 1);
   }, [c.tab]);
+  useEffect(() => {
+    sessionStorage.setItem(storageKey, JSON.stringify({ filters, page }));
+    const u = new URL(location.href);
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v) u.searchParams.set(k, String(v));
+      else u.searchParams.delete(k);
+    });
+    u.searchParams.set("page", String(page));
+    history.replaceState(null, "", u);
+  }, [filters, page, storageKey]);
   const done = () => {
     setV((v) => v + 1);
     setEditor(null);
@@ -1560,7 +1669,7 @@ function Admin(c: Context & { tab: string }) {
     cat.data?.features.find((x: Any) => x.product_id === p && x.id === f)
       ?.name || f;
   const change = (key: string, value: string) => {
-    setFilters((f) => ({ ...f, [key]: value }));
+    setFilters((f: Any) => ({ ...f, [key]: value }));
     setPage(1);
   };
   const productFilter = (
@@ -1644,8 +1753,8 @@ function Admin(c: Context & { tab: string }) {
               onChange={(e) => change("data_kind", e.target.value)}
             >
               <option value="all">全部账号</option>
-              <option value="business">非测试命名账号</option>
-              <option value="test">测试命名账号</option>
+              <option value="business">非测试账号</option>
+              <option value="test">已标记测试账号</option>
             </select>
           </Field>
           {reset}
@@ -1654,7 +1763,9 @@ function Admin(c: Context & { tab: string }) {
           <span>
             用户列表 <strong>{users.data?.total ?? "—"}</strong>
           </span>
-          <span>额度为已入账可用次数；测试标签按本地账号命名识别</span>
+          <span>
+            额度为已入账可用次数；测试标签使用明确标记；名称前缀仅供参考
+          </span>
         </div>
         <DataState {...users}>
           {users.data?.items.length ? (
@@ -1887,7 +1998,36 @@ function Admin(c: Context & { tab: string }) {
                             <small className="truncate" title={r.callback_url}>
                               回调：{r.callback_url}
                             </small>
-                            <small>{r.integration_status}</small>
+                            <small>接入：{r.integration_status}</small>
+                            <small>
+                              实际产品验收：
+                              {r.verified_at
+                                ? `${r.verified_environment} · ${date(r.verified_at)}`
+                                : "尚未登记验收结果"}
+                            </small>
+                            {r.last_check && (
+                              <small>
+                                配置检查：
+                                {r.last_check.passed ? "一致" : "存在缺项"} ·{" "}
+                                {date(r.last_check.checked_at)} ·{" "}
+                                {r.last_check.environment}
+                                <br />
+                                {r.last_check.missing.join("；")}
+                              </small>
+                            )}
+                            <button
+                              onClick={() =>
+                                c.perform(async () => {
+                                  await api(
+                                    "/api/admin/products/" + r.id + "/check",
+                                    {},
+                                  );
+                                  setV((v) => v + 1);
+                                }, "配置检查已完成；不等于产品验收通过")
+                              }
+                            >
+                              检查配置
+                            </button>
                             <div className="inline-links">
                               <a href={"/admin?tab=features&product=" + r.id}>
                                 功能
@@ -2169,6 +2309,7 @@ function Subscriptions(c: Context) {
     [scope, setScope] = useState("all"),
     [tab, setTab] = useState("subscriptions"),
     [page, setPage] = useState(1);
+  const [syncing, setSyncing] = useState(false);
   const subs = useData("/api/admin/subscriptions", v);
   const states: Any = {
     Active: "生效中",
@@ -2182,9 +2323,7 @@ function Subscriptions(c: Context) {
     Error: "异常",
     Timeout: "已超时",
   };
-  const isTest = (r: Any) =>
-    testUser(r.user) ||
-    /dummy|测试/.test([r.name, r.plan, r.displayName].join(" "));
+  const isTest = (r: Any) => r.is_test === true || r.type === "Dummy";
   const rows = (subs.data?.[tab] || []).filter(
     (r: Any) => scope === "all" || (scope === "test") === isTest(r),
   );
@@ -2198,13 +2337,18 @@ function Subscriptions(c: Context) {
           disabled={c.busy}
           onClick={() =>
             c.perform(async () => {
-              await api("/api/admin/reconcile", {});
-              setV((v) => v + 1);
-            }, "订阅核对完成")
+              setSyncing(true);
+              try {
+                await api("/api/admin/reconcile", {});
+              } finally {
+                setSyncing(false);
+                setV((v) => v + 1);
+              }
+            }, "同步已完成，请查看本次结果及异常记录")
           }
         >
           <RefreshCw size={16} />
-          重新核对
+          同步订阅权益
         </button>
       </PageTitle>
       <section className="payment-banner">
@@ -2224,9 +2368,9 @@ function Subscriptions(c: Context) {
       <DataState {...subs}>
         <div className="stat-grid">
           {[
-            ["身份侧订阅", subs.data?.subscriptions.length],
+            ["Casdoor 订阅数", subs.data?.subscriptions.length],
             ["支付记录", subs.data?.payments.length],
-            ["权益投影", subs.data?.projections.length],
+            ["已同步的产品权益", subs.data?.projections.length],
           ].map(([label, value]) => (
             <div className="stat-card" key={label}>
               <span>{label}</span>
@@ -2239,14 +2383,50 @@ function Subscriptions(c: Context) {
             <h2>权益同步</h2>
             <p>
               最近核对：
-              {subs.data?.lastRun
-                ? date(subs.data.lastRun.created_at)
+              {subs.data?.lastAttempt
+                ? date(subs.data.lastAttempt.started_at)
                 : "尚未执行"}
             </p>
           </div>
-          <Tag tone={subs.data?.lastRun ? "green" : "amber"}>
-            {subs.data?.lastRun ? "已有核对记录" : "待核对"}
+          <Tag
+            tone={
+              subs.data?.lastAttempt?.status === "success" ? "green" : "amber"
+            }
+          >
+            {syncing
+              ? "正在同步"
+              : (
+                  {
+                    processing: "正在同步",
+                    success: "同步成功",
+                    partial: "部分异常",
+                    failed: "同步失败",
+                  } as Any
+                )[subs.data?.lastAttempt?.status as string] || "尚未同步"}
           </Tag>
+          <p>
+            最近成功：
+            {subs.data?.lastSuccess
+              ? date(subs.data.lastSuccess.finished_at)
+              : "尚无成功记录"}
+          </p>
+          {subs.data?.lastAttempt?.result && (
+            <div>
+              <p>
+                处理 {subs.data.lastAttempt.result.seen || 0} 条；同步{" "}
+                {subs.data.lastAttempt.result.projected || 0} 条；跳过{" "}
+                {subs.data.lastAttempt.result.skipped || 0} 条。
+              </p>
+              {subs.data.lastAttempt.result.message && (
+                <p role="alert">{subs.data.lastAttempt.result.message}</p>
+              )}
+              {subs.data.lastAttempt.result.errors?.map((e: Any, i: number) => (
+                <p key={i} role="alert">
+                  {e.source}：用户或有效期数据不完整，请在 Casdoor 检查订阅。
+                </p>
+              ))}
+            </div>
+          )}
           <details>
             <summary>查看同步规则与本地测试状态</summary>
             <p>
@@ -2272,23 +2452,6 @@ function Subscriptions(c: Context) {
             </a>
           </div>
         </div>
-        <div className="catalog-tabs">
-          {[
-            ["subscriptions", "订阅"],
-            ["payments", "支付记录"],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              className={tab === id ? "selected" : ""}
-              onClick={() => {
-                setTab(id);
-                setPage(1);
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
         <div className="ops-toolbar">
           <Field label="数据范围">
             <select
@@ -2299,11 +2462,11 @@ function Subscriptions(c: Context) {
               }}
             >
               <option value="all">全部记录</option>
-              <option value="business">非测试命名记录</option>
-              <option value="test">测试命名记录</option>
+              <option value="business">非测试账号记录</option>
+              <option value="test">测试相关记录</option>
             </select>
           </Field>
-          <p className="muted">按账号及记录名称识别测试数据</p>
+          <p className="muted">按账号测试标记与支付提供者类型区分测试记录</p>
         </div>
         {rows.length ? (
           <div className="table-wrap ops-table">
@@ -2411,6 +2574,7 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
     [kind, setKind] = useState("membership"),
     [days, setDays] = useState(30),
     [amount, setAmount] = useState(10);
+  const [actual, setActual] = useState<Any | null>(null);
   const currentRights = rights.data?.find((r: Any) => r.product.id === product);
   const currentEnd = currentRights?.membership.expires_at
     ? new Date(currentRights.membership.expires_at).getTime()
@@ -2467,11 +2631,29 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
                       .map((f: Any) => `${f.name} ${f.remaining} 次`)
                       .join(" · ")}
                   </span>
+                  {e.features
+                    .filter((f: Any) => f.kind === "quota")
+                    .map((f: Any) => (
+                      <QuotaSources key={f.id} feature={f} />
+                    ))}
                 </div>
               ))}
           </div>
         )}
       </DataState>
+      {actual && (
+        <div className="operation-preview" role="status">
+          已保存。服务端实际结果：{actual.product.name}，会员
+          {actual.membership.active
+            ? "有效，到期 " + date(actual.membership.expires_at)
+            : "未生效"}
+          ；
+          {actual.features
+            .filter((f: Any) => f.kind === "quota")
+            .map((f: Any) => f.name + " " + f.remaining + " 次")
+            .join("；")}
+        </div>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -2492,25 +2674,14 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
               : null;
           }
           c.perform(async () => {
-            await api("/api/admin/grants", body);
+            const saved = await api("/api/admin/grants", body);
+            setActual(saved.entitlement);
             setV((v) => v + 1);
             c.done();
           }, "权益已更新");
         }}
       >
         <div className="form-grid">
-          <Field label="产品">
-            <select
-              value={product}
-              onChange={(e) => setProduct(e.target.value)}
-            >
-              {c.cat?.products.map((p: Any) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </Field>
           <Field label="操作">
             <select value={kind} onChange={(e) => setKind(e.target.value)}>
               <option value="membership">开通 / 续期会员</option>
@@ -2582,7 +2753,7 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
               : kind === "quota"
                 ? `向当前产品赠送 ${amount || 0} 次额度，其他产品不受影响。`
                 : kind === "revoke_membership"
-                  ? "撤销当前产品的手工会员。存在有效订阅时，需先在 Casdoor 暂停订阅并核对。"
+                  ? "撤销当前产品由管理员开通的会员。存在有效订阅时，需先在 Casdoor 暂停订阅并核对。"
                   : "撤销所选功能的当前可用次数；其他功能与产品不受影响。"}
           </p>
         </div>
@@ -2611,6 +2782,33 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
           </button>
         </div>
       </form>
+      <div className="setting-line">
+        <div>
+          <h3>测试账号标记</h3>
+          <p>
+            {c.user.is_test
+              ? "已明确标记为测试账号"
+              : "未标记；历史名称前缀仅供参考"}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            const reason = prompt("填写标记变更原因");
+            if (reason)
+              c.perform(async () => {
+                await api("/api/admin/users/" + c.user.uid + "/test-flag", {
+                  is_test: !c.user.is_test,
+                  reason,
+                });
+                c.user.is_test = !c.user.is_test;
+                setV((v) => v + 1);
+                c.done();
+              }, "测试标记已更新");
+          }}
+        >
+          {c.user.is_test ? "取消测试标记" : "标记为测试账号"}
+        </button>
+      </div>
       <div className="setting-line">
         <div>
           <h3>{c.user.blocked ? "恢复权益平台访问" : "停用权益平台访问"}</h3>
@@ -2824,7 +3022,7 @@ function CatalogEditor(
               </Field>
               <Field
                 label="Casdoor 套餐映射"
-                hint="格式 consumers/套餐名；商业订阅在 Casdoor 中创建，留空则不投影该套餐"
+                hint="填写 consumers/商业套餐标识；购买与订阅在 Casdoor 管理，留空则不自动同步此套餐权益"
               >
                 <input
                   name="casdoor_plan"

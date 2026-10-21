@@ -1,0 +1,347 @@
+{
+  "date": "2026-10-21",
+  "version": "v4.22.0",
+  "commit": "f11d6aca9ef065b468992de5bb4c3f315710d9f2",
+  "checks": [
+    {
+      "id": "organizations",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "groups",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "roles",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "models",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "adapters",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "enforcers",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "applications",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "providers",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "certs",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "keys",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "permissions",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "products",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "plans",
+      "status": "已集成并验证",
+      "detail": "原生套餐CRUD；浏览器Dummy订阅购买和权益映射验证通过。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "pricings",
+      "status": "已集成并验证",
+      "detail": "原生定价CRUD与浏览器选购通过。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "coupons",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "subscriptions",
+      "status": "已集成并验证",
+      "detail": "Active订阅→有效期和次数投影；暂停撤销；重复同步不重复发放。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "orders",
+      "status": "已集成并验证",
+      "detail": "原生CRUD；浏览器真实创建本机模拟购买订单。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "payments",
+      "status": "已集成并验证",
+      "detail": "官方Dummy Paid状态与重复通知幂等通过；真实商户、真实退款未验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "transactions",
+      "status": "已集成并验证",
+      "detail": "专用QA组织原生交易记录新增、读取、修改；无真实资金流转。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "agents",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "servers",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "entries",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "sites",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "rules",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "forms",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "webhooks",
+      "status": "已集成并验证",
+      "detail": "真实本地目标首次503、自动重试200，投递记录Success且attemptCount>=2。",
+      "checked_at": "2026-10-21T02:59:22.698Z"
+    },
+    {
+      "id": "tickets",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "casbin-enforce",
+      "status": "已集成并验证",
+      "detail": "持久化策略：alice允许、bob拒绝。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "users",
+      "status": "已集成并验证",
+      "detail": "专用用户资料修改，稳定subject保留。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "totp",
+      "status": "已集成并验证",
+      "detail": "专用消费者启用TOTP；错误验证码拒绝、正确验证码通过，随后解除；未改变当前超管MFA。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "dashboard",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "apps",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "sysinfo",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "invitations",
+      "status": "已集成并验证",
+      "detail": "官方注册邀请码新增、读取和停用；邀请码注册领取未另行验证。",
+      "checked_at": "2026-10-21T02:59:22.698Z"
+    },
+    {
+      "id": "marketplace",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "integrations",
+      "status": "已集成并验证",
+      "detail": "官方市场真实模板安装、配置读取和卸载；目标外部应用未连接。",
+      "checked_at": "2026-10-21T02:59:22.698Z"
+    },
+    {
+      "id": "resources",
+      "status": "已集成并验证",
+      "detail": "原生本地存储提供者配置、真实上传、下载内容一致、资源记录读取。",
+      "checked_at": "2026-10-21T02:59:22.698Z"
+    },
+    {
+      "id": "server-store",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "sessions",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "records",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "tokens",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "verifications",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "product-store",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "cart",
+      "status": "已集成并验证",
+      "detail": "浏览器加入购物车、创建订单和结算通过。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "webhook-events",
+      "status": "已集成并验证",
+      "detail": "原生读取接口通过；不等同该模块所有操作验证。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "syncers",
+      "status": "已集成并验证",
+      "detail": "官方API新增、读取与字段修改通过；具有isEnabled字段的对象验证了停用。未覆盖所有字段组合或外部执行。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "scim",
+      "status": "已集成并验证",
+      "detail": "独立组织SCIM用户创建、读取、PATCH通过；SCIM分组创建、读取、PATCH也通过。",
+      "checked_at": "2026-10-21T03:11:24.825Z"
+    },
+    {
+      "id": "CAS",
+      "status": "已集成并验证",
+      "detail": "真实服务票据校验、重放拒绝、错误service拒绝。",
+      "checked_at": "2026-10-21T02:19:55.300Z"
+    },
+    {
+      "id": "SAML",
+      "status": "已集成并验证",
+      "detail": "本地SP请求、可信证书签名及Audience/Destination验证、篡改拒绝；使用应用c14n10兼容选项；外部IdP/SP未验证。",
+      "checked_at": "2026-10-21T02:19:55.300Z"
+    },
+    {
+      "id": "database-sync",
+      "status": "已集成并验证",
+      "detail": "独立源PostgreSQL连接、用户同步、重复同步无重复用户；源实例随后停止。",
+      "checked_at": "2026-10-21T02:19:55.300Z"
+    },
+    {
+      "id": "MCP",
+      "status": "已集成并验证",
+      "detail": "OIDC授权码+PKCE和user:read作用域：initialize、tools/list、get_users；远程代理与真实工具未验证。",
+      "checked_at": "2026-10-21T02:19:55.300Z"
+    },
+    {
+      "id": "LDAP",
+      "status": "已集成并验证",
+      "detail": "隔离容器LDAP真实绑定与搜索；主服务未开放监听。",
+      "checked_at": "2026-10-21T02:25:48.573Z"
+    },
+    {
+      "id": "RADIUS",
+      "status": "已集成并验证",
+      "detail": "隔离UDP PAP正确接受、错误拒绝，验证Response Authenticator。",
+      "checked_at": "2026-10-21T02:25:48.573Z"
+    },
+    {
+      "id": "LDAPS",
+      "status": "已集成并验证",
+      "detail": "隔离容器，客户端验证CA及主机名后完成加密绑定和搜索。",
+      "checked_at": "2026-10-21T02:25:48.573Z"
+    },
+    {
+      "id": "device-code",
+      "status": "已集成并验证",
+      "detail": "设备授权pending→真实密码批准→令牌交换通过。",
+      "checked_at": "2026-10-21T02:59:22.698Z"
+    },
+    {
+      "id": "oidc",
+      "status": "已集成并验证",
+      "detail": "整合回归：授权码PKCE、nonce、签名与到期、跨组织拒绝、跨应用同UID、当前与全局退出。",
+      "checked_at": "2026-10-21T03:16:48.634167+00:00"
+    }
+  ],
+  "notes": [
+    "仅列实际检查范围；原生路由保留不等于每个操作都通过。",
+    "本地模拟支付无真实资金；未部署线上。"
+  ]
+}

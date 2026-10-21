@@ -64,20 +64,29 @@ export async function catalog() {
     ),
   );
   return {
-    products: products.rows.map((p) => {
-      const a = productApps.find((a) => a.id === p.id);
-      return {
-        ...p,
-        integration_status: !a
-          ? "未登记鉴权"
-          : !a.enabled
-            ? "鉴权已停用"
-            : a.application !== p.application ||
-                a.url + "/auth/callback/" + a.id !== p.callback_url
-              ? "登记不一致"
-              : "鉴权已配置，待产品验收",
-      };
-    }),
+    products: await Promise.all(
+      products.rows.map(async (p) => {
+        const a = productApps.find((a) => a.id === p.id);
+        return {
+          ...p,
+          last_check:
+            (
+              await pool.query(
+                "SELECT result FROM integration_checks WHERE product_id=$1 ORDER BY id DESC LIMIT 1",
+                [p.id],
+              )
+            ).rows[0]?.result || null,
+          integration_status: !a
+            ? "未登记鉴权"
+            : !a.enabled
+              ? "鉴权已停用"
+              : a.application !== p.application ||
+                  a.url + "/auth/callback/" + a.id !== p.callback_url
+                ? "登记不一致"
+                : "配置已登记，尚未完成产品验收",
+        };
+      }),
+    ),
     features: features.rows,
     plans: plans.rows,
   };
@@ -87,7 +96,22 @@ export async function saveCatalog(
   type: keyof typeof schemas,
   input: unknown,
 ) {
-  const parsed = schemas[type].parse(input) as any;
+  // Read-only metadata may be echoed by clients; never persist it from a write.
+  let editable = input;
+  if (type === "products" && input && typeof input === "object") {
+    const copy = { ...input } as Record<string, unknown>;
+    for (const field of [
+      "created_at",
+      "integration_status",
+      "last_check",
+      "verified_environment",
+      "verified_at",
+      "verification_note",
+    ])
+      delete copy[field];
+    editable = copy;
+  }
+  const parsed = schemas[type].parse(editable) as any;
   const { reason, ...row } = parsed;
   return tx(async (db) => {
     const pk = type === "products" ? ["id"] : ["product_id", "id"];

@@ -10,11 +10,20 @@
       "sha256": "2f867132329ab1ef82026fbcaa9ecefd8c6d28e68f7d44396acbd78c4270623a",
       "local_verified": true
     },
-    "linux_arm64": {"asset":"casdoor_Linux_arm64.tar.gz","sha256":"9039df7a25b9bfb867977dd1792551dd2c6f42baa051cc6753f902f3a33d0ffb"},
-    "linux_amd64": {"asset":"casdoor_Linux_x86_64.tar.gz","sha256":"c84c76f413ccd6008a84c3d05df08a276cbff9444da935eae301cfd61bf6dafe"},
+    "linux_arm64": {
+      "asset": "casdoor_Linux_arm64.tar.gz",
+      "sha256": "9039df7a25b9bfb867977dd1792551dd2c6f42baa051cc6753f902f3a33d0ffb"
+    },
+    "linux_amd64": {
+      "asset": "casdoor_Linux_x86_64.tar.gz",
+      "sha256": "c84c76f413ccd6008a84c3d05df08a276cbff9444da935eae301cfd61bf6dafe"
+    },
     "docker_tag": "casbin/casdoor:v4.22.0",
     "docker_local_verified": false,
-    "reason": "Docker Hub/ghcr registry requests failed with EOF; mirrors returned 403/not found. Official checksum-verified native release used instead; no upstream patches."
+    "reason": "本机原生后端使用官方校验发布包；完整原生前端从锁定源码构建，仅添加单独维护的React导航、品牌及购买返回入口扩展。Go后端不修改。",
+    "commit": "f11d6aca9ef065b468992de5bb4c3f315710d9f2",
+    "source_archive_sha256": "08ca33789b4f3ebb661eda9ef9e9d17c4c558faefd4fde79e4105f096fb7cb5c",
+    "native_extension": "upstream/extensions/native-navigation.md"
   },
   "postgres": {
     "image": "postgres:17-alpine@sha256:0b2882c46a2b8d8e148431b333394348cf4d7f15aec6df7f17d51dc641e56cfa",

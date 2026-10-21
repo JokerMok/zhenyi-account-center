@@ -1,0 +1,21 @@
+[
+ {"id":"oidc","label":"OAuth / OIDC、SSO与退出","path":"/applications","api":["/api/login","/api/login/oauth/access_token","/api/userinfo","/api/sso-logout"],"source":"routers/router.go","dependencies":"应用、回调、签名证书与会话策略"},
+ {"id":"device-code","label":"OAuth设备授权","path":"/applications","api":["/api/device-auth","/api/login"],"source":"controllers/auth.go","dependencies":"应用启用Device login及设备授权类型"},
+ {"id":"totp","label":"TOTP及恢复码","path":"/account","api":["/api/mfa/setup/initiate","/api/mfa/setup/verify","/api/mfa/setup/enable","/api/delete-mfa"],"source":"object/mfa_totp.go","dependencies":"验证器；本机已用专用测试账号验证"},
+ {"id":"webauthn","label":"WebAuthn / 通行密钥","path":"/account","api":["/api/webauthn/signup/begin","/api/webauthn/signup/finish","/api/webauthn/signin/begin","/api/webauthn/signin/finish"],"source":"routers/router.go","dependencies":"受信任来源、浏览器和系统认证器交互","pending":"已集成，等待外部配置","note":"注册及登录接口与原生交互保留；未进行真实安全密钥／生物识别确认。"},
+ {"id":"biometric-wallet","label":"Face ID、Web3及扫码认证","path":"/applications","api":["/api/login","/api/get-qrcode"],"source":"web/src/pages/ProviderEditPage.tsx","dependencies":"摄像头、钱包、扫码应用或对应提供者凭据","pending":"已集成，等待外部配置","note":"不自动启动摄像头，不代替用户确认钱包或硬件认证。"},
+ {"id":"external-mfa","label":"邮件、短信、RADIUS及推送MFA","path":"/providers","api":["/api/mfa/setup/initiate","/api/mfa/setup/verify"],"source":"object/mfa.go","dependencies":"对应邮件、短信、RADIUS或推送服务","pending":"已集成，等待外部配置","note":"配置、绑定、验证入口完整保留；真实外部发送未验证。"},
+ {"id":"CAS","label":"CAS服务票据","path":"/applications","api":["/cas/:organization/:application/serviceValidate","/cas/:organization/:application/p3/serviceValidate"],"source":"controllers/cas.go","dependencies":"独立应用、服务地址与票据校验客户端"},
+ {"id":"SAML","label":"SAML IdP / SP与元数据","path":"/applications","api":["/api/saml/metadata","/api/saml/redirect/:owner/:application","/api/acs"],"source":"object/saml_idp.go","dependencies":"SP实体ID、ACS、证书；本机验收覆盖IdP签名响应，外部IdP联合仍需配置"},
+ {"id":"scim","label":"SCIM用户与分组配置","path":"/syncers","api":["/scim/Users","/scim/Groups"],"source":"scim/user_handler.go","dependencies":"具有目标组织权限的访问令牌"},
+ {"id":"LDAP","label":"LDAP绑定与目录同步","path":"/organizations","api":["/api/get-ldaps","/api/sync-ldap-users"],"source":"ldap/server.go","dependencies":"独立LDAP监听开关；外部目录同步另需服务器、Base DN及绑定信息"},
+ {"id":"LDAPS","label":"LDAPS加密目录","path":"/certs","api":["/api/add-cert","/api/get-ldaps"],"source":"ldap/server.go","dependencies":"专用TLS证书、受信任CA和隔离监听端口"},
+ {"id":"RADIUS","label":"RADIUS认证监听","path":"/organizations","api":[],"source":"radius/server.go","dependencies":"组织启用开关、共享密钥与隔离UDP监听端口"},
+ {"id":"database-sync","label":"数据库同步执行","path":"/syncers","api":["/api/test-syncer-db","/api/run-syncer"],"source":"object/syncer_database.go","dependencies":"独立源数据库与明确的受信任主机"},
+ {"id":"enterprise-directories","label":"AD、Google Workspace及企业目录联合","path":"/syncers","api":["/api/add-syncer","/api/run-syncer"],"source":"object/syncer.go","dependencies":"各外部目录的地址、租户／域、账号、凭据及授权","pending":"已集成，等待外部配置","note":"未连接真实企业工作台或员工账号。"},
+ {"id":"kerberos","label":"Kerberos / SPNEGO","path":"/applications","api":["/api/kerberos-login"],"source":"controllers/auth.go","dependencies":"Kerberos域、SPN、keytab与客户端票据","pending":"已集成，等待外部配置"},
+ {"id":"MCP","label":"MCP管理协议与作用域","path":"/servers","api":["/api/mcp","/api/sync-mcp-tool","/api/get-mcp-access-token"],"source":"mcpself/base.go","dependencies":"作用域、应用和目标MCP服务；已验证本地原生MCP管理API"},
+ {"id":"external-agents","label":"智能体、MCP代理与OpenClaw记录","path":"/agents","api":["/api/get-agents","/api/get-servers","/api/get-entries"],"source":"object/agent.go","dependencies":"外部智能体／MCP服务器地址、授权和实际工具服务","pending":"已集成，等待外部配置"},
+ {"id":"A2A","label":"独立A2A协议","path":"/agents","api":[],"source":"routers/router.go","dependencies":"","pending":"该固定版本不包含","note":"README提及A2A；固定Go源码、前端与路由未发现独立实现，不把智能体登记视为A2A验证。"},
+ {"id":"llm-model-management","label":"独立LLM模型管理与推理","path":"/agents","api":[],"source":"object/site.go","dependencies":"","pending":"该固定版本不包含","note":"Models是Casbin策略模型；Site是站点访问代理。未发现独立LLM模型管理／推理模块，不能混称。"}
+]

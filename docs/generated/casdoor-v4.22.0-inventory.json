@@ -1,0 +1,3670 @@
+{
+  "version": "v4.22.0",
+  "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/",
+  "source_archive_sha256": "08ca33789b4f3ebb661eda9ef9e9d17c4c558faefd4fde79e4105f096fb7cb5c",
+  "frontend_routes": [
+    {
+      "path": "/login",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L222",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/login/:owner",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L223",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/login/oauth/authorize",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L224",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/login/oauth/device/:userCode",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L225",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/login/saml/authorize/:owner/:applicationName",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L226",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:owner/:casApplicationName/login",
+      "component": "LoginPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L227",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:owner/:casApplicationName/logout",
+      "component": "CasLogout",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L228",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/signup",
+      "component": "SignupPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L229",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/signup/:applicationName",
+      "component": "SignupPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L230",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/signup/oauth/authorize",
+      "component": "SignupPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L231",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/forget",
+      "component": "ForgetPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L232",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/forget/:applicationName",
+      "component": "ForgetPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L233",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/update-password",
+      "component": "UpdatePasswordPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L234",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/update-password/:applicationName",
+      "component": "UpdatePasswordPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L235",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/init-admin",
+      "component": "InitAdminPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L236",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/callback",
+      "component": "AuthCallback",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L237",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/callback/saml",
+      "component": "SamlCallback",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L238",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/telegram-login",
+      "component": "TelegramLogin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L239",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/captcha",
+      "component": "CaptchaPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L240",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/openid-configuration",
+      "component": "OidcDiscoveryPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L241",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/consent/:applicationName",
+      "component": "ConsentPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L242",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/prompt",
+      "component": "PromptPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L243",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/prompt/:applicationName",
+      "component": "PromptPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L244",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/result",
+      "component": "ResultPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L245",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/result/:applicationName",
+      "component": "ResultPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L246",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/select-plan/:owner/:pricingName",
+      "component": "PricingPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L249",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/buy-plan/:owner/:pricingName",
+      "component": "ProductBuyPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L250",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/buy-plan/:owner/:pricingName/result",
+      "component": "PaymentResultPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L251",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/qrcode/:owner/:paymentName",
+      "component": "QrCodePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L252",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/marketplace/theme-preview",
+      "component": "ThemePreviewPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L253",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/",
+      "component": "Dashboard",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L265",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/apps",
+      "component": "AppListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L266",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/shortcuts",
+      "component": "ShortcutsPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L267",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/account",
+      "component": "AccountPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L268",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/mfa/setup",
+      "component": "MfaSetupPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L269",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/sysinfo",
+      "component": "SystemInfoPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L270",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/organizations",
+      "component": "OrganizationListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L272",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/organizations/:organizationName",
+      "component": "OrganizationEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L273",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/organizations/:organizationName/users",
+      "component": "UserListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L274",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/users",
+      "component": "UserListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L275",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/users/:organizationName/:userName",
+      "component": "UserEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L276",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/groups",
+      "component": "GroupListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L277",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/groups/:organizationName/:groupName",
+      "component": "GroupEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L278",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/trees/:organizationName",
+      "component": "GroupTreePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L279",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/trees/:organizationName/:groupName",
+      "component": "GroupTreePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L280",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/invitations",
+      "component": "InvitationListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L281",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/invitations/:organizationName/:invitationName",
+      "component": "InvitationEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L282",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/applications",
+      "component": "ApplicationListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L284",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/applications/:organizationName/:applicationName",
+      "component": "ApplicationEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L285",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/providers",
+      "component": "ProviderListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L286",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/providers/:organizationName/:providerName",
+      "component": "ProviderEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L287",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/marketplace",
+      "component": "MarketplacePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L288",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/integrations",
+      "component": "IntegrationListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L289",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/integrations/:organizationName/:integrationName",
+      "component": "IntegrationEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L290",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/resources",
+      "component": "ResourceListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L291",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/certs",
+      "component": "CertListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L292",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/certs/:organizationName/:certName",
+      "component": "CertEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L293",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/keys",
+      "component": "KeyListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L294",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/keys/:organizationName/:keyName",
+      "component": "KeyEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L295",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/roles",
+      "component": "RoleListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L297",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/roles/:organizationName/:roleName",
+      "component": "RoleEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L298",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/permissions",
+      "component": "PermissionListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L299",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/permissions/:organizationName/:permissionName",
+      "component": "PermissionEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L300",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/models",
+      "component": "ModelListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L301",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/models/:organizationName/:modelName",
+      "component": "ModelEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L302",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/adapters",
+      "component": "AdapterListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L303",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/adapters/:organizationName/:adapterName",
+      "component": "AdapterEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L304",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/enforcers",
+      "component": "EnforcerListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L305",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/enforcers/:organizationName/:enforcerName",
+      "component": "EnforcerEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L306",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/agents",
+      "component": "AgentListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L308",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/agents/:organizationName/:agentName",
+      "component": "AgentEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L309",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/servers",
+      "component": "ServerListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L310",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/servers/:organizationName/:serverName",
+      "component": "ServerEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L311",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/server-store",
+      "component": "ServerStorePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L312",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/entries",
+      "component": "EntryListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L313",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/entries/:organizationName/:entryName",
+      "component": "EntryEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L314",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/entries/:organizationName/:entryName/transcript",
+      "component": "OpenClawSessionTranscriptPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L315",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/sites",
+      "component": "SiteListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L316",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/sites/:organizationName/:siteName",
+      "component": "SiteEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L317",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/rules",
+      "component": "RuleListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L318",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/rules/:organizationName/:ruleName",
+      "component": "RuleEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L319",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/sessions",
+      "component": "SessionListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L321",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/records",
+      "component": "RecordListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L322",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/tokens",
+      "component": "TokenListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L323",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/tokens/:tokenName",
+      "component": "TokenEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L324",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/verifications",
+      "component": "VerificationListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L325",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/product-store",
+      "component": "ProductStorePage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L327",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/products",
+      "component": "ProductListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L328",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/products/:organizationName/:productName",
+      "component": "ProductEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L329",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/products/:organizationName/:productName/buy",
+      "component": "ProductBuyPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L330",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cart",
+      "component": "CartListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L331",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/coupons",
+      "component": "CouponListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L332",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/coupons/:organizationName/:couponName",
+      "component": "CouponEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L333",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/orders",
+      "component": "OrderListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L334",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/orders/:organizationName/:orderName",
+      "component": "OrderEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L335",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/orders/:organizationName/:orderName/pay",
+      "component": "OrderPayPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L336",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/payments",
+      "component": "PaymentListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L337",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/payments/:organizationName/:paymentName",
+      "component": "PaymentEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L338",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/payments/:organizationName/:paymentName/result",
+      "component": "PaymentResultPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L339",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/plans",
+      "component": "PlanListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L340",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/plans/:organizationName/:planName",
+      "component": "PlanEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L341",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/pricings",
+      "component": "PricingListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L342",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/pricings/:organizationName/:pricingName",
+      "component": "PricingEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L343",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/subscriptions",
+      "component": "SubscriptionListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L344",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/subscriptions/:organizationName/:subscriptionName",
+      "component": "SubscriptionEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L345",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/transactions",
+      "component": "TransactionListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L346",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/transactions/:organizationName/:transactionName",
+      "component": "TransactionEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L347",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/forms",
+      "component": "FormListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L349",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/forms/:formName",
+      "component": "FormEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L350",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/syncers",
+      "component": "SyncerListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L351",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/syncers/:organizationName/:syncerName",
+      "component": "SyncerEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L352",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/webhooks",
+      "component": "WebhookListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L353",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/webhooks/:webhookName",
+      "component": "WebhookEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L354",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/webhook-events",
+      "component": "WebhookEventListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L355",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/tickets",
+      "component": "TicketListPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L356",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/tickets/:organizationName/:ticketName",
+      "component": "TicketEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L357",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/ldap/:organizationName/:ldapId",
+      "component": "LdapEditPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L358",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/ldap/sync/:organizationName/:ldapId",
+      "component": "LdapSyncPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L359",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "*",
+      "component": "NotFoundPage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L361",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    }
+  ],
+  "backend_routes": [
+    {
+      "path": "/api/signup",
+      "handler": "POST:Signup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L47",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/login",
+      "handler": "POST:Login",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L48",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-app-login",
+      "handler": "GET:GetApplicationLogin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L49",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-dashboard",
+      "handler": "GET:GetDashboard",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L50",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-dashboard-providers",
+      "handler": "GET:GetDashboardProviderDistribution",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L51",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-dashboard-mfa",
+      "handler": "GET:GetDashboardMfaCoverage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L52",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-dashboard-heatmap",
+      "handler": "GET:GetDashboardLoginHeatmap",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L53",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/logout",
+      "handler": "GET,POST:Logout",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L54",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/sso-logout",
+      "handler": "GET,POST:SsoLogout",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L55",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-account",
+      "handler": "GET:GetAccount",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L56",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/userinfo",
+      "handler": "GET,POST:GetUserinfo",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L57",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/user",
+      "handler": "GET:GetUserinfo2",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L58",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/unlink",
+      "handler": "POST:Unlink",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L59",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-saml-login",
+      "handler": "GET:GetSamlLogin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L60",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/acs",
+      "handler": "POST:HandleSamlLogin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L61",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/saml/metadata",
+      "handler": "GET:GetSamlMeta",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L62",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/saml/redirect/:owner/:application",
+      "handler": "*:HandleSamlRedirect",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L63",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/saml/logout/:owner/:application",
+      "handler": "GET,POST:HandleSamlLogout",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L64",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/webhook",
+      "handler": "*:HandleOfficialAccountEvent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L65",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-qrcode",
+      "handler": "GET:GetQRCode",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L66",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-webhook-event",
+      "handler": "GET:GetWebhookEventType",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L67",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-captcha-status",
+      "handler": "GET:GetCaptchaStatus",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L68",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/callback",
+      "handler": "POST:Callback",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L69",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/device-auth",
+      "handler": "POST:DeviceAuth",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L70",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/cancel-device-auth",
+      "handler": "POST:CancelDeviceAuth",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L71",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/device-auth-complete",
+      "handler": "POST:DeviceAuthComplete",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L72",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/kerberos-login",
+      "handler": "GET:KerberosLogin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L73",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-organizations",
+      "handler": "GET:GetOrganizations",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L75",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-organization",
+      "handler": "GET:GetOrganization",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L76",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-organization",
+      "handler": "POST:UpdateOrganization",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L77",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-organization",
+      "handler": "POST:AddOrganization",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L78",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-organization",
+      "handler": "POST:DeleteOrganization",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L79",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-default-application",
+      "handler": "GET:GetDefaultApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L80",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-organization-names",
+      "handler": "GET:GetOrganizationNames",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L81",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-groups",
+      "handler": "GET:GetGroups",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L83",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-group",
+      "handler": "GET:GetGroup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L84",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-group",
+      "handler": "POST:UpdateGroup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L85",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-group",
+      "handler": "POST:AddGroup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L86",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-group",
+      "handler": "POST:DeleteGroup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L87",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/upload-groups",
+      "handler": "POST:UploadGroups",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L88",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-users",
+      "handler": "GET:GetGlobalUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L90",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-users",
+      "handler": "GET:GetUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L91",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-sorted-users",
+      "handler": "GET:GetSortedUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L92",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-user-count",
+      "handler": "GET:GetUserCount",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L93",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-user",
+      "handler": "GET:GetUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L94",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-user",
+      "handler": "POST:UpdateUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L95",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-user",
+      "handler": "POST:AddUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L96",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-user",
+      "handler": "POST:DeleteUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L97",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/upload-users",
+      "handler": "POST:UploadUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L98",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/remove-user-from-group",
+      "handler": "POST:RemoveUserFromGroup",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L99",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/verify-identification",
+      "handler": "POST:VerifyIdentification",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L100",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/impersonate-user",
+      "handler": "POST:ImpersonateUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L101",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/exit-impersonate-user",
+      "handler": "POST:ExitImpersonateUser",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L102",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-invitations",
+      "handler": "GET:GetInvitations",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L104",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-invitation",
+      "handler": "GET:GetInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L105",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-invitation-info",
+      "handler": "GET:GetInvitationCodeInfo",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L106",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-invitation",
+      "handler": "POST:UpdateInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L107",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-invitation",
+      "handler": "POST:AddInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L108",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-invitation",
+      "handler": "POST:DeleteInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L109",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/verify-invitation",
+      "handler": "GET:VerifyInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L110",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/send-invitation",
+      "handler": "POST:SendInvitation",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L111",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-applications",
+      "handler": "GET:GetApplications",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L113",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-application",
+      "handler": "GET:GetApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L114",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-user-application",
+      "handler": "GET:GetUserApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L115",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-organization-applications",
+      "handler": "GET:GetOrganizationApplications",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L116",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-application",
+      "handler": "POST:UpdateApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L117",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-application",
+      "handler": "POST:AddApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L118",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-application",
+      "handler": "POST:DeleteApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L119",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-providers",
+      "handler": "GET:GetProviders",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L121",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-provider",
+      "handler": "GET:GetProvider",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L122",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-providers",
+      "handler": "GET:GetGlobalProviders",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L123",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-idp-discovery",
+      "handler": "GET:GetIdpDiscovery",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L124",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-provider",
+      "handler": "POST:UpdateProvider",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L125",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-provider",
+      "handler": "POST:AddProvider",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L126",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-provider",
+      "handler": "POST:DeleteProvider",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L127",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-marketplace-index",
+      "handler": "GET:GetMarketplaceIndex",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L129",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-marketplace-bundle",
+      "handler": "GET:GetMarketplaceBundle",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L130",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-integrations",
+      "handler": "GET:GetIntegrations",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L131",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-integration",
+      "handler": "GET:GetIntegration",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L132",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/install-integration",
+      "handler": "POST:InstallIntegration",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L133",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-integration",
+      "handler": "POST:DeleteIntegration",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L134",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-resources",
+      "handler": "GET:GetResources",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L136",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-resource",
+      "handler": "GET:GetResource",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L137",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-resource",
+      "handler": "POST:UpdateResource",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L138",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-resource",
+      "handler": "POST:AddResource",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L139",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-resource",
+      "handler": "POST:DeleteResource",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L140",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/upload-resource",
+      "handler": "POST:UploadResource",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L141",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-agents",
+      "handler": "GET:GetAgents",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L143",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-agent",
+      "handler": "GET:GetAgent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L144",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-agent",
+      "handler": "POST:UpdateAgent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L145",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-agent",
+      "handler": "POST:AddAgent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L146",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-agent",
+      "handler": "POST:DeleteAgent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L147",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-servers",
+      "handler": "GET:GetServers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L149",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-online-servers",
+      "handler": "GET:GetOnlineServers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L150",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/scan",
+      "handler": "GET:Scan",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L151",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/sync-intranet-servers",
+      "handler": "POST:SyncIntranetServers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L152",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-server",
+      "handler": "GET:GetServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L153",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-server",
+      "handler": "POST:UpdateServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L154",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/sync-mcp-tool",
+      "handler": "POST:SyncMcpTool",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L155",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-server",
+      "handler": "POST:AddServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L156",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-server",
+      "handler": "POST:DeleteServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L157",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/server/:owner/:name",
+      "handler": "GET:ProxyServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L158",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/server/:owner/:name",
+      "handler": "POST:ProxyServer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L159",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-mcp-access-token",
+      "handler": "GET:GetMcpAccessToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L160",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-entries",
+      "handler": "GET:GetEntries",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L162",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-entry",
+      "handler": "GET:GetEntry",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L163",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-openclaw-session-graph",
+      "handler": "GET:GetOpenClawSessionGraph",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L164",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-openclaw-session-transcript",
+      "handler": "GET:GetOpenClawSessionTranscript",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L165",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-entry",
+      "handler": "POST:UpdateEntry",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L166",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-entry",
+      "handler": "POST:AddEntry",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L167",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-entry",
+      "handler": "POST:DeleteEntry",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L168",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/v1/traces",
+      "handler": "POST:AddOtlpTrace",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L170",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/v1/metrics",
+      "handler": "POST:AddOtlpMetrics",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L171",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/v1/logs",
+      "handler": "POST:AddOtlpLogs",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L172",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-sites",
+      "handler": "GET:GetGlobalSites",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L174",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-sites",
+      "handler": "GET:GetSites",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L175",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-site",
+      "handler": "GET:GetSite",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L176",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-site",
+      "handler": "POST:UpdateSite",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L177",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-site",
+      "handler": "POST:AddSite",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L178",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-site",
+      "handler": "POST:DeleteSite",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L179",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-rules",
+      "handler": "GET:GetRules",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L181",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-rule",
+      "handler": "GET:GetRule",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L182",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-rule",
+      "handler": "POST:AddRule",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L183",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-rule",
+      "handler": "POST:UpdateRule",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L184",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-rule",
+      "handler": "POST:DeleteRule",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L185",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-certs",
+      "handler": "GET:GetCerts",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L187",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-certs",
+      "handler": "GET:GetGlobalCerts",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L188",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-cert",
+      "handler": "GET:GetCert",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L189",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-cert",
+      "handler": "POST:UpdateCert",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L190",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-cert",
+      "handler": "POST:AddCert",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L191",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-cert",
+      "handler": "POST:DeleteCert",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L192",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-cert-domain-expire",
+      "handler": "POST:UpdateCertDomainExpire",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L193",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-keys",
+      "handler": "GET:GetKeys",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L195",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-keys",
+      "handler": "GET:GetGlobalKeys",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L196",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-key",
+      "handler": "GET:GetKey",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L197",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-key",
+      "handler": "POST:UpdateKey",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L198",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-key",
+      "handler": "POST:AddKey",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L199",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-key",
+      "handler": "POST:DeleteKey",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L200",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-roles",
+      "handler": "GET:GetRoles",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L202",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-role",
+      "handler": "GET:GetRole",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L203",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-role",
+      "handler": "POST:UpdateRole",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L204",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-role",
+      "handler": "POST:AddRole",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L205",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-role",
+      "handler": "POST:DeleteRole",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L206",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/upload-roles",
+      "handler": "POST:UploadRoles",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L207",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-permissions",
+      "handler": "GET:GetPermissions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L209",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-permissions-by-submitter",
+      "handler": "GET:GetPermissionsBySubmitter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L210",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-permissions-by-role",
+      "handler": "GET:GetPermissionsByRole",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L211",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-permission",
+      "handler": "GET:GetPermission",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L212",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-permission",
+      "handler": "POST:UpdatePermission",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L213",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-permissions",
+      "handler": "POST:UpdatePermissions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L214",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-permission",
+      "handler": "POST:AddPermission",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L215",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-permission",
+      "handler": "POST:DeletePermission",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L216",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/upload-permissions",
+      "handler": "POST:UploadPermissions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L217",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-models",
+      "handler": "GET:GetModels",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L219",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-model",
+      "handler": "GET:GetModel",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L220",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-model",
+      "handler": "POST:UpdateModel",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L221",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-model",
+      "handler": "POST:AddModel",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L222",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-model",
+      "handler": "POST:DeleteModel",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L223",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-adapters",
+      "handler": "GET:GetAdapters",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L225",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-adapter",
+      "handler": "GET:GetAdapter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L226",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-adapter",
+      "handler": "POST:UpdateAdapter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L227",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-adapter",
+      "handler": "POST:AddAdapter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L228",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-adapter",
+      "handler": "POST:DeleteAdapter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L229",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-policies",
+      "handler": "GET:GetPolicies",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L230",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-filtered-policies",
+      "handler": "POST:GetFilteredPolicies",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L231",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-policy",
+      "handler": "POST:UpdatePolicy",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L232",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-policy",
+      "handler": "POST:AddPolicy",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L233",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/remove-policy",
+      "handler": "POST:RemovePolicy",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L234",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-enforcers",
+      "handler": "GET:GetEnforcers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L236",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-enforcer",
+      "handler": "GET:GetEnforcer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L237",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-enforcer",
+      "handler": "POST:UpdateEnforcer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L238",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-enforcer",
+      "handler": "POST:AddEnforcer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L239",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-enforcer",
+      "handler": "POST:DeleteEnforcer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L240",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/enforce",
+      "handler": "POST:Enforce",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L242",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/batch-enforce",
+      "handler": "POST:BatchEnforce",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L243",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-all-objects",
+      "handler": "GET:GetAllObjects",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L244",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-all-actions",
+      "handler": "GET:GetAllActions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L245",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-all-roles",
+      "handler": "GET:GetAllRoles",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L246",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-sessions",
+      "handler": "GET:GetSessions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L248",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-session",
+      "handler": "GET:GetSingleSession",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L249",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-session",
+      "handler": "POST:UpdateSession",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L250",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-session",
+      "handler": "POST:AddSession",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L251",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-session",
+      "handler": "POST:DeleteSession",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L252",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/is-session-duplicated",
+      "handler": "GET:IsSessionDuplicated",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L253",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-tokens",
+      "handler": "GET:GetTokens",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L255",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-token",
+      "handler": "GET:GetToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L256",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-token",
+      "handler": "POST:UpdateToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L257",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-token",
+      "handler": "POST:AddToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L258",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-token",
+      "handler": "POST:DeleteToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L259",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-products",
+      "handler": "GET:GetProducts",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L261",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-product",
+      "handler": "GET:GetProduct",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L262",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-product",
+      "handler": "POST:UpdateProduct",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L263",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-product",
+      "handler": "POST:AddProduct",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L264",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-product",
+      "handler": "POST:DeleteProduct",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L265",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/buy-product",
+      "handler": "POST:BuyProduct",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L266",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-coupons",
+      "handler": "GET:GetCoupons",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L268",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-coupon",
+      "handler": "GET:GetCoupon",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L269",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-coupon",
+      "handler": "POST:UpdateCoupon",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L270",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-coupon",
+      "handler": "POST:AddCoupon",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L271",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-coupon",
+      "handler": "POST:DeleteCoupon",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L272",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/validate-coupon",
+      "handler": "POST:ValidateCoupon",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L273",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-orders",
+      "handler": "GET:GetOrders",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L275",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-user-orders",
+      "handler": "GET:GetUserOrders",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L276",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-order",
+      "handler": "GET:GetOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L277",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-order",
+      "handler": "POST:UpdateOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L278",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-order",
+      "handler": "POST:AddOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L279",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-order",
+      "handler": "POST:DeleteOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L280",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/place-order",
+      "handler": "POST:PlaceOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L281",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/cancel-order",
+      "handler": "POST:CancelOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L282",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/pay-order",
+      "handler": "POST:PayOrder",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L283",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-payments",
+      "handler": "GET:GetPayments",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L285",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-user-payments",
+      "handler": "GET:GetUserPayments",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L286",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-payment",
+      "handler": "GET:GetPayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L287",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-payment",
+      "handler": "POST:UpdatePayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L288",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-payment",
+      "handler": "POST:AddPayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L289",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-payment",
+      "handler": "POST:DeletePayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L290",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/notify-payment/?:owner/?:payment",
+      "handler": "POST:NotifyPayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L291",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/invoice-payment",
+      "handler": "POST:InvoicePayment",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L292",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-plans",
+      "handler": "GET:GetPlans",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L294",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-plan",
+      "handler": "GET:GetPlan",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L295",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-plan",
+      "handler": "POST:UpdatePlan",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L296",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-plan",
+      "handler": "POST:AddPlan",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L297",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-plan",
+      "handler": "POST:DeletePlan",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L298",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-pricings",
+      "handler": "GET:GetPricings",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L300",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-pricing",
+      "handler": "GET:GetPricing",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L301",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-pricing",
+      "handler": "POST:UpdatePricing",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L302",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-pricing",
+      "handler": "POST:AddPricing",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L303",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-pricing",
+      "handler": "POST:DeletePricing",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L304",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-subscriptions",
+      "handler": "GET:GetSubscriptions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L306",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-subscription",
+      "handler": "GET:GetSubscription",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L307",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-subscription",
+      "handler": "POST:UpdateSubscription",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L308",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-subscription",
+      "handler": "POST:AddSubscription",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L309",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-subscription",
+      "handler": "POST:DeleteSubscription",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L310",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-transactions",
+      "handler": "GET:GetTransactions",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L312",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-transaction",
+      "handler": "GET:GetTransaction",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L313",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-transaction",
+      "handler": "POST:UpdateTransaction",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L314",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-transaction",
+      "handler": "POST:AddTransaction",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L315",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-transaction",
+      "handler": "POST:DeleteTransaction",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L316",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-system-info",
+      "handler": "GET:GetSystemInfo",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L318",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-version-info",
+      "handler": "GET:GetVersionInfo",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L319",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/health",
+      "handler": "GET:Health",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L320",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-prometheus-info",
+      "handler": "GET:GetPrometheusInfo",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L321",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/metrics",
+      "handler": "GET:GetMetrics",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L322",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-global-forms",
+      "handler": "GET:GetGlobalForms",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L324",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-forms",
+      "handler": "GET:GetForms",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L325",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-form",
+      "handler": "GET:GetForm",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L326",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-form",
+      "handler": "POST:UpdateForm",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L327",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-form",
+      "handler": "POST:AddForm",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L328",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-form",
+      "handler": "POST:DeleteForm",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L329",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-syncers",
+      "handler": "GET:GetSyncers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L331",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-syncer",
+      "handler": "GET:GetSyncer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L332",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-syncer",
+      "handler": "POST:UpdateSyncer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L333",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-syncer",
+      "handler": "POST:AddSyncer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L334",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-syncer",
+      "handler": "POST:DeleteSyncer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L335",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/run-syncer",
+      "handler": "POST:RunSyncer",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L336",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/test-syncer-db",
+      "handler": "POST:TestSyncerDb",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L337",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-webhooks",
+      "handler": "GET:GetWebhooks",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L339",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-webhook",
+      "handler": "GET:GetWebhook",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L340",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-webhook",
+      "handler": "POST:UpdateWebhook",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L341",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-webhook",
+      "handler": "POST:AddWebhook",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L342",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-webhook",
+      "handler": "POST:DeleteWebhook",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L343",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-webhook-events",
+      "handler": "GET:GetWebhookEvents",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L346",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-webhook-event-detail",
+      "handler": "GET:GetWebhookEvent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L347",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/replay-webhook-event",
+      "handler": "POST:ReplayWebhookEvent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L348",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-webhook-event",
+      "handler": "POST:DeleteWebhookEvent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L349",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-tickets",
+      "handler": "GET:GetTickets",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L351",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-ticket",
+      "handler": "GET:GetTicket",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L352",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-ticket",
+      "handler": "POST:UpdateTicket",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L353",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-ticket",
+      "handler": "POST:AddTicket",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L354",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-ticket",
+      "handler": "POST:DeleteTicket",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L355",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-ticket-message",
+      "handler": "POST:AddTicketMessage",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L356",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/set-password",
+      "handler": "POST:SetPassword",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L358",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-init-admin-status",
+      "handler": "GET:GetInitAdminStatus",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L359",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/init-admin-password",
+      "handler": "POST:InitAdminPassword",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L360",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/check-user-password",
+      "handler": "POST:CheckUserPassword",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L361",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-email-and-phone",
+      "handler": "GET:GetEmailAndPhone",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L362",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/send-verification-code",
+      "handler": "POST:SendVerificationCode",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L363",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/verify-code",
+      "handler": "POST:VerifyCode",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L364",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/verify-captcha",
+      "handler": "POST:VerifyCaptcha",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L365",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/reset-email-or-phone",
+      "handler": "POST:ResetEmailOrPhone",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L366",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-captcha",
+      "handler": "GET:GetCaptcha",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L367",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-verifications",
+      "handler": "GET:GetVerifications",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L368",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-ldap-users",
+      "handler": "GET:GetLdapUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L370",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-ldaps",
+      "handler": "GET:GetLdaps",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L371",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-ldap",
+      "handler": "GET:GetLdap",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L372",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-ldap",
+      "handler": "POST:AddLdap",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L373",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/update-ldap",
+      "handler": "POST:UpdateLdap",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L374",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-ldap",
+      "handler": "POST:DeleteLdap",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L375",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/sync-ldap-users",
+      "handler": "POST:SyncLdapUsers",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L376",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/login/oauth/access_token",
+      "handler": "POST:GetOAuthToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L378",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/login/oauth/refresh_token",
+      "handler": "POST:RefreshToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L379",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/login/oauth/introspect",
+      "handler": "POST:IntrospectToken",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L380",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/oauth/register",
+      "handler": "POST:DynamicClientRegister",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L381",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/oauth/register/:clientId",
+      "handler": "GET:DynamicClientRead;PUT:DynamicClientUpdate;DELETE:DynamicClientDelete",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L382",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-records",
+      "handler": "GET:GetRecords",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L384",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/get-records-filter",
+      "handler": "POST:GetRecordsByFilter",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L385",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/add-record",
+      "handler": "POST:AddRecord",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L386",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/send-email",
+      "handler": "POST:SendEmail",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L388",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/send-sms",
+      "handler": "POST:SendSms",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L389",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/send-notification",
+      "handler": "POST:SendNotification",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L390",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/webauthn/signup/begin",
+      "handler": "GET:WebAuthnSignupBegin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L392",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/webauthn/signup/finish",
+      "handler": "POST:WebAuthnSignupFinish",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L393",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/webauthn/signin/begin",
+      "handler": "GET:WebAuthnSigninBegin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L394",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/webauthn/signin/finish",
+      "handler": "POST:WebAuthnSigninFinish",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L395",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/mfa/setup/initiate",
+      "handler": "POST:MfaSetupInitiate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L397",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/mfa/setup/verify",
+      "handler": "POST:MfaSetupVerify",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L398",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/mfa/setup/enable",
+      "handler": "POST:MfaSetupEnable",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L399",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/delete-mfa",
+      "handler": "POST:DeleteMfa",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L400",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/set-preferred-mfa",
+      "handler": "POST:SetPreferredMfa",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L401",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/grant-consent",
+      "handler": "POST:GrantConsent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L403",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/revoke-consent",
+      "handler": "POST:RevokeConsent",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L404",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/openid-configuration",
+      "handler": "GET:GetOidcDiscovery",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L406",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/:application/openid-configuration",
+      "handler": "GET:GetOidcDiscoveryByApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L407",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/oauth-authorization-server",
+      "handler": "GET:GetOAuthServerMetadata",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L408",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/:application/oauth-authorization-server",
+      "handler": "GET:GetOAuthServerMetadataByApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L409",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/jwks",
+      "handler": "*:GetJwks",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L410",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/:application/jwks",
+      "handler": "*:GetJwksByApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L411",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/webfinger",
+      "handler": "GET:GetWebFinger",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L412",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/:application/webfinger",
+      "handler": "GET:GetWebFingerByApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L413",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/oauth-protected-resource",
+      "handler": "GET:GetOauthProtectedResourceMetadata",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L414",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/.well-known/:application/oauth-protected-resource",
+      "handler": "GET:GetOauthProtectedResourceMetadataByApplication",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L415",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/serviceValidate",
+      "handler": "GET:CasServiceValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L417",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/proxyValidate",
+      "handler": "GET:CasProxyValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L418",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/proxy",
+      "handler": "GET:CasProxy",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L419",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/validate",
+      "handler": "GET:CasValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L420",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/p3/serviceValidate",
+      "handler": "GET:CasP3ServiceValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L422",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/p3/proxyValidate",
+      "handler": "GET:CasP3ProxyValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L423",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/cas/:organization/:application/samlValidate",
+      "handler": "POST:SamlValidate",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L424",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/scim/*",
+      "handler": "*:HandleScim",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L426",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/mcp",
+      "handler": "POST:HandleMcp",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L428",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    },
+    {
+      "path": "/api/faceid-signin-begin",
+      "handler": "GET:FaceIDSigninBegin",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go#L430",
+      "integration": "原生实现保留；操作验证按所属模块记录，不代表逐接口全部通过"
+    }
+  ],
+  "modules": [
+    {
+      "id": "dashboard",
+      "group": "总览",
+      "label": "仪表盘",
+      "path": "/",
+      "endpoint": "get-dashboard",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L265",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "shortcuts",
+      "group": "总览",
+      "label": "快捷操作",
+      "path": "/shortcuts",
+      "endpoint": "",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L267",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "apps",
+      "group": "总览",
+      "label": "应用门户",
+      "path": "/apps",
+      "endpoint": "get-applications",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L266",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "sysinfo",
+      "group": "总览",
+      "label": "系统信息",
+      "path": "/sysinfo",
+      "endpoint": "get-version-info",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L270",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "users",
+      "group": "用户与组织",
+      "label": "用户资料",
+      "path": "/users",
+      "endpoint": "get-users",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L275",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "organizations",
+      "group": "用户与组织",
+      "label": "组织与密码规则",
+      "path": "/organizations",
+      "endpoint": "get-organizations",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L272",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "groups",
+      "group": "用户与组织",
+      "label": "分组与组织树",
+      "path": "/groups",
+      "endpoint": "get-groups",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L277",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "invitations",
+      "group": "用户与组织",
+      "label": "注册邀请",
+      "path": "/invitations",
+      "endpoint": "get-invitations",
+      "dependencies": "邮件发送需要邮件提供者",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L281",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "account",
+      "group": "用户与组织",
+      "label": "个人资料与账号安全",
+      "path": "/account",
+      "endpoint": "",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L268",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "applications",
+      "group": "身份与接入",
+      "label": "应用与协议",
+      "path": "/applications",
+      "endpoint": "get-applications",
+      "dependencies": "OIDC/SAML/CAS应用配置及精确回调",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L284",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "providers",
+      "group": "身份与接入",
+      "label": "身份及服务提供者",
+      "path": "/providers",
+      "endpoint": "get-providers",
+      "dependencies": "第三方账号、邮件、短信、存储、支付、验证码等服务需要各自凭据",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L286",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "marketplace",
+      "group": "身份与接入",
+      "label": "应用市场",
+      "path": "/marketplace",
+      "endpoint": "get-marketplace-index",
+      "dependencies": "需要访问官方应用市场网络",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L288",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "integrations",
+      "group": "身份与接入",
+      "label": "已安装集成",
+      "path": "/integrations",
+      "endpoint": "get-integrations",
+      "dependencies": "具体集成的外部应用",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L289",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "resources",
+      "group": "身份与接入",
+      "label": "资源与存储",
+      "path": "/resources",
+      "endpoint": "get-resources",
+      "dependencies": "上传需要可用存储提供者",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L291",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "certs",
+      "group": "身份与接入",
+      "label": "证书",
+      "path": "/certs",
+      "endpoint": "get-certs",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L292",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "keys",
+      "group": "身份与接入",
+      "label": "密钥",
+      "path": "/keys",
+      "endpoint": "get-keys",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L294",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "roles",
+      "group": "角色与策略",
+      "label": "角色",
+      "path": "/roles",
+      "endpoint": "get-roles",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L297",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "permissions",
+      "group": "角色与策略",
+      "label": "权限与策略",
+      "path": "/permissions",
+      "endpoint": "get-permissions",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L299",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "models",
+      "group": "角色与策略",
+      "label": "Casbin模型",
+      "path": "/models",
+      "endpoint": "get-models",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L301",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "adapters",
+      "group": "角色与策略",
+      "label": "策略适配器",
+      "path": "/adapters",
+      "endpoint": "get-adapters",
+      "dependencies": "独立存储时需要目标数据库",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L303",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "enforcers",
+      "group": "角色与策略",
+      "label": "策略执行器",
+      "path": "/enforcers",
+      "endpoint": "get-enforcers",
+      "dependencies": "需要模型和适配器",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L305",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "agents",
+      "group": "AI与MCP",
+      "label": "智能体",
+      "path": "/agents",
+      "endpoint": "get-agents",
+      "dependencies": "外部智能体地址与凭据",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L308",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "servers",
+      "group": "AI与MCP",
+      "label": "MCP服务器",
+      "path": "/servers",
+      "endpoint": "get-servers",
+      "dependencies": "MCP服务地址；远程服务需其授权",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L310",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "server-store",
+      "group": "AI与MCP",
+      "label": "MCP市场",
+      "path": "/server-store",
+      "endpoint": "get-servers",
+      "dependencies": "访问市场网络",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L312",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "entries",
+      "group": "AI与MCP",
+      "label": "接入入口",
+      "path": "/entries",
+      "endpoint": "get-entries",
+      "dependencies": "关联智能体或MCP服务器",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L313",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "sites",
+      "group": "AI与MCP",
+      "label": "站点与访问代理",
+      "path": "/sites",
+      "endpoint": "get-sites",
+      "dependencies": "站点域名与上游服务配置",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L316",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "rules",
+      "group": "AI与MCP",
+      "label": "转发规则",
+      "path": "/rules",
+      "endpoint": "get-rules",
+      "dependencies": "关联站点和提供者",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L318",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "sessions",
+      "group": "会话与审计",
+      "label": "登录会话",
+      "path": "/sessions",
+      "endpoint": "get-sessions",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L321",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "records",
+      "group": "会话与审计",
+      "label": "身份审计日志",
+      "path": "/records",
+      "endpoint": "get-records",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L322",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "tokens",
+      "group": "会话与审计",
+      "label": "访问令牌",
+      "path": "/tokens",
+      "endpoint": "get-tokens",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L323",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "verifications",
+      "group": "会话与审计",
+      "label": "验证记录",
+      "path": "/verifications",
+      "endpoint": "get-verifications",
+      "dependencies": "发送验证依赖邮件或短信",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L325",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "product-store",
+      "group": "商业管理",
+      "label": "商品商店",
+      "path": "/product-store",
+      "endpoint": "get-products",
+      "dependencies": "可售商品与支付配置",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L327",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "products",
+      "group": "商业管理",
+      "label": "商业商品",
+      "path": "/products",
+      "endpoint": "get-products",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L328",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "coupons",
+      "group": "商业管理",
+      "label": "支付优惠券",
+      "path": "/coupons",
+      "endpoint": "get-coupons",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L332",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "cart",
+      "group": "商业管理",
+      "label": "购物车",
+      "path": "/cart",
+      "endpoint": "get-user",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L331",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "orders",
+      "group": "商业管理",
+      "label": "订单",
+      "path": "/orders",
+      "endpoint": "get-orders",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L334",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "payments",
+      "group": "商业管理",
+      "label": "支付记录",
+      "path": "/payments",
+      "endpoint": "get-payments",
+      "dependencies": "真实交易需要商户凭据",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L337",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "plans",
+      "group": "商业管理",
+      "label": "商业套餐",
+      "path": "/plans",
+      "endpoint": "get-plans",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L340",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "pricings",
+      "group": "商业管理",
+      "label": "定价页",
+      "path": "/pricings",
+      "endpoint": "get-pricings",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L342",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "subscriptions",
+      "group": "商业管理",
+      "label": "订阅",
+      "path": "/subscriptions",
+      "endpoint": "get-subscriptions",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L344",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "transactions",
+      "group": "商业管理",
+      "label": "资金交易",
+      "path": "/transactions",
+      "endpoint": "get-transactions",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L346",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "forms",
+      "group": "集成与工具",
+      "label": "表单",
+      "path": "/forms",
+      "endpoint": "get-forms",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L349",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "syncers",
+      "group": "集成与工具",
+      "label": "目录与数据同步",
+      "path": "/syncers",
+      "endpoint": "get-syncers",
+      "dependencies": "同步目标地址、数据库或外部目录凭据",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L351",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "webhooks",
+      "group": "集成与工具",
+      "label": "Webhook配置",
+      "path": "/webhooks",
+      "endpoint": "get-webhooks",
+      "dependencies": "通知目标URL",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L353",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "webhook-events",
+      "group": "集成与工具",
+      "label": "Webhook投递记录",
+      "path": "/webhook-events",
+      "endpoint": "get-webhook-events",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L355",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "tickets",
+      "group": "集成与工具",
+      "label": "工单",
+      "path": "/tickets",
+      "endpoint": "get-tickets",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L356",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    },
+    {
+      "id": "swagger",
+      "group": "集成与工具",
+      "label": "API浏览器",
+      "path": "/swagger",
+      "endpoint": "",
+      "dependencies": "",
+      "source": "https://github.com/casdoor/casdoor/blob/v4.22.0/routers/router.go",
+      "owner": "Casdoor",
+      "status": "已配置，尚未验证",
+      "verification": "待本轮真实接口和操作检查"
+    }
+  ],
+  "notes": [
+    "路由清单不是操作验收结果；运行结果见实际验收记录。",
+    "README提及A2A，但固定源码未发现独立A2A路由或实现，不把智能体页面等同A2A协议。",
+    "LDAP、MFA、WebAuthn、CAS、SAML、SCIM、OAuth设备流等配置在组织、用户或应用详情中；接口见完整后端清单。"
+  ],
+  "provider_type_options": [
+    "ADFS",
+    "AWS S3",
+    "Adyen",
+    "Agent",
+    "AirWallex",
+    "Alibaba Cloud",
+    "Alibaba Cloud Facebody",
+    "Alibaba Cloud PNVS SMS",
+    "Alipay",
+    "Aliyun Captcha",
+    "Aliyun IDaaS",
+    "Aliyun OSS",
+    "Aliyun SMS",
+    "Amazon",
+    "Amazon SNS",
+    "Apple",
+    "Auth0",
+    "Azure ACS",
+    "Azure Blob",
+    "AzureAD",
+    "AzureADB2C",
+    "Baidu",
+    "Baidu Cloud SMS",
+    "Balance",
+    "Bark",
+    "BattleNet",
+    "Bilibili",
+    "Bitbucket",
+    "Box",
+    "CUCloud",
+    "CUCloud OSS",
+    "Casdoor",
+    "Casdoor Permission Log",
+    "CloudFoundry",
+    "Cloudflare Turnstile",
+    "Custom",
+    "Custom Flexible",
+    "Custom HTTP",
+    "Custom HTTP Email",
+    "Custom HTTP SMS",
+    "Custom10",
+    "Custom2",
+    "Custom3",
+    "Custom4",
+    "Custom5",
+    "Custom6",
+    "Custom7",
+    "Custom8",
+    "Custom9",
+    "Dailymotion",
+    "Deezer",
+    "Default",
+    "DigitalOcean",
+    "DingTalk",
+    "Discord",
+    "Douyin",
+    "Dropbox",
+    "Dummy",
+    "EveOnline",
+    "Facebook",
+    "FastSpring",
+    "Fitbit",
+    "GC",
+    "GEETEST",
+    "GitHub",
+    "GitLab",
+    "Gitea",
+    "Gitee",
+    "Google",
+    "Google Chat",
+    "Google Cloud Storage",
+    "Heroku",
+    "Huawei Cloud SMS",
+    "InfluxCloud",
+    "Infobip SMS",
+    "Infoflow",
+    "Instagram",
+    "Intercom",
+    "Jumio",
+    "Kakao",
+    "Keycloak",
+    "Kwai",
+    "Lark",
+    "Lastfm",
+    "Lemon Squeezy",
+    "Line",
+    "LinkedIn",
+    "Local File System",
+    "Local UniFace",
+    "MCP Scan",
+    "Mailru",
+    "Mailtrap",
+    "Matrix",
+    "Meetup",
+    "Microsoft Teams",
+    "MicrosoftOnline",
+    "MinIO",
+    "Mock SMS",
+    "Msg91 SMS",
+    "Naver",
+    "Nextcloud",
+    "OIDC",
+    "OSON SMS",
+    "Okta",
+    "OneDrive",
+    "Oura",
+    "Paddle",
+    "Patreon",
+    "PayPal",
+    "Polar",
+    "Pushbullet",
+    "Pushover",
+    "QQ",
+    "Qiniu Cloud Kodo",
+    "RADIUS",
+    "Reddit",
+    "Resend",
+    "Rocket Chat",
+    "SELinux Log",
+    "SUBMAIL",
+    "SUBMAIL SMS",
+    "SalesForce",
+    "Security Scan",
+    "SendGrid",
+    "Shopify",
+    "Slack",
+    "SmsBao SMS",
+    "Soundcloud",
+    "Spotify",
+    "Steam",
+    "Strava",
+    "Stripe",
+    "Synology",
+    "Syslog",
+    "System Log",
+    "Telegram",
+    "Tencent Cloud COS",
+    "Tencent Cloud SMS",
+    "TikTok",
+    "Tumblr",
+    "Twilio SMS",
+    "Twitch",
+    "Twitter",
+    "Typetalk",
+    "UCloud SMS",
+    "Uber",
+    "VK",
+    "Viber",
+    "Volc Engine SMS",
+    "WeChat",
+    "WeChat Pay",
+    "WeChatMiniProgram",
+    "WeCom",
+    "Webpush",
+    "Weibo",
+    "Wepay",
+    "Xero",
+    "Yahoo",
+    "Yammer",
+    "Yandex",
+    "Zoom",
+    "hCaptcha",
+    "reCAPTCHA v2",
+    "reCAPTCHA v3"
+  ],
+  "capabilities": [
+    {
+      "id": "oidc",
+      "label": "OAuth / OIDC、SSO与退出",
+      "path": "/applications",
+      "api": [
+        "/api/login",
+        "/api/login/oauth/access_token",
+        "/api/userinfo",
+        "/api/sso-logout"
+      ],
+      "source": "routers/router.go",
+      "dependencies": "应用、回调、签名证书与会话策略"
+    },
+    {
+      "id": "device-code",
+      "label": "OAuth设备授权",
+      "path": "/applications",
+      "api": [
+        "/api/device-auth",
+        "/api/login"
+      ],
+      "source": "controllers/auth.go",
+      "dependencies": "应用启用Device login及设备授权类型"
+    },
+    {
+      "id": "totp",
+      "label": "TOTP及恢复码",
+      "path": "/account",
+      "api": [
+        "/api/mfa/setup/initiate",
+        "/api/mfa/setup/verify",
+        "/api/mfa/setup/enable",
+        "/api/delete-mfa"
+      ],
+      "source": "object/mfa_totp.go",
+      "dependencies": "验证器；本机已用专用测试账号验证"
+    },
+    {
+      "id": "webauthn",
+      "label": "WebAuthn / 通行密钥",
+      "path": "/account",
+      "api": [
+        "/api/webauthn/signup/begin",
+        "/api/webauthn/signup/finish",
+        "/api/webauthn/signin/begin",
+        "/api/webauthn/signin/finish"
+      ],
+      "source": "routers/router.go",
+      "dependencies": "受信任来源、浏览器和系统认证器交互",
+      "pending": "已集成，等待外部配置",
+      "note": "注册及登录接口与原生交互保留；未进行真实安全密钥／生物识别确认。"
+    },
+    {
+      "id": "biometric-wallet",
+      "label": "Face ID、Web3及扫码认证",
+      "path": "/applications",
+      "api": [
+        "/api/login",
+        "/api/get-qrcode"
+      ],
+      "source": "web/src/pages/ProviderEditPage.tsx",
+      "dependencies": "摄像头、钱包、扫码应用或对应提供者凭据",
+      "pending": "已集成，等待外部配置",
+      "note": "不自动启动摄像头，不代替用户确认钱包或硬件认证。"
+    },
+    {
+      "id": "external-mfa",
+      "label": "邮件、短信、RADIUS及推送MFA",
+      "path": "/providers",
+      "api": [
+        "/api/mfa/setup/initiate",
+        "/api/mfa/setup/verify"
+      ],
+      "source": "object/mfa.go",
+      "dependencies": "对应邮件、短信、RADIUS或推送服务",
+      "pending": "已集成，等待外部配置",
+      "note": "配置、绑定、验证入口完整保留；真实外部发送未验证。"
+    },
+    {
+      "id": "CAS",
+      "label": "CAS服务票据",
+      "path": "/applications",
+      "api": [
+        "/cas/:organization/:application/serviceValidate",
+        "/cas/:organization/:application/p3/serviceValidate"
+      ],
+      "source": "controllers/cas.go",
+      "dependencies": "独立应用、服务地址与票据校验客户端"
+    },
+    {
+      "id": "SAML",
+      "label": "SAML IdP / SP与元数据",
+      "path": "/applications",
+      "api": [
+        "/api/saml/metadata",
+        "/api/saml/redirect/:owner/:application",
+        "/api/acs"
+      ],
+      "source": "object/saml_idp.go",
+      "dependencies": "SP实体ID、ACS、证书；本机验收覆盖IdP签名响应，外部IdP联合仍需配置"
+    },
+    {
+      "id": "scim",
+      "label": "SCIM用户与分组配置",
+      "path": "/syncers",
+      "api": [
+        "/scim/Users",
+        "/scim/Groups"
+      ],
+      "source": "scim/user_handler.go",
+      "dependencies": "具有目标组织权限的访问令牌"
+    },
+    {
+      "id": "LDAP",
+      "label": "LDAP绑定与目录同步",
+      "path": "/organizations",
+      "api": [
+        "/api/get-ldaps",
+        "/api/sync-ldap-users"
+      ],
+      "source": "ldap/server.go",
+      "dependencies": "独立LDAP监听开关；外部目录同步另需服务器、Base DN及绑定信息"
+    },
+    {
+      "id": "LDAPS",
+      "label": "LDAPS加密目录",
+      "path": "/certs",
+      "api": [
+        "/api/add-cert",
+        "/api/get-ldaps"
+      ],
+      "source": "ldap/server.go",
+      "dependencies": "专用TLS证书、受信任CA和隔离监听端口"
+    },
+    {
+      "id": "RADIUS",
+      "label": "RADIUS认证监听",
+      "path": "/organizations",
+      "api": [],
+      "source": "radius/server.go",
+      "dependencies": "组织启用开关、共享密钥与隔离UDP监听端口"
+    },
+    {
+      "id": "database-sync",
+      "label": "数据库同步执行",
+      "path": "/syncers",
+      "api": [
+        "/api/test-syncer-db",
+        "/api/run-syncer"
+      ],
+      "source": "object/syncer_database.go",
+      "dependencies": "独立源数据库与明确的受信任主机"
+    },
+    {
+      "id": "enterprise-directories",
+      "label": "AD、Google Workspace及企业目录联合",
+      "path": "/syncers",
+      "api": [
+        "/api/add-syncer",
+        "/api/run-syncer"
+      ],
+      "source": "object/syncer.go",
+      "dependencies": "各外部目录的地址、租户／域、账号、凭据及授权",
+      "pending": "已集成，等待外部配置",
+      "note": "未连接真实企业工作台或员工账号。"
+    },
+    {
+      "id": "kerberos",
+      "label": "Kerberos / SPNEGO",
+      "path": "/applications",
+      "api": [
+        "/api/kerberos-login"
+      ],
+      "source": "controllers/auth.go",
+      "dependencies": "Kerberos域、SPN、keytab与客户端票据",
+      "pending": "已集成，等待外部配置"
+    },
+    {
+      "id": "MCP",
+      "label": "MCP管理协议与作用域",
+      "path": "/servers",
+      "api": [
+        "/api/mcp",
+        "/api/sync-mcp-tool",
+        "/api/get-mcp-access-token"
+      ],
+      "source": "mcpself/base.go",
+      "dependencies": "作用域、应用和目标MCP服务；已验证本地原生MCP管理API"
+    },
+    {
+      "id": "external-agents",
+      "label": "智能体、MCP代理与OpenClaw记录",
+      "path": "/agents",
+      "api": [
+        "/api/get-agents",
+        "/api/get-servers",
+        "/api/get-entries"
+      ],
+      "source": "object/agent.go",
+      "dependencies": "外部智能体／MCP服务器地址、授权和实际工具服务",
+      "pending": "已集成，等待外部配置"
+    },
+    {
+      "id": "A2A",
+      "label": "独立A2A协议",
+      "path": "/agents",
+      "api": [],
+      "source": "routers/router.go",
+      "dependencies": "",
+      "pending": "该固定版本不包含",
+      "note": "README提及A2A；固定Go源码、前端与路由未发现独立实现，不把智能体登记视为A2A验证。"
+    },
+    {
+      "id": "llm-model-management",
+      "label": "独立LLM模型管理与推理",
+      "path": "/agents",
+      "api": [],
+      "source": "object/site.go",
+      "dependencies": "",
+      "pending": "该固定版本不包含",
+      "note": "Models是Casbin策略模型；Site是站点访问代理。未发现独立LLM模型管理／推理模块，不能混称。"
+    }
+  ]
+}

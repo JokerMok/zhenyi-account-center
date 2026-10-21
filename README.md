@@ -26,21 +26,25 @@ npm run admin:reset-password
 | 页面 | 地址 |
 | --- | --- |
 | 消费者中心 | http://localhost:5310 |
-| 权益运营 | http://localhost:5310/admin |
+| 完整管理与业务扩展 | http://localhost:5310/admin |
 | Casdoor | http://localhost:5300 |
 | 拼豆 / 录屏接入示例 | http://localhost:5311 / http://localhost:5312 |
 
 `npm stop` 停止并保留数据，`npm run status` 查看状态。修改代码后先 `npm run build` 再重启。数据库、应用与产品机器凭据自动生成，不需要人工填写；均不得提交 Git。管理员组织为 `built-in`，消费者组织为 `consumers`。测试数据只存在本地，请勿直接用于生产。
 
-## 运营后台
+## 完整管理后台
 
-访问 `/admin`，使用独立管理员账号。用户列表支持产品、账号 / 会员状态筛选和分页，可直接查看会员到期与已入账额度；权益编辑在右侧抽屉完成。产品配置关联功能与套餐，兑换码区分可用、过期、用尽、停用。流水支持按用户 / 业务请求、产品、操作类型、日期追溯，审计以结构化前后值展示。窄屏列表采用卡片与全屏编辑。
+访问 `/admin`，使用已有受信任管理员。同一管理员登录原生完整管理工作区5300和业务扩展5310，保留原生全部路由与配置页。原生导航提供臻一业务扩展入口；业务导航按模块进入原生实际列表、详情和操作。
 
-测试命名标签仅为展示筛选，不承担权限隔离。所有会员、额度、状态变更仍由服务端校验；真实支付商户未配置时不启用收费。
+[完整功能覆盖与缺项](docs/full-coverage.md) · [管理员指南](docs/admin-guide.md) · [外部服务配置](docs/external-services.md)
+
+用户列表支持产品、账号 / 会员状态筛选和分页，可直接查看会员到期与已入账额度；权益编辑在右侧抽屉完成。产品配置关联功能与套餐，兑换码区分可用、过期、用尽、停用。流水支持按用户 / 业务请求、产品、操作类型、日期追溯，审计以结构化前后值展示。窄屏列表采用卡片与全屏编辑。
+
+测试账号使用明确字段标记；历史名称前缀只供参考。测试标记不承担权限隔离。所有会员、额度、状态变更仍由服务端校验；真实支付商户未配置时不启用收费。
 
 ## 运行方式
 
-Casdoor 固定 `v4.22.0`。本机 Docker 可用，但官方镜像仓库请求失败，因此使用官方 Darwin ARM64 发布包，已核对官方 SHA-256；PostgreSQL 仍由 Compose 运行。源码不作修改。[版本锁定与来源](docs/upstream-lock.json)、[初始化与运维](docs/operations.md)包含详情。`infra/compose.yml` 另有可选 Casdoor 容器配置；该镜像在本机未运行验收。
+Casdoor 固定 `v4.22.0`。本机 Docker 可用，但官方镜像仓库请求失败，因此使用官方 Darwin ARM64 发布包，已核对官方 SHA-256；PostgreSQL 仍由 Compose 运行。后端源码不修改；完整原生前端从同一锁定源码构建，单独维护编译期React导航、品牌与购买返回入口扩展。[版本锁定与来源](docs/upstream-lock.json)、[初始化与运维](docs/operations.md)包含详情。`infra/compose.yml` 另有可选 Casdoor 容器配置；该镜像在本机未运行验收。
 
 身份库 `casdoor` 和业务库 `entitlements` 使用不同数据库、不同登录角色；业务代码不访问 Casdoor 表。示例产品有独立的环境文件和受行权限约束的数据库角色，只能存取各自会话与任务，不能读权益表或其他产品会话。
 
@@ -50,6 +54,7 @@ npm run dev:beadgrid    # 拼豆示例后端
 npm run dev:focustake   # 录屏示例后端
 npm run dev:web         # 前端开发服务（默认代理账号中心）
 npm run build
+npm run native:build    # 重建固定版本完整原生前端与扩展
 npm test                # 本地关键业务测试，会创建合成测试账号与流水
 npm run test:payment    # 官方 Dummy 测试：订单、通知、订阅和权益；只允许本机
 npm run release-holds   # 手动释放超时预占

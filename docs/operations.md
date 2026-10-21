@@ -24,7 +24,7 @@ Casdoor 先使用随机机器引导密码保护内置管理员，避免公网抢
 
 已登录管理员从后台“账号与安全”在新窗口进入官方 `/account`，重新验证后使用原生密码表单。完成后关闭窗口返回后台并重新登录。原生改密通过 Casdoor `/api/set-password`，由其完成哈希、历史策略与令牌撤销。
 
-本地忘记密码执行 `npm run admin:reset-password`，两次隐藏输入新密码；不接受命令行密码或管道输入。命令使用本机私密应用凭据调用同一官方接口，先按已固定 subject 查找管理员，不能按浏览器输入选择账号；修改后核对 subject，删除本地旧会话，追加不含密码的审计。用户名、UID、权益与原审计保持不变。恢复需要本机文件访问权限，不对普通消费者提供恢复接口。
+本地忘记密码执行 `npm run admin:reset-password`，两次隐藏输入新密码；不接受命令行密码或管道输入。命令使用本机私密应用凭据调用同一官方接口，先按已固定 subject 查找管理员，不能按浏览器输入选择账号；修改后核对 subject，删除本地旧会话，追加不含密码的审计。重置后通过官方登录接口核实新密码，撤销旧会话并清除旧 credentials / 初始化 JSON 中的明文密码与遗留 bootstrap 输入，不再保存新密码。接口拒绝、网络异常及后续清理失败会分别报告，不把仅修改文件视为成功。用户名、UID、权益与原审计保持不变。恢复需要本机文件访问权限，不对普通消费者提供恢复接口。
 
 不要删除 `.local`、管理员或数据库卷来恢复登录。本机机器密钥与测试数据均被 Git 忽略。
 
@@ -67,3 +67,19 @@ npm run restore -- backups/accounts-日期.tar.gz
 核对锁定版本源代码：[初始化与首次密码](https://github.com/casdoor/casdoor/blob/v4.22.0/object/init.go)、[用户改密及稳定身份查询](https://github.com/casdoor/casdoor/blob/v4.22.0/controllers/user.go)、[原生密码表单](https://github.com/casdoor/casdoor/blob/v4.22.0/web-old/src/common/modal/PasswordModal.js)。官方欢迎页初始化接口仅在内置管理员没有密码且从未登录时可用，不能覆盖本项目已有管理员；本项目使用受本机一次性授权保护的初始化导入。官方 `update-organization` 要求完整组织对象，因此先读取原对象，再只改变管理组织密码选项，保留其他配置。
 
 涉及管理员的旧关键测试与模拟支付测试可通过私密环境变量 `TEST_ADMIN_PASSWORD` 提供测试账号密码，用户名按稳定 subject 查询；兼容旧本机初始化凭据。不要在命令行参数、提交文件或截图中放密码。这不是日常使用流程。
+
+## 单次本机临时验收
+
+常规恢复维持至少8位规则。用户明确要求本机临时短密码时，可在隐藏交互命令后使用 `-- --local-acceptance`；此选项仅允许非生产、回环 HOST、HTTP 回环身份服务与账号中心。只有官方改密写入期间临时调整管理组织密码选项，结束即恢复常规策略；消费者组织不变。密码由交互输入，不含固定测试密码或生产默认值，不由启动脚本反复写入。
+
+## v4.22.0完整前端与可回退扩展
+
+`npm start` 首次构建完整原生前端；需联网访问固定GitHub归档及npm依赖仓库，额外使用锁定的yarn1.22.22。源码归档哈希、二进制版本／完整commit见upstream-lock；后端不修改。`npm run native:build` 重新应用独立编译期React扩展，所有原生路由保留。CENTER_URL变化时启动脚本检测构建戳并重新构建，避免扩展跳转旧地址。可用`NATIVE_NPM_REGISTRY`指定依赖下载镜像，版本和integrity仍由原生yarn.lock约束。
+
+原生前端原包保留在 `.local/casdoor/web/build-official-v4.22.0`，上一构建保留`build-previous`。停止本项目后替换build目录即可回退前端；数据库迁移004只增列、表和索引，不清库。回退旧服务前先备份，保留新增表和历史记录，不执行破坏性down迁移。扩展差异和Apache许可证见`upstream/`。
+
+v4.22.0 Webhook投递worker仅在启动时已经存在配置才运行。bootstrap通过官方API创建禁用的 `zhenyi-worker-bootstrap` 占位配置（空events，不投递），首次创建后启动脚本只重启本项目Casdoor一次；之后不会重复重启。这样原生新增并启用的Webhook可实际投递和重试，仍由Casdoor保存投递记录。
+
+主机默认只开放回环5300／5310／5311／5312／5342。LDAP、LDAPS、RADIUS主监听保持关闭；该版本LDAP和RADIUS监听在进程内绑定0.0.0.0，不在日常主机无隔离启用。本轮使用独立身份库和临时容器，回环映射5356 HTTP、5357 LDAP、5359 LDAPS、5358 UDP RADIUS；测试结束即停止移除。RADIUS关闭值是-1，不能用0代替（0会请求随机端口）。
+
+实际验证脚本：`npm run test:native`、`test:protocols`、`test:listeners`、`test:auxiliary`。使用TEST_ADMIN_PASSWORD在本机交互环境授权当前管理员登录；不要把密码放入命令历史、Git或报告。可通过本机shell隐藏读取环境变量。脚本会创建合成测试记录；其结果在被忽略的.local内。native与protocol脚本需已下载锁定源码；listeners需Docker及官方Linux ARM64包，创建独立身份库，不能当作生产环境巡检。

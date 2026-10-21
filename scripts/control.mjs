@@ -143,6 +143,18 @@ if (command === "start") {
   }
   Object.assign(process.env, dotenv.parse(readFileSync(".env")));
   await downloadCasdoor();
+  const nativeStamp = existsSync(".local/native-build.json")
+    ? JSON.parse(readFileSync(".local/native-build.json", "utf8"))
+    : null;
+  if (
+    !nativeStamp ||
+    nativeStamp.center !== process.env.CENTER_URL ||
+    nativeStamp.extension_sha256 !==
+      createHash("sha256")
+        .update(readFileSync("scripts/build-native.mjs"))
+        .digest("hex")
+  )
+    run(process.execPath, ["scripts/build-native.mjs"]);
   run("docker", [...compose, "up", "-d", "--wait", "postgres"]);
   run(process.execPath, ["scripts/roles.mjs"]);
   run(process.execPath, ["--import", "tsx", "scripts/migrate.ts"]);
@@ -163,6 +175,20 @@ if (command === "start") {
     });
   }
   run(process.execPath, ["--import", "tsx", "scripts/bootstrap.ts"]);
+  if (existsSync(".local/restart-native-worker")) {
+    if (alive("casdoor")) {
+      const { pid } = JSON.parse(readFileSync(pidFile("casdoor")));
+      process.kill(pid, "SIGTERM");
+      for (let i = 0; i < 30 && alive("casdoor"); i++)
+        await new Promise((r) => setTimeout(r, 100));
+    }
+    launch("casdoor", "./casdoor", [], resolve(".local/casdoor"));
+    await ready(
+      "http://127.0.0.1:" + (process.env.CASDOOR_PORT || 5300) + "/api/health",
+      "casdoor",
+    );
+    unlinkSync(".local/restart-native-worker");
+  }
   Object.assign(process.env, dotenv.parse(readFileSync(".env")));
   if (!existsSync("dist/web/index.html")) run("npm", ["run", "build"]);
   for (const name of ["center", "beadgrid", "focustake"]) {

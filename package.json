@@ -24,7 +24,15 @@
     "backup": "node scripts/backup.mjs",
     "restore": "node scripts/backup.mjs restore",
     "admin:reset-password": "tsx scripts/admin-reset-password.ts",
-    "demo:recover": "tsx scripts/recover-demo.ts"
+    "demo:recover": "tsx scripts/recover-demo.ts",
+    "native:build": "node scripts/build-native.mjs",
+    "native:inventory": "python3 scripts/inventory-casdoor.py",
+    "test:native": "tsx scripts/verify-native.ts",
+    "test:protocols": "tsx scripts/verify-protocols.ts",
+    "test:listeners": "tsx scripts/verify-listeners.ts",
+    "test:auxiliary": "tsx scripts/verify-auxiliary.ts",
+    "test:purchase": "tsx scripts/local-purchase.ts",
+    "native:report": "python3 scripts/report-coverage.py"
   },
   "dependencies": {
     "bcryptjs": "3.0.2",
@@ -48,9 +56,11 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@vitejs/plugin-react": "5.0.4",
+    "@xmldom/xmldom": "0.8.11",
     "prettier": "3.6.2",
     "tsx": "4.20.6",
     "typescript": "5.9.3",
-    "vite": "7.1.12"
+    "vite": "7.1.12",
+    "xml-crypto": "6.1.2"
   }
 }
