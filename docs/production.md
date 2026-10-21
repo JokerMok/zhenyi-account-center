@@ -17,7 +17,7 @@ sudo /srv/apps/zhenyi-accounts/deploy/manage.sh logs 80
 sudo /srv/apps/zhenyi-accounts/deploy/manage.sh restart
 ```
 
-构建在Mac隔离Git归档中使用正式URL，不修改开发.env；服务器使用npm锁文件安装运行依赖，包括实际需要的tsx。程序、配置与构建目录由root管理；Casdoor仅能写 `shared/uploads` 和 `shared/logs/casdoor`。三个长驻服务为 `zhenyi-accounts-casdoor`、`zhenyi-accounts-identity`、`zhenyi-accounts-center`，配置开机自启及失败重启。数据库Compose固定项目名zhenyi-accounts、独立卷、回环5342，不操作其他项目数据库。
+构建在Mac隔离Git归档中使用正式URL，不修改开发.env；服务器使用npm锁文件安装运行依赖，包括实际需要的tsx。程序、配置与构建目录由root管理；Casdoor仅能写 `shared/uploads` 、`shared/logs/casdoor` 和 `shared/sessions`。三个长驻服务为 `zhenyi-accounts-casdoor`、`zhenyi-accounts-identity`、`zhenyi-accounts-center`，配置开机自启及失败重启。数据库Compose固定项目名zhenyi-accounts、独立卷、回环5342，不操作其他项目数据库。
 
 新发布先校验文件清单，完整操作持有 `shared/operation.lock`；已有release不执行npm ci或覆盖。更新前自动备份，切换current，迁移、启动与健康检查；失败恢复前一指针和原服务状态。迁移是前向操作，不自动倒退数据库。`rollback <releases下完整SHA>`校验目标声明兼容当前已应用迁移后退应用，保留数据并先备份。跨上游或不兼容数据库版本需另做隔离恢复，脚本拒绝冒险回退。
 
@@ -47,7 +47,7 @@ node scripts/backup.mjs restore /绝对路径/备份.tar.gz --mode production
 
 生产按systemd记录每项原状态，停止并核对本项目所有写入服务／端口，保留数据库运行，然后转储身份库、权益库并复制上传内容和必要配置。前后两次停写核对通过才标consistent=true；任何失败都会尝试恢复原来应运行的服务。恢复服务失败、归档中断均不会发布成功备份文件。不会用本机PID文件管理生产进程、另起脱管进程或启动演示服务。
 
-备份目录 `/srv/backups/zhenyi-accounts`，仅root读取；内容含数据库、签名证书／私钥、机器环境、稳定管理员subject、私密产品登记、运维配置与上传文件。可重建前端不重复打包。逐文件SHA-256和外部归档SHA-256均验证。备份含隐私和密钥但当前不加密；同机备份不抵御整机丢失，异机副本未配置。
+备份目录 `/srv/backups/zhenyi-accounts`，仅root读取；内容含数据库、签名证书／私钥、机器环境、稳定管理员subject、私密产品登记、运维配置、上传文件与身份会话文件。可重建前端不重复打包。逐文件SHA-256和外部归档SHA-256均验证。备份含隐私和密钥但当前不加密；同机备份不抵御整机丢失，异机副本未配置。
 
 每日 `03:50 Asia/Shanghai`执行 `zhenyi-accounts-backup.timer`，错过后补跑；仅新备份成功后保留最近7份日备份，人工manual备份不轮转。查看 `journalctl -u zhenyi-accounts-backup.service`、`systemctl status zhenyi-accounts-backup.timer`及 `shared/backup-last.json`。备份、恢复与部署共用同一个排他操作锁；异常遗留锁必须先核对owner进程，不按时间强删。
 
@@ -55,4 +55,4 @@ node scripts/backup.mjs restore /绝对路径/备份.tar.gz --mode production
 
 ## 真实上传路径
 
-固定版本本地存储实际写工作目录下files/。生产Casdoor工作目录是 `shared/state/casdoor`，files链接到 `shared/uploads`；web/build和swagger链接到current发布资源，日志单独链接到shared/logs/casdoor。发布和重启不会移动上传内容。默认创建“本地持久化上传”原生存储提供者，域名为正式issuer；本轮上传、下载和恢复的实际结果另见验收记录。
+固定版本本地存储实际写工作目录下files/。生产Casdoor工作目录是 `shared/state/casdoor`，files链接到 `shared/uploads`；web/build和swagger链接到current发布资源，日志单独链接到shared/logs/casdoor，原生文件会话tmp链接到shared/sessions。发布和重启不会移动上传内容。默认创建并关联“本地持久化上传”原生存储提供者（保留管理员已选的存储），域名为正式issuer；本轮上传、下载和恢复的实际结果另见验收记录。

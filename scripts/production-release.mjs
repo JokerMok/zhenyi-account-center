@@ -127,7 +127,16 @@ await writeFile(
 const list = target + ".list";
 await writeFile(list, [...entries, "RELEASE.json"].join("\n") + "\n");
 const bundle = target + ".tar.gz";
-await run("tar", ["-czf", bundle, "-C", target, "-T", list]);
+await run("tar", [
+  "--no-xattrs",
+  "--no-mac-metadata",
+  "-czf",
+  bundle,
+  "-C",
+  target,
+  "-T",
+  list,
+]);
 await writeFile(
   bundle + ".sha256",
   (await sha(bundle)) + "  " + bundle.split("/").at(-1) + "\n",

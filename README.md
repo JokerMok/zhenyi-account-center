@@ -1,6 +1,13 @@
 # 臻一账号中心
 
-面向消费者产品的公共账号与权益平台。Casdoor 管理身份和商业订阅，公共权益服务管理产品会员投影、功能权限、次数、兑换码和流水。React + TypeScript / Node.js + TypeScript / PostgreSQL。未改动其他产品仓库，未接入员工账号，未迁移用户或部署线上。
+面向消费者产品的公共账号与权益平台。Casdoor 管理身份和商业订阅，公共权益服务管理产品会员投影、功能权限、次数、兑换码和流水。React + TypeScript / Node.js + TypeScript / PostgreSQL。未改动其他产品仓库，未接入员工账号，未迁移真实产品用户。正式环境部署与实际验收见下文。
+
+## 正式环境
+
+- [个人中心](https://accounts.shizibandu.icu/) · [唯一管理后台](https://accounts.shizibandu.icu/admin)
+- OIDC issuer：`https://identity.accounts.shizibandu.icu`。生产独立身份与业务数据库，没有导入本机账号、演示服务或测试支付。
+- 管理员 `admin`，组织 `built-in`，使用本人在隐藏终端设置的正式密码。后台右上角“我的账户”修改密码；本机 `npm run production:admin` 经 SSH 恢复，服务器使用 `sudo /srv/apps/zhenyi-accounts/deploy/manage.sh admin:reset-password`。启动和更新不覆盖密码。
+- [生产运维、备份与回退](docs/production.md) · [正式产品接入](docs/production-integration.md) · [本次公网验收](docs/production-acceptance.md)。实际部署提交以服务器 `current/RELEASE.json` 为准。
 
 ## 本地使用
 
@@ -30,7 +37,7 @@ npm run admin:reset-password
 | 统一认证（登录／注册） | http://localhost:5300 |
 | 拼豆 / 录屏接入示例 | http://localhost:5311 / http://localhost:5312 |
 
-`npm stop` 停止并保留数据，`npm run status` 查看状态。修改代码后先 `npm run build` 再重启。数据库、应用与产品机器凭据自动生成，不需要人工填写；均不得提交 Git。管理员组织为 `built-in`，消费者组织为 `consumers`。测试数据只存在本地，请勿直接用于生产。
+`npm stop` 停止并保留数据，`npm run status` 查看状态。修改代码后先 `npm run build` 再重启。数据库、应用与产品机器凭据自动生成，不需要人工填写；均不得提交 Git。管理员组织为 `built-in`，消费者组织为 `consumers`。本机历史测试数据没有发布到生产；公网验收仅使用明确标记的专用数据。
 
 ## 完整管理后台
 

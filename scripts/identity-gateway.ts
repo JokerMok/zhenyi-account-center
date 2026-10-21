@@ -30,6 +30,21 @@ app.use(
   "/flag-icons",
   express.static(staticRoot + "/flag-icons", { fallthrough: false }),
 );
+// Casdoor falls back to its SPA for missing uploaded files. Serve the same
+// persistent public files here so missing resources retain a real 404 status.
+app.use(
+  "/files",
+  (_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  },
+  express.static(resolve(".local/casdoor/files"), {
+    fallthrough: false,
+    index: false,
+    redirect: false,
+    dotfiles: "deny",
+  }),
+);
 const modules = [
   "users",
   "groups",

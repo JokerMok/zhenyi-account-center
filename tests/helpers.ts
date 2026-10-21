@@ -69,7 +69,9 @@ export async function login(
   );
   const cookie = callback.headers
     .getSetCookie()
-    .filter((x) => x.startsWith("zy_" + appId + "="))
+    .filter((x) =>
+      x.startsWith((config.production ? "__Host-" : "") + "zy_" + appId + "="),
+    )
     .map((x) => x.split(";")[0])
     .join("; ");
   assert(cookie, 500, "TEST_COOKIE", "未建立产品会话");

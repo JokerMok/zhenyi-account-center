@@ -187,6 +187,37 @@ async function finalize() {
         createdTime: new Date().toISOString(),
       },
     );
+  // Associate the real local storage provider with native account uploads.
+  // Preserve any storage provider already selected by the administrator.
+  for (const name of ["app-built-in", "zhenyi-admin", "zhenyi-center"]) {
+    const application = await call("get-application", { id: "admin/" + name });
+    const providers = application.providers || [];
+    let hasStorage = false;
+    for (const entry of providers) {
+      const selected = await call("get-provider", {
+        id: "admin/" + entry.name,
+      });
+      if (selected?.category === "Storage") hasStorage = true;
+    }
+    if (!hasStorage)
+      await call(
+        "update-application",
+        { id: "admin/" + name },
+        {
+          ...application,
+          providers: [
+            ...providers,
+            {
+              name: "zhenyi-local-storage",
+              canSignUp: false,
+              canSignIn: false,
+              canUnlink: false,
+              prompted: false,
+            },
+          ],
+        },
+      );
+  }
   const worker = await call("get-webhook", {
     id: "built-in/zhenyi-worker-bootstrap",
   });

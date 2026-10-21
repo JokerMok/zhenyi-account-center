@@ -64,6 +64,8 @@ assert(
 );
 const app = express();
 app.disable("x-powered-by");
+// Only the local Caddy hop is trusted; arbitrary forwarded chains are not.
+if (config.production) app.set("trust proxy", "loopback");
 app.use(
   helmet({
     contentSecurityPolicy: {
