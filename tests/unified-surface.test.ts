@@ -35,6 +35,7 @@ test("本地内置资源真实存在且MIME正确，缺失资源严格404", asyn
   }
   for (const base of [
     center + "/admin/static",
+    center + "/static",
     identity + "/static",
     identity,
   ]) {
@@ -44,7 +45,10 @@ test("本地内置资源真实存在且MIME正确，缺失资源严格404", asyn
       assert(!String(r.headers.get("content-type")).includes("html"));
     }
   }
-  for (const path of ["/files/uploads/missing.png", "/files/uploads/missing.txt"]) {
+  for (const path of [
+    "/files/uploads/missing.png",
+    "/files/uploads/missing.txt",
+  ]) {
     const r = await fetch(identity + path);
     assert.equal(r.status, 404, path);
     assert(!String(r.headers.get("content-type")).includes("html"));

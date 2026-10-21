@@ -17,7 +17,7 @@ sudo /srv/apps/zhenyi-accounts/deploy/manage.sh logs 80
 sudo /srv/apps/zhenyi-accounts/deploy/manage.sh restart
 ```
 
-构建在Mac隔离Git归档中使用正式URL，不修改开发.env；服务器使用npm锁文件安装运行依赖，包括实际需要的tsx。程序、配置与构建目录由root管理；Casdoor仅能写 `shared/uploads` 、`shared/logs/casdoor` 和 `shared/sessions`。三个长驻服务为 `zhenyi-accounts-casdoor`、`zhenyi-accounts-identity`、`zhenyi-accounts-center`，配置开机自启及失败重启。数据库Compose固定项目名zhenyi-accounts、独立卷、回环5342，不操作其他项目数据库。
+构建在Mac隔离Git归档中使用正式URL，不修改开发.env；服务器使用npm锁文件安装运行依赖，包括实际需要的tsx。程序、配置与构建目录由root管理；中心只信任回环Caddy代理的转发来源，不信任任意代理链。Casdoor仅能写 `shared/uploads` 、`shared/logs/casdoor` 和 `shared/sessions`。三个长驻服务为 `zhenyi-accounts-casdoor`、`zhenyi-accounts-identity`、`zhenyi-accounts-center`，配置开机自启及失败重启。数据库Compose固定项目名zhenyi-accounts、独立卷、回环5342，不操作其他项目数据库。
 
 新发布先校验文件清单，完整操作持有 `shared/operation.lock`；已有release不执行npm ci或覆盖。更新前自动备份，切换current，迁移、启动与健康检查；失败恢复前一指针和原服务状态。迁移是前向操作，不自动倒退数据库。`rollback <releases下完整SHA>`校验目标声明兼容当前已应用迁移后退应用，保留数据并先备份。跨上游或不兼容数据库版本需另做隔离恢复，脚本拒绝冒险回退。
 
@@ -56,3 +56,5 @@ node scripts/backup.mjs restore /绝对路径/备份.tar.gz --mode production
 ## 真实上传路径
 
 固定版本本地存储实际写工作目录下files/。生产Casdoor工作目录是 `shared/state/casdoor`，files链接到 `shared/uploads`；web/build和swagger链接到current发布资源，日志单独链接到shared/logs/casdoor，原生文件会话tmp链接到shared/sessions。发布和重启不会移动上传内容。默认创建并关联“本地持久化上传”原生存储提供者（保留管理员已选的存储），域名为正式issuer；本轮上传、下载和恢复的实际结果另见验收记录。
+
+原生身份对象中已有的`/static`头像／Logo路径通过账号中心的只读静态别名兼容，统一后台仍使用`/admin/static`；该别名不代理API或另一套前端。上传由网关`/files`直接提供持久化文件，缺失内容返回404，不落入Casdoor SPA。

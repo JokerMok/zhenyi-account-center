@@ -1,4 +1,6 @@
-# 本地实际验收结果
+# 本地历史验收结果
+
+**当前公网部署与实际验收见 [生产验收](production-acceptance.md)。以下为既有本地阶段记录，不代表现在仍未部署。**
 
 日期：2026-10-20。环境：macOS ARM64、Node.js 25.9.0、Docker 29.5.2、PostgreSQL 17、Casdoor v4.22.0 官方 Darwin ARM64 包。范围仅限本机项目，未操作线上数据或其他产品仓库。
 

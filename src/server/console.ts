@@ -40,7 +40,8 @@ export function installConsole(app: Express) {
     (_req, res) => res.status(404).type("text/plain").send("资源不存在"),
   );
   app.use(
-    "/admin/static",
+    // Existing native objects retain /static URLs; this is an asset-only alias.
+    ["/admin/static", "/static"],
     express.static(resolve(".local/native-static"), { fallthrough: true }),
     (_req, res) => res.status(404).type("text/plain").send("资源不存在"),
   );

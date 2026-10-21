@@ -35,3 +35,9 @@ Casdoor保存身份、密码、组织、权限与商业原始记录；权益服�
 `upstream/console/`、共享业务内容、资源清单及编译脚本均纳入Git。构建从已校验的官方归档重置补丁目标，应用React扩展后构建；不依赖被忽略目录的手工改动。保留Apache-2.0及字体／旗帜资源许可。详见 [资源构建](resources.md)、[上游差异](../upstream/extensions/native-navigation.md)。
 
 本轮没有数据库结构迁移。旧管理查询参数由服务器与React兼容转换；保留现有账号、权益、审计。回退先用新脚本停止所有本项目服务，再切回旧提交和旧内部端口配置；身份数据不降级、不清库，详见运维文档。
+
+## 正式部署（2026-10-21）
+
+正式消费者／管理入口为accounts.shizibandu.icu，identity.accounts.shizibandu.icu是稳定issuer；两者由现有Caddy反代到回环5310／5300，原始Go后端5305不公开。生产全新独立数据库与机器凭据，没有把Mac测试库换issuer搬过去。生产不启动5311／5312示例。
+
+原生会话tmp、用户上传files分别持久化到shared/sessions与shared/uploads；只读静态/static兼容原生已存对象URL，后台资源主路径/admin/static。/files由身份网关直接提供并真实404。程序、配置与可重建资源保持root管理，只为Casdoor开放上传、日志、会话目录写权限。生产systemd一致备份保留数据库运行，服务状态复原与隔离恢复详见production.md。
