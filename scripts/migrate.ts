@@ -7,7 +7,7 @@ export async function migrate() {
       "CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz DEFAULT now())",
     );
     for (const name of (await readdir("migrations"))
-      .filter((x) => x.endsWith(".sql"))
+      .filter((x) => /^\d{3,}_[a-zA-Z0-9_-]+\.sql$/.test(x))
       .sort()) {
       if (
         (

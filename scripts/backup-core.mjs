@@ -108,6 +108,7 @@ export async function createBackup(
       await chmod(join(stage, "private", key), 0o600);
     }
     await copyTree(c.uploadDir, join(stage, "uploads"));
+    if (c.sessionDir) await copyTree(c.sessionDir, join(stage, "sessions"));
     // Prove quiescence still holds after both dumps and the file snapshot.
     await manager.assertStopped(state);
     if (signal?.aborted) throw Error("备份已中断");
@@ -311,6 +312,11 @@ export async function restoreIsolated(c, archive, { exec = run, signal } = {}) {
     databases,
     directory: dir,
     uploads: join(dir, "uploads"),
+    sessions:
+      manifest.sha256 &&
+      Object.keys(manifest.sha256).some((p) => p.startsWith("sessions/"))
+        ? join(dir, "sessions")
+        : null,
     checksums_verified: true,
     production_switched: false,
   };

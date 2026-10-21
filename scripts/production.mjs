@@ -94,6 +94,7 @@ async function settings() {
       { key: "entitlements", name: "entitlements", role: "entitlements" },
     ],
     uploadDir: join(shared, "uploads"),
+    sessionDir: join(shared, "sessions"),
     privateFiles: {
       env: join(shared, "config/app.env"),
       products: join(shared, "config/products.json"),
@@ -117,6 +118,14 @@ async function settings() {
     const old = await loadBackupConfig("production");
     if (JSON.stringify(old.units) !== JSON.stringify(units))
       throw Error("已有服务配置不同，请先核查");
+    if (!old.sessionDir) {
+      old.sessionDir = c.sessionDir;
+      await writeFile(
+        join(shared, "config/ops.json"),
+        JSON.stringify(old, null, 2),
+        { mode: 0o640 },
+      );
+    }
     return old;
   }
   await writeFile(join(shared, "config/ops.json"), JSON.stringify(c, null, 2), {
@@ -217,7 +226,7 @@ async function finalize() {
 async function installUnits() {
   const base = `[Unit]\nAfter=network-online.target docker.service\nWants=network-online.target\n[Service]\nType=simple\nUser=zyaccounts\nGroup=zyaccounts\nRestart=on-failure\nRestartSec=3\nUMask=0027\nNoNewPrivileges=true\nPrivateTmp=true\nProtectSystem=strict\nProtectHome=true\nKillMode=control-group\nTimeoutStopSec=45\n`;
   for (const [id, extra] of Object.entries({
-    casdoor: `WorkingDirectory=${shared}/state/casdoor\nExecStart=${root}/current/bin/casdoor\nReadWritePaths=${shared}/uploads ${shared}/logs/casdoor\nMemoryMax=512M\n`,
+    casdoor: `WorkingDirectory=${shared}/state/casdoor\nExecStart=${root}/current/bin/casdoor\nReadWritePaths=${shared}/uploads ${shared}/logs/casdoor ${shared}/sessions\nMemoryMax=512M\n`,
     identity: `WorkingDirectory=${root}/current\nEnvironmentFile=${shared}/config/app.env\nExecStart=${runtime} --import tsx scripts/identity-gateway.ts\nMemoryMax=256M\n`,
     center: `WorkingDirectory=${root}/current\nEnvironmentFile=${shared}/config/app.env\nExecStart=${runtime} --import tsx src/server/main.ts\nMemoryMax=512M\n`,
   })) {
@@ -345,6 +354,7 @@ await withOperationLock(join(shared, "operation.lock"), async () => {
       "state/casdoor/conf",
       "state/casdoor/web",
       "uploads",
+      "sessions",
       "logs/casdoor",
       "runtime",
       "backup-work",
@@ -368,6 +378,7 @@ await withOperationLock(join(shared, "operation.lock"), async () => {
     for (const [target, path] of [
       [join(shared, "config/casdoor.conf"), "conf/app.conf"],
       [join(shared, "uploads"), "files"],
+      [join(shared, "sessions"), "tmp"],
       [join(shared, "logs/casdoor"), "logs"],
       [join(root, "current/native-web"), "web/build"],
       [join(root, "current/swagger"), "swagger"],
@@ -379,7 +390,7 @@ await withOperationLock(join(shared, "operation.lock"), async () => {
       join(root, "current/native-static"),
       join(shared, "state/native-static"),
     );
-    // Programs/configuration remain root-owned and read-only in each sandbox. Only logs/uploads are writable by Casdoor.
+    // Programs/configuration remain root-owned and read-only in each sandbox. Only logs/uploads/session state are writable by Casdoor.
     await run("chown", ["root:zyaccounts", shared]);
     await run("chown", [
       "-R",
@@ -397,11 +408,20 @@ await withOperationLock(join(shared, "operation.lock"), async () => {
       "-R",
       "zyaccounts:zyaccounts",
       join(shared, "uploads"),
+      join(shared, "sessions"),
       join(shared, "logs"),
     ]);
     await installUnits();
     await run("docker", [...c.compose, "up", "-d", "--wait", "postgres"]);
-    await activate(release, c, !had);
+    // An interrupted first installation keeps its generated identity/configuration.
+    // The pending initialization file is required; absence is never treated as a clean install.
+    const initialized = await exists(join(shared, "state/casdoor/initialized"));
+    if (
+      !initialized &&
+      !(await exists(join(shared, "state/casdoor/init_data.json")))
+    )
+      throw Error("初始化状态不完整；保留数据并停止，不能重建身份");
+    await activate(release, c, !initialized);
     await run("systemctl", ["start", "zhenyi-accounts-backup.timer"]);
     await writeFile(
       join(root, "deploy/manage.sh"),

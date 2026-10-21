@@ -13,6 +13,8 @@ import { run } from "./ops-runtime.mjs";
 import { sha, files } from "./backup-core.mjs";
 const root = resolve(import.meta.dirname, "..");
 process.chdir(root);
+// macOS metadata must never become files in the Linux release.
+process.env.COPYFILE_DISABLE = "1";
 const shaCommit = (
   process.argv[2] ||
   execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
@@ -114,7 +116,7 @@ const manifest = {
   center: "https://accounts.shizibandu.icu",
   issuer: "https://identity.accounts.shizibandu.icu",
   compatibleMigrations: (await readdir(join(target, "migrations")))
-    .filter((x) => x.endsWith(".sql"))
+    .filter((x) => /^\d{3,}_[a-zA-Z0-9_-]+\.sql$/.test(x))
     .sort(),
   sha256: digests,
 };
