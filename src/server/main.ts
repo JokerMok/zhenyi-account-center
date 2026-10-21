@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { resolve } from "node:path";
+import { installConsole } from "./console";
 import { z, ZodError } from "zod";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -69,7 +70,12 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https:",
+          ...(config.production ? [] : ["http:"]),
+        ],
         scriptSrc: ["'self'"],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
@@ -79,6 +85,11 @@ app.use(
     hsts: config.production ? undefined : false,
   }),
 );
+if (serverId === "center") installConsole(app);
+app.get("/brand.svg", (_req, res) => {
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.sendFile(resolve("dist/web/brand.svg"));
+});
 app.use(express.json({ limit: "32kb" }));
 app.use(cookieParser());
 app.use((req, res, next) => {
@@ -110,6 +121,17 @@ app.get("/api/config", async (_req, res) => {
     beadgrid: config.BEADGRID_URL,
     focustake: config.FOCUSTAKE_URL,
     login: "/auth/login",
+    contextProduct: (() => {
+      const id = String(
+        _req.query.product || _req.cookies.zy_product_context || "",
+      );
+      const p = appConfigs[id];
+      return serverId === "center" &&
+        p?.enabled &&
+        !["center", "admin"].includes(id)
+        ? { id, name: p.name, url: p.url }
+        : null;
+    })(),
     signup: `${config.CASDOOR_URL}/signup/${appConfigs[serverId].application}`,
     services: state
       ? Object.fromEntries(
@@ -250,6 +272,26 @@ if (serverId === "center") {
       );
     },
   );
+  app.get("/api/admin/identities/by-subject", async (req, res) => {
+    const subject = ident.parse(req.query.subject);
+    const u = await casdoorApi("get-user", {
+      owner: "consumers",
+      userId: subject,
+    });
+    assert(
+      u && u.id === subject && u.owner === "consumers",
+      404,
+      "IDENTITY_NOT_FOUND",
+      "消费者身份不存在",
+    );
+    const row = (
+      await pool.query(
+        "INSERT INTO identities(issuer,subject,organization,username,display_name) VALUES($1,$2,'consumers',$3,$4) ON CONFLICT(issuer,subject) DO UPDATE SET username=EXCLUDED.username,display_name=EXCLUDED.display_name RETURNING uid",
+        [config.CASDOOR_URL, subject, u.name, u.displayName || u.name],
+      )
+    ).rows[0];
+    res.json({ uid: row.uid });
+  });
   app.get("/api/admin/catalog", async (_req, res) => res.json(await catalog()));
   app.put("/api/admin/catalog/:type", async (req: Authenticated, res) =>
     res.json(
@@ -859,7 +901,28 @@ if (serverId === "center") {
 app.use("/api", (_req, res) =>
   res.status(404).json({ error: "接口不存在", code: "NOT_FOUND" }),
 );
+app.get("/", (req, res, next) => {
+  const id = String(req.query.product || "");
+  if (
+    serverId === "center" &&
+    appConfigs[id]?.enabled &&
+    !["center", "admin"].includes(id)
+  )
+    res.cookie("zy_product_context", id, {
+      httpOnly: true,
+      secure: config.production,
+      sameSite: "lax",
+      maxAge: 3600000,
+      path: "/",
+    });
+  next();
+});
 app.use(express.static(resolve("dist/web"), { index: false }));
+app.use((req, res, next) => {
+  if (/\.(png|jpe?g|svg|gif|webp|ico|woff2?|ttf|css|js|map)$/i.test(req.path))
+    return res.status(404).type("text/plain").send("资源不存在");
+  next();
+});
 app.get("/{*path}", (_req, res) =>
   res.sendFile(resolve("dist/web/index.html")),
 );
@@ -888,7 +951,7 @@ app.use((e: any, req: Request, res: Response, _next: NextFunction) => {
       .status(status)
       .type("html")
       .send(
-        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="/auth/login?switch=1">重新登录 / 切换账号</a></body></html>`,
+        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="/auth/login?${req.originalUrl.startsWith("/auth/callback/admin") ? "mode=admin&" : ""}switch=1">重新登录 / 切换账号</a></body></html>`,
       );
   else res.status(status).json({ error: message, code });
 });

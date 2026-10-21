@@ -101,7 +101,7 @@ const legacy = await readFile(".local/credentials.json", "utf8")
 const administrator = chosen ||
   legacy?.administrator || { username: "admin", password: secret() };
 const baseConf = `appname = casdoor
-httpport = 5300
+httpport = ${env.CASDOOR_BACKEND_PORT || 5305}
 httpaddr = 127.0.0.1
 runmode = prod
 copyrequestbody = true
@@ -123,7 +123,7 @@ defaultApplication = app-built-in
 defaultLanguage = zh
 forceLanguage = zh
 frontendBaseDir = ./web/build
-staticBaseUrl = ${env.CASDOOR_URL}
+staticBaseUrl = /static
 showGithubCorner = false
 enableGzip = true
 logPostOnly = true
@@ -194,7 +194,7 @@ if (!(await exists(".local/casdoor/initialized"))) {
       name,
       displayName: {
         CENTER: "臻一账号中心",
-        ADMIN: "臻一权益运营",
+        ADMIN: "臻一管理后台",
         BEADGRID: "拼豆工坊",
         FOCUSTAKE: "专注录屏",
       }[id],

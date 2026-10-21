@@ -2,11 +2,11 @@
 
 核对日期：2026-10-21。运行二进制版本 v4.22.0，commit `f11d6aca9ef065b468992de5bb4c3f315710d9f2`。固定源码提取 119 条前端路由、331 条后端路由、47 个导航入口及 164 个显式提供者选项ID。
 
-完整原生前后端与配置页面均保留，扩展为编译期React导航；没有iframe或DOM注入。下面“已集成并验证”仅指写明的操作，不代表所有提供者、参数组合、硬件及外部系统均验收。全部逐路由来源见 [机器清单](generated/casdoor-v4.22.0-inventory.json)。
+完整原生前后端与配置页面均保留；本轮改为同一React Router／AppLayout中的原生和业务页面，所有表中管理入口统一加 `/admin` 前缀；没有iframe或DOM注入。下面“已集成并验证”仅指写明的操作，不代表所有提供者、参数组合、硬件及外部系统均验收。逐模块操作证据主要来自前轮完整接入，不能理解为本轮逐项重验；本轮结构、权限与资源定向回归见acceptance.md。全部逐路由来源见 [机器清单](generated/casdoor-v4.22.0-inventory.json)。
 
-| 分类 / 功能 | 真实入口（5300） | 后端读取接口 | 依赖配置 | 接入状态 / 验证范围 / 剩余 | 官方来源 |
+| 分类 / 功能 | 统一后台相对入口（5310/admin） | 后端读取接口 | 依赖配置 | 接入状态 / 验证范围 / 剩余 | 官方来源 |
 | --- | --- | --- | --- | --- | --- |
-| 总览 / 仪表盘 | `/` | `/api/get-dashboard` | 无需外部凭据 | 已集成并验证；原生读取接口通过；不等同该模块所有操作验证。 | [固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L265) |
+| 总览 / 仪表盘 | `/system/dashboard` | `/api/get-dashboard` | 无需外部凭据 | 已集成并验证；原生读取接口通过；不等同该模块所有操作验证。 | [固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L265) |
 | 总览 / 快捷操作 | `/shortcuts` | 原生页面组合接口 | 无需外部凭据 | 已配置，尚未验证；页面与原生实现保留；本轮未单独操作验证。 | [固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L267) |
 | 总览 / 应用门户 | `/apps` | `/api/get-applications` | 无需外部凭据 | 已集成并验证；原生读取接口通过；不等同该模块所有操作验证。 | [固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L266) |
 | 总览 / 系统信息 | `/sysinfo` | `/api/get-version-info` | 无需外部凭据 | 已集成并验证；原生读取接口通过；不等同该模块所有操作验证。 | [固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/web/src/App.tsx#L270) |

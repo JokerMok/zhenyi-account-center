@@ -11,6 +11,7 @@ import {
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import dotenv from "dotenv";
+import { nativeBuildKey } from "./native-inputs.mjs";
 const root = resolve(import.meta.dirname, "..");
 process.chdir(root);
 const command = process.argv[2] || "start";
@@ -32,9 +33,11 @@ function alive(name) {
     });
     return name === "setup"
       ? comm.includes("scripts/admin-setup.ts")
-      : name === "casdoor"
-        ? comm.includes("./casdoor")
-        : comm.includes("src/server/main.ts");
+      : name === "identity-gateway"
+        ? comm.includes("scripts/identity-gateway.ts")
+        : name === "casdoor"
+          ? comm.includes("./casdoor")
+          : comm.includes("src/server/main.ts");
   } catch {
     return false;
   }
@@ -149,19 +152,38 @@ if (command === "start") {
   if (
     !nativeStamp ||
     nativeStamp.center !== process.env.CENTER_URL ||
-    nativeStamp.extension_sha256 !==
-      createHash("sha256")
-        .update(readFileSync("scripts/build-native.mjs"))
-        .digest("hex")
+    nativeStamp.issuer !== process.env.CASDOOR_URL ||
+    nativeStamp.extension_sha256 !== nativeBuildKey()
   )
     run(process.execPath, ["scripts/build-native.mjs"]);
   run("docker", [...compose, "up", "-d", "--wait", "postgres"]);
   run(process.execPath, ["scripts/roles.mjs"]);
   run(process.execPath, ["--import", "tsx", "scripts/migrate.ts"]);
+  const confPath = ".local/casdoor/conf/app.conf";
+  let nativeConf = readFileSync(confPath, "utf8");
+  nativeConf = nativeConf
+    .replace(
+      /^httpport\s*=.*$/m,
+      "httpport = " + (process.env.CASDOOR_BACKEND_PORT || 5305),
+    )
+    .replace(/^staticBaseUrl\s*=.*$/m, "staticBaseUrl = /static");
+  writeFileSync(confPath, nativeConf, { mode: 0o600 });
   launch("casdoor", "./casdoor", [], resolve(".local/casdoor"));
   await ready(
-    "http://127.0.0.1:" + (process.env.CASDOOR_PORT || 5300) + "/api/health",
+    "http://127.0.0.1:" +
+      (process.env.CASDOOR_BACKEND_PORT || 5305) +
+      "/api/health",
     "casdoor",
+  );
+  launch(
+    "identity-gateway",
+    process.execPath,
+    ["--import", "tsx", "scripts/identity-gateway.ts"],
+    root,
+  );
+  await ready(
+    "http://127.0.0.1:" + (process.env.CASDOOR_PORT || 5300) + "/api/health",
+    "identity-gateway",
   );
   if (!existsSync(".local/casdoor/initialized")) {
     // The initializer must never run again after successful first import: preserve admin edits across restarts.
@@ -184,7 +206,9 @@ if (command === "start") {
     }
     launch("casdoor", "./casdoor", [], resolve(".local/casdoor"));
     await ready(
-      "http://127.0.0.1:" + (process.env.CASDOOR_PORT || 5300) + "/api/health",
+      "http://127.0.0.1:" +
+        (process.env.CASDOOR_BACKEND_PORT || 5305) +
+        "/api/health",
       "casdoor",
     );
     unlinkSync(".local/restart-native-worker");
@@ -238,7 +262,13 @@ if (command === "start") {
       "\n管理员：使用首次设置的账号密码登录 /admin；忘记密码运行 npm run admin:reset-password",
   );
 } else if (command === "stop") {
-  for (const name of ["beadgrid", "focustake", "center", "casdoor"]) {
+  for (const name of [
+    "beadgrid",
+    "focustake",
+    "center",
+    "identity-gateway",
+    "casdoor",
+  ]) {
     if (alive(name)) {
       const { pid } = JSON.parse(readFileSync(pidFile(name)));
       process.kill(pid, "SIGTERM");
@@ -248,7 +278,13 @@ if (command === "start") {
   run("docker", [...compose, "stop", "postgres"]);
   console.log("本项目服务已停止，数据保留。");
 } else if (command === "status") {
-  for (const name of ["casdoor", "center", "beadgrid", "focustake"])
+  for (const name of [
+    "casdoor",
+    "identity-gateway",
+    "center",
+    "beadgrid",
+    "focustake",
+  ])
     console.log(
       name + ": " + (alive(name) ? "运行中" : "未运行（或由外部手动启动）"),
     );

@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     depends_on:
       postgres: {condition: service_healthy}
-    ports: ["127.0.0.1:5300:8000"]
+    ports: ["127.0.0.1:5305:8000"]
     volumes:
       - ../.local/casdoor-docker/app.conf:/conf/app.conf:ro
       - ../.local/casdoor-docker/init_data.json:/init_data.json:ro

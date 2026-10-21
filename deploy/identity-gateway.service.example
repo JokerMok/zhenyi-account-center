@@ -1,0 +1,19 @@
+[Unit]
+Description=Zhenyi identity public gateway and local static resources
+After=network-online.target casdoor.service
+Requires=casdoor.service
+[Service]
+Type=simple
+User=zhenyi
+Group=zhenyi
+WorkingDirectory=/opt/zhenyi-accounts
+EnvironmentFile=/opt/zhenyi-accounts/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --import tsx scripts/identity-gateway.ts
+Restart=on-failure
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+[Install]
+WantedBy=multi-user.target

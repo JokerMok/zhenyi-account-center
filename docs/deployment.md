@@ -14,14 +14,14 @@
 
 若镜像渠道仍不可用，可使用已锁定的官方 Linux 发布包，流程与本机原生运行一致。根据主机选择 `casdoor_Linux_arm64.tar.gz` 或 `casdoor_Linux_x86_64.tar.gz`，从固定 release 下载并按 `upstream-lock.json` 核对哈希，再解压二进制和 `web/build`。本轮在隔离容器验证了校验后的Linux ARM64原生包及LDAP／LDAPS／RADIUS；真实Linux主机、x86_64包和systemd启动仍未验收。完整前端还需按`npm run native:build`生成；不把本机容器测试当作生产验收。
 
-`deploy/casdoor.service.example` 为原生运行的 systemd 模板；`deploy/accounts-center.service.example` 为业务服务模板。真实产品后端单独管理，不部署本地测试示例或测试账号。
+`deploy/casdoor.service.example` 为内部原生后端（5305）模板；`deploy/identity-gateway.service.example` 为公开身份网关（5300）模板；`deploy/accounts-center.service.example` 为中心及统一后台（5310）模板。三者分别启动，模板未在Linux主机验收。真实产品后端单独管理，不部署本地测试示例或测试账号。
 
 ## 域名与回调
 
 `deploy/Caddyfile.example` 规划：
 
 - `accounts.shizibandu.icu` → 账号中心 5310。
-- `identity.accounts.shizibandu.icu` → Casdoor 5300。该额外身份主机名只是建议模板，使用前需确认 DNS、证书与备案条件。
+- `identity.accounts.shizibandu.icu` → 身份网关 5300（内部Casdoor为5305）。该额外身份主机名只是建议模板，使用前需确认 DNS、证书与备案条件。
 - 真实拼豆、录屏保留各自域名和会话。两个演示产品默认只在本机运行。
 
 获准部署后，将 CENTER_URL、CASDOOR_URL 和产品地址改为精确 HTTPS 地址，更新 Casdoor origin / originFrontend 和应用 redirectUris，更新后台接入登记。issuer 改变会改变身份映射键，正式环境应使用全新空库；若未来迁移已有用户，必须专门处理 issuer + subject 映射，不能自动按邮箱合并。
@@ -39,3 +39,9 @@
 ## 首次管理员设置的本机边界
 
 先在目标主机本地完成初始化，再开放反向代理。临时设置服务仅监听 `127.0.0.1:5313`，要求随机一次性授权和精确的 localhost Host／Origin；反向代理只转发5310，禁止转发5313。远程主机需要经受控本机隧道访问设置页；本轮未验证 Linux 或 SSH 隧道。Casdoor 初始化期间已使用随机机器引导密码，不开放无密码的原生管理员注册。设置成功后删除一次性授权和临时管理员明文输入，后续启动不能覆盖既有账号。
+
+## 统一后台与静态资源
+
+`npm run native:build`必须在目标发布目录生成完整原生前端与业务扩展，再启动三项服务。公开管理地址始终是accounts主机的 `/admin`；不要把旧身份主机当成第二套后台。Caddy分别整体反代5310与5300，不向公网暴露5305。CASDOOR_PORT=5300、CASDOOR_BACKEND_PORT=5305与CENTER_PORT／PORT=5310独立于HTTPS公开URL。
+
+资源构建会校验并发布随Git保存的图标、旗帜和字体；`staticBaseUrl=/static`，后台使用/admin/static。不要把未知图片路径重写成index.html。反代模板无需单独CDN规则，详见 [资源构建](resources.md)。

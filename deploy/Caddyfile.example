@@ -2,10 +2,12 @@
 # Replace the identity hostname and product hostnames with the approved deployment plan.
 accounts.shizibandu.icu {
     encode zstd gzip
+    # /admin: unified frontend; /admin/api: identity proxy; /api: business API
     reverse_proxy 127.0.0.1:5310
 }
 identity.accounts.shizibandu.icu {
     encode zstd gzip
+    # Public issuer stays here; raw Casdoor 5305 is loopback-only.
     reverse_proxy 127.0.0.1:5300
 }
 # Independent example product origins; do not expose these synthetic tests in production.

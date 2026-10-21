@@ -1,0 +1,835 @@
+{
+  "upstream": "Casdoor v4.22.0",
+  "scope": "仅固定源码显式图片与OAuth提供者图标，非完整CDN",
+  "files": [
+    {
+      "path": "img/captcha_default.png",
+      "source": "https://cdn.casbin.org/img/captcha_default.png",
+      "sha256": "2eb1d67b76ab6b5d76a4ebae48ae230ebc69705698b9b0f1cd2e58a1907b3e26",
+      "bytes": 19056
+    },
+    {
+      "path": "img/casbin.svg",
+      "source": "https://cdn.casbin.org/img/casbin.svg",
+      "sha256": "cac1564bfe2f2cdba75269d8d18b18abb5da27b881f9a382b730d1f317eb8a1e",
+      "bytes": 16208
+    },
+    {
+      "path": "img/casdoor-logo_1185x256.png",
+      "source": "https://cdn.casbin.org/img/casdoor-logo_1185x256.png",
+      "sha256": "cad005da477becf0b404368be7523b78aeaaf4ec595ce9bdee5c396948d3800d",
+      "bytes": 72204
+    },
+    {
+      "path": "img/casdoor-logo_1185x256_dark.png",
+      "source": "https://cdn.casbin.org/img/casdoor-logo_1185x256_dark.png",
+      "sha256": "db07fc7b1e2e49219017c0a8128e9b490a8a81a50328cd774f00afd5a5670f48",
+      "bytes": 72908
+    },
+    {
+      "path": "img/casdoor.png",
+      "source": "https://cdn.casbin.org/img/casdoor.png",
+      "sha256": "708946828401ef738b4a10cc63029d94e835307c094974b129ead5f4dc48d6ec",
+      "bytes": 38624
+    },
+    {
+      "path": "img/cucloud.png",
+      "source": "https://cdn.casbin.org/img/cucloud.png",
+      "sha256": "cb37abded778da75311b399d2f49ca659b887f1f6939cf4688ccd63a3d320ce1",
+      "bytes": 31444
+    },
+    {
+      "path": "img/email_default.png",
+      "source": "https://cdn.casbin.org/img/email_default.png",
+      "sha256": "5a50c9e1b3be3032b4777d4a7b0f2a48afa202b19f781c52ced425195bd6b683",
+      "bytes": 11920
+    },
+    {
+      "path": "img/email_mailtrap.png",
+      "source": "https://cdn.casbin.org/img/email_mailtrap.png",
+      "sha256": "7af068e65f58561f4af7b562e2afb72844989cf947bf2cbdb2a0cfa33cdacf04",
+      "bytes": 5398
+    },
+    {
+      "path": "img/email_resend.png",
+      "source": "https://cdn.casbin.org/img/email_resend.png",
+      "sha256": "41c244043cbaaf8a3791255e11696c795dc650d4672769dc827d67ffa2521153",
+      "bytes": 12592
+    },
+    {
+      "path": "img/email_sendgrid.png",
+      "source": "https://cdn.casbin.org/img/email_sendgrid.png",
+      "sha256": "819f4e94e04b6b5798c20e732d3dc6768c37b01c5ff2dd17d89f497bd9db7ed0",
+      "bytes": 4344
+    },
+    {
+      "path": "img/favicon.png",
+      "source": "https://cdn.casbin.org/img/favicon.png",
+      "sha256": "708946828401ef738b4a10cc63029d94e835307c094974b129ead5f4dc48d6ec",
+      "bytes": 38624
+    },
+    {
+      "path": "img/mfa_radius.png",
+      "source": "https://cdn.casbin.org/img/mfa_radius.png",
+      "sha256": "9d9b6daf39e48caa0901927586fa9ee08779f292f093ae12acf403fb1b0726bf",
+      "bytes": 23095
+    },
+    {
+      "path": "img/payment_adyen.svg",
+      "source": "https://cdn.casbin.org/img/payment_adyen.svg",
+      "sha256": "74816fa56d572702c0482e945479c15c691baa6f8e7e5023e9aeaf1967f15817",
+      "bytes": 811
+    },
+    {
+      "path": "img/payment_airwallex.svg",
+      "source": "https://cdn.casbin.org/img/payment_airwallex.svg",
+      "sha256": "d0fd25190d11e1148ced96b6f70f3609dfed2ef4fbcfc551b3f49be4cfc2ac92",
+      "bytes": 832
+    },
+    {
+      "path": "img/payment_alipay.png",
+      "source": "https://cdn.casbin.org/img/payment_alipay.png",
+      "sha256": "042491618d7db2f472a5bcb7509d20d4c8ac70e97502b0f9f6d2665d23577a63",
+      "bytes": 8295
+    },
+    {
+      "path": "img/payment_balance.svg",
+      "source": "https://cdn.casbin.org/img/payment_balance.svg",
+      "sha256": "68576253aca373bb6ac1a2517f8a2ef8b54be515a891f49e4d7550d312b9fe85",
+      "bytes": 1311
+    },
+    {
+      "path": "img/payment_fastspring.png",
+      "source": "https://cdn.casbin.org/img/payment_fastspring.png",
+      "sha256": "08b871cdc19199820e2c3285ba471f858bd41f51774e877befd7a24d86b630bd",
+      "bytes": 3442
+    },
+    {
+      "path": "img/payment_gc.png",
+      "source": "https://cdn.casbin.org/img/payment_gc.png",
+      "sha256": "83c3ebf2b45fddbe9579588b7c41c69fdd3633e2f3e72aeed15eecbd2f072dcf",
+      "bytes": 4402
+    },
+    {
+      "path": "img/payment_lemonsqueezy.jpg",
+      "source": "https://cdn.casbin.org/img/payment_lemonsqueezy.jpg",
+      "sha256": "ca96e529e8eab8d2971a2f37c01ea262b8cadbd23c0f48ad1d2c9b07f89e4c9a",
+      "bytes": 8979
+    },
+    {
+      "path": "img/payment_paddle.png",
+      "source": "https://cdn.casbin.org/img/payment_paddle.png",
+      "sha256": "da976e6c9e16e523a7bc840e2ad31fbab789968524f3f6d84c1d9e415cef488c",
+      "bytes": 1588
+    },
+    {
+      "path": "img/payment_paypal.png",
+      "source": "https://cdn.casbin.org/img/payment_paypal.png",
+      "sha256": "c6e6850102f5c347b589d6a02bff4ec747246ddc09dd6263f35d26361f392e33",
+      "bytes": 22981
+    },
+    {
+      "path": "img/payment_polar.png",
+      "source": "https://cdn.casbin.org/img/payment_polar.png",
+      "sha256": "da976e6c9e16e523a7bc840e2ad31fbab789968524f3f6d84c1d9e415cef488c",
+      "bytes": 1588
+    },
+    {
+      "path": "img/payment_wechat_pay.png",
+      "source": "https://cdn.casbin.org/img/payment_wechat_pay.png",
+      "sha256": "8c5f758d63242762ff6fed6447a9aa83718be8a65432c90de5b08a45e89d94a7",
+      "bytes": 20497
+    },
+    {
+      "path": "img/social_adfs.png",
+      "source": "https://cdn.casbin.org/img/social_adfs.png",
+      "sha256": "06e673aed98bfe94081d0fbedf029e5d78fc4618787ad8add8a7bd4643e1cb12",
+      "bytes": 7361
+    },
+    {
+      "path": "img/social_alipay.png",
+      "source": "https://cdn.casbin.org/img/social_alipay.png",
+      "sha256": "e4ca2d5f55e5270b5bcb9956f335e278fa24a440bbe52c1add62d312978f8565",
+      "bytes": 13927
+    },
+    {
+      "path": "img/social_aliyun.png",
+      "source": "https://cdn.casbin.org/img/social_aliyun.png",
+      "sha256": "47990f361f0001eeb48464a2f9a363843d89c7b69edc26d6325049294d3d25b2",
+      "bytes": 4859
+    },
+    {
+      "path": "img/social_amazon.png",
+      "source": "https://cdn.casbin.org/img/social_amazon.png",
+      "sha256": "840f9a27e59298fe7d91d9d28d851395330a3bfd4b07430f77f0db12e0451ee3",
+      "bytes": 6280
+    },
+    {
+      "path": "img/social_apple.png",
+      "source": "https://cdn.casbin.org/img/social_apple.png",
+      "sha256": "037e4f6e3361897c3e338397efd818ce9dbe68bb8356db3dfb1f241b764faf64",
+      "bytes": 9389
+    },
+    {
+      "path": "img/social_auth0.png",
+      "source": "https://cdn.casbin.org/img/social_auth0.png",
+      "sha256": "d4d67fb4c89940517f82ae878bf36fc69d9ac33811891d87fcb007fa4665f566",
+      "bytes": 6120
+    },
+    {
+      "path": "img/social_aws.png",
+      "source": "https://cdn.casbin.org/img/social_aws.png",
+      "sha256": "0b12d2a457d0206f7778f99ef9e2a91b30d2b10d7889290bc40e3770e9bfbfee",
+      "bytes": 65983
+    },
+    {
+      "path": "img/social_azure.png",
+      "source": "https://cdn.casbin.org/img/social_azure.png",
+      "sha256": "d9b61ab6022dbeca008c14e78af6bcfe34ad24283de5f67e1d4299c74b3f4f2b",
+      "bytes": 71982
+    },
+    {
+      "path": "img/social_azuread.png",
+      "source": "https://cdn.casbin.org/img/social_azuread.png",
+      "sha256": "e486f69f7c53bab6c0015d3e485ca2a5e7f524965df9b7875493ed73c7939f56",
+      "bytes": 32142
+    },
+    {
+      "path": "img/social_azureadb2c.png",
+      "source": "https://cdn.casbin.org/img/social_azureadb2c.png",
+      "sha256": "6064eb2e6f1494ff565af7e777cc8424f979e669b04b16b0ace0138a8d34dce5",
+      "bytes": 15814
+    },
+    {
+      "path": "img/social_baidu.png",
+      "source": "https://cdn.casbin.org/img/social_baidu.png",
+      "sha256": "880a91464978f042236abf917c8817c42ff5f459103c63d17de377fccea1d37a",
+      "bytes": 13307
+    },
+    {
+      "path": "img/social_baidu_cloud.png",
+      "source": "https://cdn.casbin.org/img/social_baidu_cloud.png",
+      "sha256": "f1af7b4572e3d2b31d8a6094cafcae6e93edfac542e5b763bfbd80c62fb6e46a",
+      "bytes": 4271
+    },
+    {
+      "path": "img/social_bark.png",
+      "source": "https://cdn.casbin.org/img/social_bark.png",
+      "sha256": "c4b026c0dd1a770b9cbfdeae4957a7d0aa0567afb7900aa4e34a747f54b41c95",
+      "bytes": 12128
+    },
+    {
+      "path": "img/social_battlenet.png",
+      "source": "https://cdn.casbin.org/img/social_battlenet.png",
+      "sha256": "138376e0fda42744de2d73d4bc548ab84f186648a5e61a60d658332537b5ab8e",
+      "bytes": 12826
+    },
+    {
+      "path": "img/social_bilibili.png",
+      "source": "https://cdn.casbin.org/img/social_bilibili.png",
+      "sha256": "ec24835bb4162ec01aafb4c2685973d3782f1aee3cca42ea7ee7eaa356fce3bd",
+      "bytes": 16012
+    },
+    {
+      "path": "img/social_bitbucket.png",
+      "source": "https://cdn.casbin.org/img/social_bitbucket.png",
+      "sha256": "fd0057ca8741ddd836b9d5fba070f8817b2890b027f85ef53e1f6896fd5dc4f3",
+      "bytes": 60485
+    },
+    {
+      "path": "img/social_box.png",
+      "source": "https://cdn.casbin.org/img/social_box.png",
+      "sha256": "de211c49310719d2a61d089911f623f2e017fbeb0fe3b5232addb748940ec5ea",
+      "bytes": 9068
+    },
+    {
+      "path": "img/social_casdoor.png",
+      "source": "https://cdn.casbin.org/img/social_casdoor.png",
+      "sha256": "708946828401ef738b4a10cc63029d94e835307c094974b129ead5f4dc48d6ec",
+      "bytes": 38624
+    },
+    {
+      "path": "img/social_cloudflare.png",
+      "source": "https://cdn.casbin.org/img/social_cloudflare.png",
+      "sha256": "c3916862cfead3af678d0fe7cfcc90cdf69713c1d95bdb988320ffba20a57f0e",
+      "bytes": 63290
+    },
+    {
+      "path": "img/social_cloudfoundry.png",
+      "source": "https://cdn.casbin.org/img/social_cloudfoundry.png",
+      "sha256": "ae65f02e7d4c7faa0308f8012f553bf575a79823f7fb6d3e50d1b0e18f022498",
+      "bytes": 24702
+    },
+    {
+      "path": "img/social_cucloud.png",
+      "source": "https://cdn.casbin.org/img/social_cucloud.png",
+      "sha256": "38819b212a351618ba1a1a12bd723646211ac1aa197d604d9285f8927c497961",
+      "bytes": 16429
+    },
+    {
+      "path": "img/social_custom.png",
+      "source": "https://cdn.casbin.org/img/social_custom.png",
+      "sha256": "f1b079839b4a8dcef6b74faad946e9def7ee9f44b30b53f4acedd8e44ac7fd6e",
+      "bytes": 78311
+    },
+    {
+      "path": "img/social_dailymotion.png",
+      "source": "https://cdn.casbin.org/img/social_dailymotion.png",
+      "sha256": "d3b0e084ca756fc47e9be45cdc16bb71f2c8bf67e908b9147d0cae1eb3ef16ae",
+      "bytes": 5962
+    },
+    {
+      "path": "img/social_deezer.png",
+      "source": "https://cdn.casbin.org/img/social_deezer.png",
+      "sha256": "2256d0a04773db335f4ad6c8ec54f64d333d85b1ce196defad70a1c9cfe38682",
+      "bytes": 1231
+    },
+    {
+      "path": "img/social_default.png",
+      "source": "https://cdn.casbin.org/img/social_default.png",
+      "sha256": "30f5942ea8151a0169b15e916e8e17678845e20185dd4e621df32ff521f45df1",
+      "bytes": 8209
+    },
+    {
+      "path": "img/social_digitalocean.png",
+      "source": "https://cdn.casbin.org/img/social_digitalocean.png",
+      "sha256": "fadcec1de9ff5e59d75cc22bb0adb7ef0dd5a2f8cd834000f133581f5ca59b0d",
+      "bytes": 4155
+    },
+    {
+      "path": "img/social_dingtalk.png",
+      "source": "https://cdn.casbin.org/img/social_dingtalk.png",
+      "sha256": "71699654e41f3bfc51a2264c0aad6a99576e716fe0fee01125c021d5bec5ef92",
+      "bytes": 32275
+    },
+    {
+      "path": "img/social_discord.png",
+      "source": "https://cdn.casbin.org/img/social_discord.png",
+      "sha256": "4e26f71d127b030491e9654fffc1ae348be4087ba6e493a0f548e5e608940fa8",
+      "bytes": 9212
+    },
+    {
+      "path": "img/social_douyin.png",
+      "source": "https://cdn.casbin.org/img/social_douyin.png",
+      "sha256": "7820b8adc65de6c47b93cfc77a57de52b7571c372929bfd9f9e238ecfc4dd362",
+      "bytes": 47957
+    },
+    {
+      "path": "img/social_dropbox.png",
+      "source": "https://cdn.casbin.org/img/social_dropbox.png",
+      "sha256": "ee2d3c087c9f0db9ee0b9e4c2562f5f4a70740d93dc103f1d2fd17f831285729",
+      "bytes": 6172
+    },
+    {
+      "path": "img/social_eveonline.png",
+      "source": "https://cdn.casbin.org/img/social_eveonline.png",
+      "sha256": "d6a823f4034a8b02efca115a57bdbeda256c992d80d50374e3172da91195ca32",
+      "bytes": 2065
+    },
+    {
+      "path": "img/social_facebook.png",
+      "source": "https://cdn.casbin.org/img/social_facebook.png",
+      "sha256": "df2d679b77c515e63a22758083ee3c21c8fb02f75cf3cb2ff4739a8379bf7ec7",
+      "bytes": 5631
+    },
+    {
+      "path": "img/social_file.png",
+      "source": "https://cdn.casbin.org/img/social_file.png",
+      "sha256": "c8d4f84314634525a2ae7b69bc05638ba4af643ba8fc7d0ec7d0c738a859b6e2",
+      "bytes": 7186
+    },
+    {
+      "path": "img/social_fitbit.png",
+      "source": "https://cdn.casbin.org/img/social_fitbit.png",
+      "sha256": "b221bb95dfc168db4cd443d195c58628c6146b1ce474387e42b6fb271a893e97",
+      "bytes": 6318
+    },
+    {
+      "path": "img/social_geetest.png",
+      "source": "https://cdn.casbin.org/img/social_geetest.png",
+      "sha256": "3fa3f872191cde9dc004cb28555cc6db94bf3883136fb971bd175edca8bcd013",
+      "bytes": 3946
+    },
+    {
+      "path": "img/social_gitea.png",
+      "source": "https://cdn.casbin.org/img/social_gitea.png",
+      "sha256": "d1a4ff97d3f3378780eb79d03e151c99e4dbb089121f9d3a2f0954d77a9ef532",
+      "bytes": 34693
+    },
+    {
+      "path": "img/social_gitee.png",
+      "source": "https://cdn.casbin.org/img/social_gitee.png",
+      "sha256": "bb1da66b0704fbe662b903f76a3afa854ada2b9c80c684b8ebfca7163b9c63c0",
+      "bytes": 14203
+    },
+    {
+      "path": "img/social_github.png",
+      "source": "https://cdn.casbin.org/img/social_github.png",
+      "sha256": "8e7031e9cc2a8a86111b65b22139a8412858ef26181a9d3facff03b67596ee8c",
+      "bytes": 2921
+    },
+    {
+      "path": "img/social_gitlab.png",
+      "source": "https://cdn.casbin.org/img/social_gitlab.png",
+      "sha256": "cc709d9b5198b5c62f6201cf6ac609f07de6c2a658f4bab17f450f2d4a667c5d",
+      "bytes": 10668
+    },
+    {
+      "path": "img/social_google.png",
+      "source": "https://cdn.casbin.org/img/social_google.png",
+      "sha256": "f907bfdefb996fc5a83653eb4fb68a5232620ffd8edc32fa6a16d41bffb9ffd5",
+      "bytes": 7063
+    },
+    {
+      "path": "img/social_google_chat.png",
+      "source": "https://cdn.casbin.org/img/social_google_chat.png",
+      "sha256": "fc9cb87c0a81414fad43d8961491ad32c881d0521e0de2c510356fa919bcf28b",
+      "bytes": 4350
+    },
+    {
+      "path": "img/social_google_cloud.png",
+      "source": "https://cdn.casbin.org/img/social_google_cloud.png",
+      "sha256": "c2b6ee22c83507eb07784cee45d9e1be4875fdd9e628b2e5dd6733c5439f53ac",
+      "bytes": 30917
+    },
+    {
+      "path": "img/social_hcaptcha.png",
+      "source": "https://cdn.casbin.org/img/social_hcaptcha.png",
+      "sha256": "ed50abbc6a107b767854d41163ae6299d7cd371f90cd8072c90425facaeb91c6",
+      "bytes": 1582
+    },
+    {
+      "path": "img/social_heroku.png",
+      "source": "https://cdn.casbin.org/img/social_heroku.png",
+      "sha256": "6f33cbe9267b9b1dfc5012b211f27f87a7cf4408b683a1acd5c48f9dcd221111",
+      "bytes": 60372
+    },
+    {
+      "path": "img/social_huawei.png",
+      "source": "https://cdn.casbin.org/img/social_huawei.png",
+      "sha256": "65aeb15b2127f9733d3fd3264cdc90f7db30f65ef1326f36bced916d8b226b73",
+      "bytes": 141979
+    },
+    {
+      "path": "img/social_influxcloud.png",
+      "source": "https://cdn.casbin.org/img/social_influxcloud.png",
+      "sha256": "5d1158d356939dcd73997d97d99381444d41ab660436428950ea9ddd13804837",
+      "bytes": 17912
+    },
+    {
+      "path": "img/social_infobip.png",
+      "source": "https://cdn.casbin.org/img/social_infobip.png",
+      "sha256": "9f4d4094a1a2133fca6f6c759bc8d8248ce334a9fdedf334711f767125d6786a",
+      "bytes": 9007
+    },
+    {
+      "path": "img/social_infoflow.png",
+      "source": "https://cdn.casbin.org/img/social_infoflow.png",
+      "sha256": "1f90797e8ac04e91edcf62b154c142af9f9d5b0392c32a3e837cf6244bd86706",
+      "bytes": 15300
+    },
+    {
+      "path": "img/social_instagram.png",
+      "source": "https://cdn.casbin.org/img/social_instagram.png",
+      "sha256": "2df8ef8c059500882f35fa16477fdd8c4c247a2a84d1e71212df6de0a0adad71",
+      "bytes": 87575
+    },
+    {
+      "path": "img/social_intercom.png",
+      "source": "https://cdn.casbin.org/img/social_intercom.png",
+      "sha256": "3bf5ccafbf873dcaf6d8b6aa6ab83897101d226a79ddcb52b54167907d92b909",
+      "bytes": 7954
+    },
+    {
+      "path": "img/social_jumio.png",
+      "source": "https://cdn.casbin.org/img/social_jumio.png",
+      "sha256": "a6166395cb5462745a12b5a4d11dbda1473ce1d0c24daeb984a1922e8341fd03",
+      "bytes": 1731
+    },
+    {
+      "path": "img/social_kakao.png",
+      "source": "https://cdn.casbin.org/img/social_kakao.png",
+      "sha256": "db3111a7c320e5f13a1e99b0a1e780b469450dfe8f60511ec286c9de790471f9",
+      "bytes": 4492
+    },
+    {
+      "path": "img/social_keycloak.png",
+      "source": "https://cdn.casbin.org/img/social_keycloak.png",
+      "sha256": "880ea1d1400279ea5fa6d3d03e6d41612b9c67d4e39954a00987edb09846bddb",
+      "bytes": 5461
+    },
+    {
+      "path": "img/social_kwai.png",
+      "source": "https://cdn.casbin.org/img/social_kwai.png",
+      "sha256": "63e2851635c8ec3ffc37d9dfcda659a3eab29060da111c04d432bbc3d236b9ef",
+      "bytes": 11256
+    },
+    {
+      "path": "img/social_lark.png",
+      "source": "https://cdn.casbin.org/img/social_lark.png",
+      "sha256": "45e8bac0730df5ca757ba27a21a92283702a985497dc940e5fbaf15fc6fcbfbe",
+      "bytes": 2820
+    },
+    {
+      "path": "img/social_lastfm.png",
+      "source": "https://cdn.casbin.org/img/social_lastfm.png",
+      "sha256": "d63754923e53c5fdf1da53fc32c837e97204e2fa14af7640e101566da1b1e7a9",
+      "bytes": 33147
+    },
+    {
+      "path": "img/social_line.png",
+      "source": "https://cdn.casbin.org/img/social_line.png",
+      "sha256": "f31945136abd8b318ee6031ed9fabbb09ce17fbff11334bc84e00f96f23ababa",
+      "bytes": 5629
+    },
+    {
+      "path": "img/social_linkedin.png",
+      "source": "https://cdn.casbin.org/img/social_linkedin.png",
+      "sha256": "6598259c06fc99380a248bcf5ebde9fd4807dbd0dcc07b31b708999fab1d70fa",
+      "bytes": 7383
+    },
+    {
+      "path": "img/social_mailru.png",
+      "source": "https://cdn.casbin.org/img/social_mailru.png",
+      "sha256": "b5769585be7de743b88938564605147691914d989ef3fe73877e66d4387dc1d1",
+      "bytes": 19347
+    },
+    {
+      "path": "img/social_matrix.png",
+      "source": "https://cdn.casbin.org/img/social_matrix.png",
+      "sha256": "37703ec92c0339e9753db79118eb36c00138380b37b33975d9c1293d208abf28",
+      "bytes": 21231
+    },
+    {
+      "path": "img/social_meetup.png",
+      "source": "https://cdn.casbin.org/img/social_meetup.png",
+      "sha256": "48a9d2e474ae0bc6f0e92027a7c44c12010779f40b3cfd8d36fe1224e7c589f7",
+      "bytes": 8752
+    },
+    {
+      "path": "img/social_microsoftonline.png",
+      "source": "https://cdn.casbin.org/img/social_microsoftonline.png",
+      "sha256": "d24f5751ad617758174c1ca3b2ef936a81300c6bf50e68d2d9a8ef2256d68c76",
+      "bytes": 948
+    },
+    {
+      "path": "img/social_minio.png",
+      "source": "https://cdn.casbin.org/img/social_minio.png",
+      "sha256": "1f000dc2a1528bca0fa29598de57bcc7d32a9ed99d932d62e3efc2689698d5d6",
+      "bytes": 24919
+    },
+    {
+      "path": "img/social_msg91.ico",
+      "source": "https://cdn.casbin.org/img/social_msg91.ico",
+      "sha256": "18a226095419f4dd76ee7ace87ec5763c9237bc30f290c9a300cff9cceb92dad",
+      "bytes": 6528
+    },
+    {
+      "path": "img/social_naver.png",
+      "source": "https://cdn.casbin.org/img/social_naver.png",
+      "sha256": "14f8eee1e33180cf1d9fa0cbe9fca62aa16cfa91dcbd0fd570409267de1ea0d6",
+      "bytes": 3844
+    },
+    {
+      "path": "img/social_nextcloud.png",
+      "source": "https://cdn.casbin.org/img/social_nextcloud.png",
+      "sha256": "e9f925fc02142b55b8c0117911da1e82446918472a13ca2c2e3cb538f1bf3922",
+      "bytes": 9626
+    },
+    {
+      "path": "img/social_okta.png",
+      "source": "https://cdn.casbin.org/img/social_okta.png",
+      "sha256": "d8d920cdd20b68138d5c6c1c4524b4e2b6ad7a56e70d5d0f82341731c85f7bf8",
+      "bytes": 10239
+    },
+    {
+      "path": "img/social_onedrive.png",
+      "source": "https://cdn.casbin.org/img/social_onedrive.png",
+      "sha256": "bccee92dacea16d96cd690a6963749865893b18485e00141f52c01883f2db00b",
+      "bytes": 9754
+    },
+    {
+      "path": "img/social_openai.svg",
+      "source": "https://cdn.casbin.org/img/social_openai.svg",
+      "sha256": "9b2c94a44f116bfbc7c0506b34573cb9b5494a4cd0f2747ddb22de715b078220",
+      "bytes": 1802
+    },
+    {
+      "path": "img/social_osonsms.svg",
+      "source": "project-authored text label; upstream SVG unavailable",
+      "sha256": "0ca44646eecea6aba98ba642fa2dfd72fa9b838d2007fe18f9350a3869889d3f",
+      "bytes": 264
+    },
+    {
+      "path": "img/social_oura.png",
+      "source": "https://cdn.casbin.org/img/social_oura.png",
+      "sha256": "da1c57d726fab19953f58061702cd9259dfb07eb61da625859bf41f56420cddd",
+      "bytes": 14506
+    },
+    {
+      "path": "img/social_patreon.png",
+      "source": "https://cdn.casbin.org/img/social_patreon.png",
+      "sha256": "05443b2ab70821a44318b9c55abc3cca02947c6c4826bdf9a352d90fa4380363",
+      "bytes": 10667
+    },
+    {
+      "path": "img/social_paypal.png",
+      "source": "https://cdn.casbin.org/img/social_paypal.png",
+      "sha256": "f28abaaefea97c957941689c7f5bf0b0e4b916d7b8b45831c4ef97457cc9c591",
+      "bytes": 7148
+    },
+    {
+      "path": "img/social_pushbullet.png",
+      "source": "https://cdn.casbin.org/img/social_pushbullet.png",
+      "sha256": "d31d0af0cd8581ddce334f25bd443e8860abea6dddfeae4b19316d68561f08e1",
+      "bytes": 9261
+    },
+    {
+      "path": "img/social_pushover.png",
+      "source": "https://cdn.casbin.org/img/social_pushover.png",
+      "sha256": "676b7c0c68c10cfe43e7c5d3297d1e819eecb0c3a6da4e139843dedd24356f2b",
+      "bytes": 21875
+    },
+    {
+      "path": "img/social_qiniu_cloud.png",
+      "source": "https://cdn.casbin.org/img/social_qiniu_cloud.png",
+      "sha256": "73149fbd9865558755829e22ff4143bf1f2d4d510f2c91b346958391032a0648",
+      "bytes": 1877
+    },
+    {
+      "path": "img/social_qq.png",
+      "source": "https://cdn.casbin.org/img/social_qq.png",
+      "sha256": "61ec7961a9292c0df0176be2ca2fff329ffa736c52f4d00edb6fae6a19ea6231",
+      "bytes": 176217
+    },
+    {
+      "path": "img/social_recaptcha.png",
+      "source": "https://cdn.casbin.org/img/social_recaptcha.png",
+      "sha256": "e3cf54c362713b734ae836228dd125f41c7762859da42400c67ae842f2cc8d13",
+      "bytes": 3160
+    },
+    {
+      "path": "img/social_reddit.png",
+      "source": "https://cdn.casbin.org/img/social_reddit.png",
+      "sha256": "3cd22f2d2f126e002842380ae92c1cbcc30e93d3cb6f1785e0820136f3ad3cd7",
+      "bytes": 22350
+    },
+    {
+      "path": "img/social_rocket_chat.png",
+      "source": "https://cdn.casbin.org/img/social_rocket_chat.png",
+      "sha256": "b73282b712b844b2c31bcbf9bedfca997e937cd4a48169d6d5fb571f3c87eeac",
+      "bytes": 8437
+    },
+    {
+      "path": "img/social_salesforce.png",
+      "source": "https://cdn.casbin.org/img/social_salesforce.png",
+      "sha256": "803c99077378946993f11d90b53e92f4d947050666a217f71103cdadcf0fd04b",
+      "bytes": 3374
+    },
+    {
+      "path": "img/social_shopify.png",
+      "source": "https://cdn.casbin.org/img/social_shopify.png",
+      "sha256": "a48c8eac8c34603c333e5330258ecfb07a4f2cb21224c9a54f1996f5995ab793",
+      "bytes": 12489
+    },
+    {
+      "path": "img/social_slack.png",
+      "source": "https://cdn.casbin.org/img/social_slack.png",
+      "sha256": "ed7a883937ff1028bb023e7d17165ff4e6e134c0da1cdf24c2d5fe50b1520409",
+      "bytes": 28795
+    },
+    {
+      "path": "img/social_smsbao.png",
+      "source": "https://cdn.casbin.org/img/social_smsbao.png",
+      "sha256": "d1f609eb9c4d7a12d0800fc8b466918312a03c074f50860820a069ea13925e5d",
+      "bytes": 5289
+    },
+    {
+      "path": "img/social_soundcloud.png",
+      "source": "https://cdn.casbin.org/img/social_soundcloud.png",
+      "sha256": "3d60b51ee5acf3b37daaf83f7849e971cab93846162b1702b482fe2803487a2f",
+      "bytes": 8847
+    },
+    {
+      "path": "img/social_spotify.png",
+      "source": "https://cdn.casbin.org/img/social_spotify.png",
+      "sha256": "3ed2bd6e8d2d2598c24827c53da8786354371e3d8f88faf5eb279fb58acddb09",
+      "bytes": 11766
+    },
+    {
+      "path": "img/social_steam.png",
+      "source": "https://cdn.casbin.org/img/social_steam.png",
+      "sha256": "bc68e73fc3c8f892e66a41fab79e9a5b5cce6e80acf14ad5ed5868b36a42005d",
+      "bytes": 47373
+    },
+    {
+      "path": "img/social_strava.png",
+      "source": "https://cdn.casbin.org/img/social_strava.png",
+      "sha256": "2e8c4b011b7e87a0618dfacfcb7054e9738a3977cc53bacfe350f644c26192eb",
+      "bytes": 6657
+    },
+    {
+      "path": "img/social_stripe.png",
+      "source": "https://cdn.casbin.org/img/social_stripe.png",
+      "sha256": "e8c27676c5f49804a6f7bda3ec5c46628675620b24ba15ce5c008b95f8d28411",
+      "bytes": 9456
+    },
+    {
+      "path": "img/social_submail.svg",
+      "source": "https://cdn.casbin.org/img/social_submail.svg",
+      "sha256": "191a5f9c4964577d60505cfe3a67cb4d4645ed9cfcfc587b0bb3c59f6e71a0b7",
+      "bytes": 1856
+    },
+    {
+      "path": "img/social_synology.png",
+      "source": "https://cdn.casbin.org/img/social_synology.png",
+      "sha256": "90a5adc72bdd8fe804d9a3a3386821fb3f9cc6ea4ef788a4ff35c8c5b55aeee7",
+      "bytes": 4524
+    },
+    {
+      "path": "img/social_teams.png",
+      "source": "https://cdn.casbin.org/img/social_teams.png",
+      "sha256": "ab7e5a00795c7997d484aea3fe7f974cf0007cde94e89ea1b066aea095878fe2",
+      "bytes": 6409
+    },
+    {
+      "path": "img/social_telegram.png",
+      "source": "https://cdn.casbin.org/img/social_telegram.png",
+      "sha256": "2949f98ca33e217f2137b765986944edcdb57714e067451f204b0c7a0daa200f",
+      "bytes": 3688
+    },
+    {
+      "path": "img/social_tencent_cloud.jpg",
+      "source": "https://cdn.casbin.org/img/social_tencent_cloud.jpg",
+      "sha256": "8f4828b569eb58bd355c93c3e3651a97ef9b22f98c00a9c6ad1b051172d8c421",
+      "bytes": 39934
+    },
+    {
+      "path": "img/social_tiktok.png",
+      "source": "https://cdn.casbin.org/img/social_tiktok.png",
+      "sha256": "dde36e5ba848e3fb32c0ddb8e043764c388e6155f791bdabfc1af7efdbffc389",
+      "bytes": 12868
+    },
+    {
+      "path": "img/social_tumblr.png",
+      "source": "https://cdn.casbin.org/img/social_tumblr.png",
+      "sha256": "b19a34fb18b4383e10259818c9b1ef7923ea354921c5ba9e9254ba71d5abeacc",
+      "bytes": 8186
+    },
+    {
+      "path": "img/social_twilio.svg",
+      "source": "https://cdn.casbin.org/img/social_twilio.svg",
+      "sha256": "45ea1e3673efd59c92333b16332f8b8f308c1e2c2a83154a3ead0e1ae89bef28",
+      "bytes": 549
+    },
+    {
+      "path": "img/social_twitch.png",
+      "source": "https://cdn.casbin.org/img/social_twitch.png",
+      "sha256": "533a31f2a2154f9a967f9495ed1a9270885125c0373a8720adaa425c6bc32d68",
+      "bytes": 9618
+    },
+    {
+      "path": "img/social_twitter.png",
+      "source": "https://cdn.casbin.org/img/social_twitter.png",
+      "sha256": "aeb8f203a6a21cca668c5c8983dfe86b3cf95add102305da8208100595d69800",
+      "bytes": 9480
+    },
+    {
+      "path": "img/social_typetalk.png",
+      "source": "https://cdn.casbin.org/img/social_typetalk.png",
+      "sha256": "99998c71cb7234ceb8bf7893232150ac14579736d3d74e55bc3ce7e0a21bb72b",
+      "bytes": 2755
+    },
+    {
+      "path": "img/social_uber.png",
+      "source": "https://cdn.casbin.org/img/social_uber.png",
+      "sha256": "55cead0fd1296e371043790d24a2e610eedc9365bed7fbcdb728cd319328567a",
+      "bytes": 7209
+    },
+    {
+      "path": "img/social_ucloud.png",
+      "source": "https://cdn.casbin.org/img/social_ucloud.png",
+      "sha256": "f627fa0f7372090f914337fed17582c978975e2d5e72d594123a3d06d3ed78ab",
+      "bytes": 906
+    },
+    {
+      "path": "img/social_viber.png",
+      "source": "https://cdn.casbin.org/img/social_viber.png",
+      "sha256": "df64ca2de0c606710f7ba774940aadb89b38206fe8236dcad8127bbe9deff7b1",
+      "bytes": 8059
+    },
+    {
+      "path": "img/social_vk.png",
+      "source": "https://cdn.casbin.org/img/social_vk.png",
+      "sha256": "14a18a7e1de9a4911953476e99c3cc0323514fcbd6e21466e9119551273e7efc",
+      "bytes": 12799
+    },
+    {
+      "path": "img/social_volc_engine.jpg",
+      "source": "https://cdn.casbin.org/img/social_volc_engine.jpg",
+      "sha256": "28fb5c5f57198c5642fc5fc345371a475f3bc6ce2c6c39f29dce467ed01e76e6",
+      "bytes": 10307
+    },
+    {
+      "path": "img/social_wechat.png",
+      "source": "https://cdn.casbin.org/img/social_wechat.png",
+      "sha256": "8ee75d372cf531e5b17fa30939e80e26e60ca4b61520670c6e849e0be91a0a42",
+      "bytes": 21523
+    },
+    {
+      "path": "img/social_wechatminiprogram.png",
+      "source": "https://cdn.casbin.org/img/social_wechatminiprogram.png",
+      "sha256": "aae1e362d8e76a29b983d1acd79fbd6ce6dc16c8c236771e5370d21ffcaf7897",
+      "bytes": 143706
+    },
+    {
+      "path": "img/social_wecom.png",
+      "source": "https://cdn.casbin.org/img/social_wecom.png",
+      "sha256": "349b905261555927602f746e017efb4c23973bdc93bba260614147d06506069d",
+      "bytes": 8571
+    },
+    {
+      "path": "img/social_weibo.png",
+      "source": "https://cdn.casbin.org/img/social_weibo.png",
+      "sha256": "a80428d465c2d7d6dc9e4d78ee64c7314723c3cdc0d68f2dd3846f4fe829caa2",
+      "bytes": 9064
+    },
+    {
+      "path": "img/social_wepay.png",
+      "source": "https://cdn.casbin.org/img/social_wepay.png",
+      "sha256": "a6ec6088e7057514a84bf8fb9efb2bca40705666d36cf2148f37a043e1fe6e59",
+      "bytes": 2230
+    },
+    {
+      "path": "img/social_xero.png",
+      "source": "https://cdn.casbin.org/img/social_xero.png",
+      "sha256": "17970f98fe033f7e394376b8bbcc80375226c890c719980ac5b33993887d19be",
+      "bytes": 7601
+    },
+    {
+      "path": "img/social_yahoo.png",
+      "source": "https://cdn.casbin.org/img/social_yahoo.png",
+      "sha256": "380f00b20db436e6ff64ad09c4b160c76db05ca0a5bf03d061c1f63290c0d9e7",
+      "bytes": 3060
+    },
+    {
+      "path": "img/social_yammer.png",
+      "source": "https://cdn.casbin.org/img/social_yammer.png",
+      "sha256": "02525e7b931efea10ffff4822b00b6181f67b5a936fcf7524d6c9cb6ec4703ee",
+      "bytes": 6003
+    },
+    {
+      "path": "img/social_yandex.png",
+      "source": "https://cdn.casbin.org/img/social_yandex.png",
+      "sha256": "b960d13e70030c29560bd76dc5ce82812326b92c24098a50f1b33852a537cc6e",
+      "bytes": 8066
+    },
+    {
+      "path": "img/social_zoom.png",
+      "source": "https://cdn.casbin.org/img/social_zoom.png",
+      "sha256": "e49451ea6378868038bc229196b2687d2ae96860c126627bf98cd576da2cf6e1",
+      "bytes": 4502
+    }
+  ],
+  "unavailable": []
+}

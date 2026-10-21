@@ -96,9 +96,9 @@ vm.runInNewContext(output, {
       getRequestOrganization: () => org,
       isDefaultOrganizationSelected: () => false,
       isLocalAdminUser: () => true,
-      StaticBaseUrl: "",
+      StaticBaseUrl: config.CASDOOR_URL + "/static",
     },
-    { get: (o: any, k: any) => o[k] || (() => suffix) },
+    { get: (o: any, k: any) => (k in o ? o[k] : () => suffix) },
   ),
 });
 const account = { owner: org, name: "qa_user", isAdmin: true };

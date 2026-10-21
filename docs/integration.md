@@ -2,6 +2,12 @@
 
 本仓库中的 beadgrid、focustake 是演示产品，本轮没有更改真实拼豆或录屏仓库。下一轮在真实产品仓库内接入时，可复用 `examples/product-client.ts` 和 `src/server/auth.ts` 的授权码处理方式，不需要复制整个管理后台。
 
+## 产品内账号模块与个人中心
+
+产品自己呈现账号菜单、当前产品会员和剩余次数。登录后用产品后端会话查询本产品权益；不要把中心整页复制或iframe嵌入。两个不同布局的实现见 `src/web/product-apps.tsx`，协议封装仍用 `examples/product-client.ts`。
+
+“账号与安全”跳转 `CENTER_URL/?product=已登记产品标识&tab=security`，兑换入口可用 `tab=redeem`。中心只从启用的服务端登记返回可信产品URL；product参数不参与授权，不接受任意return_to。新产品应先在 `config/products.json`登记并重启。不要让浏览器持有产品密钥、数据库密码或管理员凭据。个人中心、各产品、管理后台使用各自会话；管理Cookie不与根消费者身份Cookie混用。
+
 ## 接入步骤
 
 1. 为真实产品确定唯一产品标识、后端地址、精确登录回调地址。在 Casdoor 创建 `consumers` 组织下的独立应用，启用授权码、RS256、`JWT-Standard`、登录会话，配置单个精确回调白名单；禁止通配回调。消费者应用启用用户名密码，未配置的短信、邮件、微信提供者保持关闭。

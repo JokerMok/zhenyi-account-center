@@ -53,7 +53,7 @@ export const appConfigs: Record<string, AppConfig> = {
   },
   admin: {
     id: "admin",
-    name: "权益运营",
+    name: "臻一管理后台",
     url: env.CENTER_URL,
     application: "zhenyi-admin",
     clientId: env.CASDOOR_ADMIN_CLIENT_ID,

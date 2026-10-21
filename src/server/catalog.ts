@@ -83,7 +83,7 @@ export async function catalog() {
               : a.application !== p.application ||
                   a.url + "/auth/callback/" + a.id !== p.callback_url
                 ? "登记不一致"
-                : "配置已登记，尚未完成产品验收",
+                : "配置已登记，待验证实际接入",
         };
       }),
     ),

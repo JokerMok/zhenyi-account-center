@@ -1,6 +1,6 @@
 # 外部服务配置与验证清单
 
-全部使用 Casdoor v4.22.0 原生配置页面与后端逻辑。管理入口 http://localhost:5300/providers 、http://localhost:5300/applications 、http://localhost:5300/syncers 。本机未接入真实商户或员工系统。保存不是验证成功；缺项在中心完整管理页读取实际提供者配置后显示。已保存的敏感配置只由原生权限和脱敏接口处理，中心状态接口不返回密钥。
+全部使用 Casdoor v4.22.0 原生配置页面与后端逻辑。管理入口 http://localhost:5310/admin/providers 、http://localhost:5310/admin/applications 、http://localhost:5310/admin/syncers 。本机未接入真实商户或员工系统。保存不是验证成功；缺项在统一后台“系统设置→配置与诊断”读取实际提供者配置后显示。已保存的敏感配置只由原生权限和脱敏接口处理，中心状态接口不返回密钥。
 
 | 能力 | 最少需要提供／配置 | 原生验证与回调 | 当前边界 |
 | --- | --- | --- | --- |

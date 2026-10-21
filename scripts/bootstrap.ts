@@ -50,6 +50,15 @@ for (const name of ["built-in", "consumers"]) {
       },
     );
 }
+const managementApplication = await casdoorApi("get-application", {
+  id: "admin/zhenyi-admin",
+});
+if (managementApplication?.displayName === "臻一权益运营")
+  await casdoorApi(
+    "update-application",
+    { id: "admin/zhenyi-admin" },
+    { ...managementApplication, displayName: "臻一管理后台" },
+  );
 const workerConfig = {
   owner: "built-in",
   organization: "built-in",

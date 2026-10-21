@@ -1,25 +1,6 @@
 import React, { useEffect, useState } from "react";
 import modules from "../../config/casdoor-modules.json";
 type Any = Record<string, any>;
-export function NativeNavigation({ url }: { url: string }) {
-  return (
-    <div className="native-navigation">
-      <p>Casdoor 完整管理</p>
-      {[...new Set(modules.map((m) => m.group))].map((group) => (
-        <details key={group}>
-          <summary>{group}</summary>
-          {modules
-            .filter((m) => m.group === group)
-            .map((m) => (
-              <a key={m.id} href={url + m.path}>
-                {m.label}
-              </a>
-            ))}
-        </details>
-      ))}
-    </div>
-  );
-}
 export function CompleteManagement({
   request,
   casdoor,
@@ -47,7 +28,7 @@ export function CompleteManagement({
   }, [version]);
   return (
     <>
-      <h1>完整管理与配置状态</h1>
+      <h1>配置与诊断</h1>
       <p>
         身份、组织、认证协议和商业记录由 Casdoor
         管理；产品权益、次数与任务恢复由公共权益服务管理。
@@ -56,10 +37,7 @@ export function CompleteManagement({
         <h2>Casdoor v4.22.0</h2>
         <p>
           全部原生页面与操作保留。配置已保存、接口可读和实际业务验证是不同的状态。
-        </p>
-        <a className="button primary" href={casdoor + "/"}>
-          进入原生管理工作区
-        </a>{" "}
+        </p>{" "}
         <button onClick={() => setVersion((v) => v + 1)}>刷新配置状态</button>
         {data && (
           <p className="muted">
@@ -115,7 +93,12 @@ export function CompleteManagement({
                 .map((m: any) => (
                   <div className="setting-line" key={m.id}>
                     <div>
-                      <a href={casdoor + m.path}>
+                      <a
+                        href={
+                          casdoor +
+                          (m.path === "/" ? "/system/dashboard" : m.path)
+                        }
+                      >
                         <strong>{m.label}</strong>
                       </a>
                       <p>
@@ -133,7 +116,13 @@ export function CompleteManagement({
                         </small>
                       )}
                     </div>
-                    <a className="button" href={casdoor + m.path}>
+                    <a
+                      className="button"
+                      href={
+                        casdoor +
+                        (m.path === "/" ? "/system/dashboard" : m.path)
+                      }
+                    >
                       进入配置
                     </a>
                   </div>
@@ -153,7 +142,12 @@ export function CompleteManagement({
                   </small>
                 </div>
                 {m.status !== "该固定版本不包含" && (
-                  <a className="button" href={casdoor + m.path}>
+                  <a
+                    className="button"
+                    href={
+                      casdoor + (m.path === "/" ? "/system/dashboard" : m.path)
+                    }
+                  >
                     配置入口
                   </a>
                 )}

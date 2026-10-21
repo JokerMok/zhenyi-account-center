@@ -2,7 +2,7 @@
 
 ## 版本与来源
 
-2026-10-20 检查官方仓库、发布页和文档，固定 Casdoor `v4.22.0`，官方发布提交短号 `f11d6ac`。完整发布包哈希见 `upstream-lock.json`。本机为 macOS ARM64，官方 Darwin ARM64 包的 SHA-256 已验证。未改动上游源码。
+2026-10-20 检查官方仓库、发布页和文档，固定 Casdoor `v4.22.0`，官方发布提交短号 `f11d6ac`。完整发布包哈希见 `upstream-lock.json`。本机为 macOS ARM64，官方 Darwin ARM64 包的 SHA-256 已验证。后端发布包未修改；前端通过受版本管理的编译期扩展整合。
 
 - [官方仓库](https://github.com/casdoor/casdoor/tree/v4.22.0)
 - [发布与校验值](https://github.com/casdoor/casdoor/releases/tag/v4.22.0)
@@ -22,7 +22,7 @@
 
 Casdoor 先使用随机机器引导密码保护内置管理员，避免公网抢先设置。自定义首个用户名通过初始化用户对象完成；上游不允许重命名 `built-in/admin`，因此既有管理员不走改名或删除重建。首次自定义用户名导入时按官方要求临时启用 built-in 的新增管理员许可，导入后立即关闭；内置机器管理员仍由随机机器密码保护。导入完成后移走初始化文件，清除临时用户密码，固定实际 subject；重启不重新导入。只有 `built-in` 组织改为 `AtLeast8`、密码不过期；`consumers` 原有规则不变。
 
-已登录管理员从后台“账号与安全”在新窗口进入官方 `/account`，重新验证后使用原生密码表单。完成后关闭窗口返回后台并重新登录。原生改密通过 Casdoor `/api/set-password`，由其完成哈希、历史策略与令牌撤销。
+已登录管理员从右上角账号菜单→“我的账户”进入同一后台 `/admin/account`，使用官方密码表单；修改后重新登录。原生改密通过 Casdoor `/api/set-password`，由其完成哈希、历史策略与令牌撤销。
 
 本地忘记密码执行 `npm run admin:reset-password`，两次隐藏输入新密码；不接受命令行密码或管道输入。命令使用本机私密应用凭据调用同一官方接口，先按已固定 subject 查找管理员，不能按浏览器输入选择账号；修改后核对 subject，删除本地旧会话，追加不含密码的审计。重置后通过官方登录接口核实新密码，撤销旧会话并清除旧 credentials / 初始化 JSON 中的明文密码与遗留 bootstrap 输入，不再保存新密码。接口拒绝、网络异常及后续清理失败会分别报告，不把仅修改文件视为成功。用户名、UID、权益与原审计保持不变。恢复需要本机文件访问权限，不对普通消费者提供恢复接口。
 
@@ -31,7 +31,7 @@ Casdoor 先使用随机机器引导密码保护内置管理员，避免公网抢
 ## 持久化与任务
 
 - 数据卷：`zhenyi-accounts_accounts-postgres`。不同数据库与角色隔离身份和权益。两个示例仅有自己的会话、登录尝试和任务行权限，无权读取或更新权益表。
-- Casdoor：`.local/casdoor`。前端构建随官方发布包提供，服务绑定 `127.0.0.1:5300`。
+- Casdoor：`.local/casdoor`。前端构建随官方发布包提供，原始后端绑定 `127.0.0.1:5305`，公开身份网关为5300。
 - 该版本上游 RADIUS 启动逻辑无独立关闭开关，留空端口会绑定随机 UDP 端口。本项目配置 `radiusServerPort = -1` 让该非业务监听器拒绝启动，使用随机 secret，并保持组织的 RADIUS 关闭；日志中的对应 invalid port 提示是这一配置的预期结果。运行时已核对没有 UDP 监听，不修改上游代码。
 - 应用日志与 PID：`.local/*.log`、`.local/*.pid.json`。停止脚本只处理本项目进程和数据库服务，不操作其他项目。
 - 两个示例产品每30秒恢复自己的未完成任务，也可 `APP_ID=beadgrid npm run demo:recover`。从持久化任务读取预占ID／原请求号，凭产品后端密钥恢复，无需浏览器会话。中心仍不可用时保留 `pending_recovery`。
@@ -74,12 +74,25 @@ npm run restore -- backups/accounts-日期.tar.gz
 
 ## v4.22.0完整前端与可回退扩展
 
-`npm start` 首次构建完整原生前端；需联网访问固定GitHub归档及npm依赖仓库，额外使用锁定的yarn1.22.22。源码归档哈希、二进制版本／完整commit见upstream-lock；后端不修改。`npm run native:build` 重新应用独立编译期React扩展，所有原生路由保留。CENTER_URL变化时启动脚本检测构建戳并重新构建，避免扩展跳转旧地址。可用`NATIVE_NPM_REGISTRY`指定依赖下载镜像，版本和integrity仍由原生yarn.lock约束。
+`npm start` 首次构建完整原生前端；需联网访问固定GitHub归档及npm依赖仓库，额外使用锁定的yarn1.22.22。源码归档哈希、二进制版本／完整commit见upstream-lock；后端不修改。`npm run native:build` 重新应用独立编译期React扩展，所有原生路由保留。CENTER_URL、CASDOOR_URL或受版本管理的扩展输入变化时启动脚本检测构建戳并重新构建，避免扩展跳转旧地址。可用`NATIVE_NPM_REGISTRY`指定依赖下载镜像，版本和integrity仍由原生yarn.lock约束。
 
 原生前端原包保留在 `.local/casdoor/web/build-official-v4.22.0`，上一构建保留`build-previous`。停止本项目后替换build目录即可回退前端；数据库迁移004只增列、表和索引，不清库。回退旧服务前先备份，保留新增表和历史记录，不执行破坏性down迁移。扩展差异和Apache许可证见`upstream/`。
 
 v4.22.0 Webhook投递worker仅在启动时已经存在配置才运行。bootstrap通过官方API创建禁用的 `zhenyi-worker-bootstrap` 占位配置（空events，不投递），首次创建后启动脚本只重启本项目Casdoor一次；之后不会重复重启。这样原生新增并启用的Webhook可实际投递和重试，仍由Casdoor保存投递记录。
 
-主机默认只开放回环5300／5310／5311／5312／5342。LDAP、LDAPS、RADIUS主监听保持关闭；该版本LDAP和RADIUS监听在进程内绑定0.0.0.0，不在日常主机无隔离启用。本轮使用独立身份库和临时容器，回环映射5356 HTTP、5357 LDAP、5359 LDAPS、5358 UDP RADIUS；测试结束即停止移除。RADIUS关闭值是-1，不能用0代替（0会请求随机端口）。
+主机默认只开放回环5300／5305／5310／5311／5312／5342。LDAP、LDAPS、RADIUS主监听保持关闭；该版本LDAP和RADIUS监听在进程内绑定0.0.0.0，不在日常主机无隔离启用。本轮使用独立身份库和临时容器，回环映射5356 HTTP、5357 LDAP、5359 LDAPS、5358 UDP RADIUS；测试结束即停止移除。RADIUS关闭值是-1，不能用0代替（0会请求随机端口）。
 
 实际验证脚本：`npm run test:native`、`test:protocols`、`test:listeners`、`test:auxiliary`。使用TEST_ADMIN_PASSWORD在本机交互环境授权当前管理员登录；不要把密码放入命令历史、Git或报告。可通过本机shell隐藏读取环境变量。脚本会创建合成测试记录；其结果在被忽略的.local内。native与protocol脚本需已下载锁定源码；listeners需Docker及官方Linux ARM64包，创建独立身份库，不能当作生产环境巡检。
+
+## 本次统一管理迁移与回退
+
+本轮没有数据库结构迁移，不重新初始化、不改管理员凭据。启动脚本仅把本机原始Casdoor内部监听调整到CASDOOR_BACKEND_PORT（5305），staticBaseUrl调整为/static；公开issuer仍是5300。旧/admin?tab=入口兼容映射到新React路由。首次旧种子应用名称“臻一权益运营”可升级为“臻一管理后台”；自定义名称／Logo不覆盖。
+
+修改前已执行保留数据的备份，归档在本机backups目录，包含敏感材料不得提交。回退步骤：
+
+1. 先用当前代码 `npm stop`，确保新身份网关也停止，再切换上一已知提交（本轮基线53767f3）。
+2. 恢复修改前Casdoor conf（本机 `.local/casdoor/conf/app.pre-unified.conf`，或私密备份），原始监听恢复5300。保留现有.env、管理员subject、数据库和签名文件。不要再次导入初始化JSON。
+3. 将被忽略的源码生成目录改名保存，清除构建戳后由旧构建脚本从固定归档重新生成旧前端；也可还原保留的原包／旧构建。不要让旧构建脚本复用新扩展过的源码目录。
+4. 启动旧版本，定向核对登录及历史记录。此次无down迁移，不能通过清库回退。
+
+回退方案已记录，未对当前工作数据执行代码降级。新结构的完整停止／启动与身份、历史记录保留已实际验证；备份恢复库隔离验证沿用历史记录。

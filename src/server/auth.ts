@@ -98,18 +98,32 @@ export function installAuth(app: Express, serverId: string) {
         state,
         nonce,
         verifier,
-        req.query.account === "1"
-          ? "account"
-          : appId === "admin"
-            ? "admin"
-            : "user",
+        JSON.stringify({
+          kind:
+            req.query.account === "1"
+              ? "account"
+              : appId === "admin"
+                ? "admin"
+                : "user",
+          next:
+            appId === "admin" &&
+            typeof req.query.next === "string" &&
+            /^\/admin(?:\/|\?|$)/.test(req.query.next) &&
+            !/[\\\r\n]/.test(req.query.next)
+              ? req.query.next
+              : null,
+        }),
       ],
     );
     res.cookie(cookie("login_" + appId), attempt, {
       ...cookieOptions,
       maxAge: 600000,
     });
-    const u = new URL(d.authorization_endpoint);
+    const u = new URL(
+      appId === "admin"
+        ? appConfigs.admin.url + "/admin/login/oauth/authorize"
+        : d.authorization_endpoint,
+    );
     const callback = a.url + `/auth/callback/${appId}`;
     const params = {
       client_id: a.clientId,
@@ -222,12 +236,19 @@ export function installAuth(app: Express, serverId: string) {
       ],
     );
     res.cookie(cookie(appId), token, { ...cookieOptions, expires: expiry });
+    const savedMode = row.mode.startsWith("{")
+      ? JSON.parse(row.mode)
+      : { kind: row.mode };
     res.redirect(
-      row.mode === "account"
+      savedMode.kind === "account"
         ? config.CASDOOR_URL + "/account"
         : appId === "admin"
-          ? "/admin"
-          : "/",
+          ? savedMode.next || "/admin"
+          : serverId === "center" &&
+              appConfigs[req.cookies.zy_product_context]?.enabled &&
+              !["center", "admin"].includes(req.cookies.zy_product_context)
+            ? "/?product=" + encodeURIComponent(req.cookies.zy_product_context)
+            : "/",
     );
   });
   for (const appId of (serverId === "center"

@@ -14,12 +14,12 @@ checks['oidc']={'id':'oidc','status':'已集成并验证','detail':'整合回归
 # Runtime checks stay local; the checked-in snapshot contains no user ids, credentials, payloads or private log data.
 report={'date':'2026-10-21','version':inv['version'],'commit':'f11d6aca9ef065b468992de5bb4c3f315710d9f2','checks':list(checks.values()),'notes':['仅列实际检查范围；原生路由保留不等于每个操作都通过。','本地模拟支付无真实资金；未部署线上。']}
 pathlib.Path('docs/generated/verification-summary.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-lines=['# Casdoor v4.22.0 完整功能覆盖与实际验收','',f"核对日期：2026-10-21。运行二进制版本 v4.22.0，commit `{report['commit']}`。固定源码提取 {len(inv['frontend_routes'])} 条前端路由、{len(inv['backend_routes'])} 条后端路由、47 个导航入口及 {len(inv['provider_type_options'])} 个显式提供者选项ID。",'', '完整原生前后端与配置页面均保留，扩展为编译期React导航；没有iframe或DOM注入。下面“已集成并验证”仅指写明的操作，不代表所有提供者、参数组合、硬件及外部系统均验收。全部逐路由来源见 [机器清单](generated/casdoor-v4.22.0-inventory.json)。','', '| 分类 / 功能 | 真实入口（5300） | 后端读取接口 | 依赖配置 | 接入状态 / 验证范围 / 剩余 | 官方来源 |','| --- | --- | --- | --- | --- | --- |']
+lines=['# Casdoor v4.22.0 完整功能覆盖与实际验收','',f"核对日期：2026-10-21。运行二进制版本 v4.22.0，commit `{report['commit']}`。固定源码提取 {len(inv['frontend_routes'])} 条前端路由、{len(inv['backend_routes'])} 条后端路由、47 个导航入口及 {len(inv['provider_type_options'])} 个显式提供者选项ID。",'', '完整原生前后端与配置页面均保留，同一React Router／AppLayout内整合业务内容，表中管理路径统一加/admin前缀；没有iframe或DOM注入。下面“已集成并验证”仅指写明的操作，不代表所有提供者、参数组合、硬件及外部系统均验收。全部逐路由来源见 [机器清单](generated/casdoor-v4.22.0-inventory.json)。','', '| 分类 / 功能 | 统一后台相对入口（5310/admin） | 后端读取接口 | 依赖配置 | 接入状态 / 验证范围 / 剩余 | 官方来源 |','| --- | --- | --- | --- | --- | --- |']
 external={'providers','agents','servers','entries','sites','rules','syncers','verifications','server-store'}
 for m in inv['modules']:
  r=checks.get(m['id']);status=r['status'] if r else '已配置，尚未验证';detail=r['detail'] if r else '页面与原生实现保留；本轮未单独操作验证。'
  if m['id'] in external:status='已集成，等待外部配置'
- lines.append('| '+ ' | '.join([m['group']+' / '+m['label'],'`'+m['path']+'`','`/api/'+m['endpoint']+'`' if m['endpoint'] else '原生页面组合接口',m['dependencies'] or '无需外部凭据',status+'；'+detail,'[固定源码]('+m['source']+')'])+' |')
+ lines.append('| '+ ' | '.join([m['group']+' / '+m['label'],'`'+('/system/dashboard' if m['path']=='/' else m['path'])+'`','`/api/'+m['endpoint']+'`' if m['endpoint'] else '原生页面组合接口',m['dependencies'] or '无需外部凭据',status+'；'+detail,'[固定源码]('+m['source']+')'])+' |')
 lines+=['','## 协议、认证及版本边界','','| 能力 | 入口与接口 | 状态 | 本轮实际验证与缺项 | 官方来源 |','| --- | --- | --- | --- | --- |']
 for m in inv['capabilities']:
  r=checks.get(m['id']);state=m.get('pending',r['status'] if r else '已配置，尚未验证');detail=(r['detail'] if r else m.get('note','未单独验证'))+'；'+m['dependencies'];lines.append('| '+' | '.join([m['label'],'`'+m['path']+'`；'+', '.join('`'+p+'`' for p in m['api']),state,detail,'[固定源码](https://github.com/casdoor/casdoor/blob/v4.22.0/'+m['source']+')'])+' |')
