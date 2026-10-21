@@ -387,20 +387,14 @@ function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
         )}
       </div>
       <div className="welcome-products">
-        {!admin && (
-          <>
-            <a href={cfg.beadgrid}>
+        {!admin &&
+          (cfg.products || []).map((p: Any) => (
+            <a key={p.id} href={p.url}>
               <Blocks size={20} />
-              拼豆工坊 <small>示例产品</small>
+              {p.name}
               <ArrowUpRight size={16} />
             </a>
-            <a href={cfg.focustake}>
-              <LayoutGrid size={20} />
-              专注录屏 <small>示例产品</small>
-              <ArrowUpRight size={16} />
-            </a>
-          </>
-        )}
+          ))}
       </div>
       <div className="fineprint">
         可用登录方式以统一登录页为准。第三方服务的配置状态可在账号与安全中查看。
@@ -465,6 +459,9 @@ function DataState({
 function EntitlementList({ items }: { items: Any[] }) {
   return (
     <div className="product-list">
+      {!items.length && (
+        <Empty>尚未开通产品权益，开通或兑换后会在这里显示。</Empty>
+      )}
       {items.map((e) => (
         <article className="product-row" key={e.product.id}>
           <div className={"product-icon " + e.product.id}>
@@ -713,7 +710,7 @@ function Consumer(c: Context & { tab: string }) {
       />
       <div className="section-heading">
         <h2>我的产品</h2>
-        <span>演示产品 · 独立权益</span>
+        <span>各产品权益独立管理</span>
       </div>
       <DataState data={data} error={error}>
         <EntitlementList items={data || []} />

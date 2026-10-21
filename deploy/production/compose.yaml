@@ -1,0 +1,28 @@
+name: zhenyi-accounts
+services:
+  postgres:
+    image: postgres@sha256:aa90e97ee862e558111d34cfb8b2c4bec768c2b039fb791341686928560263b3
+    restart: unless-stopped
+    mem_limit: 768m
+    ports: ["127.0.0.1:5342:5432"]
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      CASDOOR_DB_PASSWORD: ${CASDOOR_DB_PASSWORD:?}
+      ENTITLEMENTS_DB_PASSWORD: ${ENTITLEMENTS_DB_PASSWORD:?}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/10-accounts.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    logging:
+      driver: local
+      options: {max-size: "10m", max-file: "3"}
+volumes:
+  postgres-data:
+networks:
+  default:
+    ipam:
+      config: [{subnet: 10.237.0.0/24}]

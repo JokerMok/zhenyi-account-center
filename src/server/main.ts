@@ -11,7 +11,7 @@ import { installConsole } from "./console";
 import { z, ZodError } from "zod";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { config, appConfigs } from "./config";
+import { config, appConfigs, productApps } from "./config";
 import { pool, tx, assert, Fault, lock } from "./db";
 import {
   installAuth,
@@ -132,6 +132,9 @@ app.get("/api/config", async (_req, res) => {
         ? { id, name: p.name, url: p.url }
         : null;
     })(),
+    products: productApps
+      .filter((p) => p.enabled)
+      .map((p) => ({ id: p.id, name: p.name, url: p.url })),
     signup: `${config.CASDOOR_URL}/signup/${appConfigs[serverId].application}`,
     services: state
       ? Object.fromEntries(
@@ -146,6 +149,7 @@ app.get("/api/config", async (_req, res) => {
   });
 });
 installAuth(app, serverId);
+app.get("/login", (_req, res) => res.redirect("/auth/login"));
 
 if (serverId === "center") {
   app.get(

@@ -1,6 +1,23 @@
 import http from "node:http";
 import https from "node:https";
 import type { Request, Response, RequestHandler } from "express";
+export function identityCookie(
+  raw: string,
+  admin: boolean,
+  production = process.env.NODE_ENV === "production",
+) {
+  if (!raw.startsWith("casdoor_session_id=")) return raw;
+  let value = raw
+    .replace(/;\s*Domain=[^;]*/gi, "")
+    .replace(/;\s*SameSite=[^;]*/gi, "");
+  if (admin)
+    value = value
+      .replace(/^casdoor_session_id=/, "zy_identity_admin=")
+      .replace(/;\s*Path=\/[^;]*/i, "; Path=/admin");
+  if (!/;\s*HttpOnly(?:;|$)/i.test(value)) value += "; HttpOnly";
+  if (production && !/;\s*Secure(?:;|$)/i.test(value)) value += "; Secure";
+  return (value += "; SameSite=Lax");
+}
 // Streaming reverse proxy: forwards the browser's own identity cookie; no administrative credential is added.
 export function proxyTo(target: string, strip = ""): RequestHandler {
   return (req: Request, res: Response) => {
@@ -45,18 +62,9 @@ export function proxyTo(target: string, strip = ""): RequestHandler {
           )
             res.setHeader(
               key,
-              key === "set-cookie" && strip
-                ? (Array.isArray(value) ? value : [value]).map(
-                    (v) =>
-                      v
-                        .replace(/^casdoor_session_id=/, "zy_identity_admin=")
-                        .replace(/;\s*Path=\/[^;]*/i, "; Path=/admin") +
-                      (v.startsWith("casdoor_session_id=")
-                        ? "; SameSite=Lax" +
-                          (process.env.NODE_ENV === "production"
-                            ? "; Secure"
-                            : "")
-                        : ""),
+              key === "set-cookie"
+                ? (Array.isArray(value) ? value : [value]).map((v) =>
+                    identityCookie(v, Boolean(strip)),
                   )
                 : value,
             );

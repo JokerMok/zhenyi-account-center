@@ -118,7 +118,68 @@ async function downloadCasdoor() {
   mkdirSync(".local/casdoor", { recursive: true });
   run("tar", ["-xzf", archive, "-C", ".local/casdoor", "--exclude", "conf"]);
 }
-if (command === "start") {
+if (command.startsWith("writers-")) {
+  const names = [
+    "beadgrid",
+    "focustake",
+    "center",
+    "identity-gateway",
+    "casdoor",
+  ];
+  if (command === "writers-status") {
+    console.log(
+      JSON.stringify({
+        root,
+        services: Object.fromEntries(names.map((n) => [n, alive(n)])),
+      }),
+    );
+  } else {
+    const snapshot = JSON.parse(readFileSync(process.argv[3], "utf8"));
+    if (snapshot.root !== root) throw Error("进程快照不是本项目");
+    if (command === "writers-stop") {
+      for (const name of names)
+        if (alive(name)) {
+          const { pid } = JSON.parse(readFileSync(pidFile(name)));
+          process.kill(pid, "SIGTERM");
+          for (let i = 0; i < 100 && alive(name); i++)
+            await new Promise((r) => setTimeout(r, 100));
+          if (alive(name)) throw Error("进程未停止：" + name);
+        }
+    } else if (command === "writers-resume") {
+      Object.assign(process.env, dotenv.parse(readFileSync(".env")));
+      for (const name of [...names].reverse())
+        if (snapshot.services[name]) {
+          launch(
+            name,
+            name === "casdoor" ? "./casdoor" : process.execPath,
+            name === "casdoor"
+              ? []
+              : [
+                  "--import",
+                  "tsx",
+                  name === "identity-gateway"
+                    ? "scripts/identity-gateway.ts"
+                    : "src/server/main.ts",
+                ],
+            name === "casdoor" ? resolve(".local/casdoor") : root,
+            { APP_ID: name },
+          );
+          await ready(
+            "http://127.0.0.1:" +
+              {
+                casdoor: process.env.CASDOOR_BACKEND_PORT || 5305,
+                "identity-gateway": process.env.CASDOOR_PORT || 5300,
+                center: process.env.PORT || 5310,
+                beadgrid: 5311,
+                focustake: 5312,
+              }[name] +
+              "/api/health",
+            name,
+          );
+        }
+    } else throw Error("未知写入进程命令");
+  }
+} else if (command === "start") {
   run(process.execPath, ["--import", "tsx", "scripts/setup.ts"]);
   if (existsSync(".local/admin-setup.json")) {
     const setup = JSON.parse(readFileSync(".local/admin-setup.json"));

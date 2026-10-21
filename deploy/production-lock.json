@@ -1,0 +1,5 @@
+{
+  "node": {"version":"v22.23.3","asset":"node-v22.23.3-linux-x64.tar.xz","url":"https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.xz","sha256":"df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de"},
+  "postgres": {"image":"postgres@sha256:aa90e97ee862e558111d34cfb8b2c4bec768c2b039fb791341686928560263b3","architecture":"linux/amd64","version":"17.11"},
+  "casdoor": {"version":"v4.22.0","architecture":"linux/amd64","asset":"casdoor_Linux_x86_64.tar.gz","sha256":"c84c76f413ccd6008a84c3d05df08a276cbff9444da935eae301cfd61bf6dafe"}
+}
