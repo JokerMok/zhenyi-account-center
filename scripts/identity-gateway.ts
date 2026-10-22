@@ -93,6 +93,10 @@ const modules = [
   "apps",
 ];
 app.use(async (req, res, next) => {
+  // The public identity root belongs to consumers. Only explicit management paths
+  // lead to /admin; signing out from a native profile must never select built-in.
+  if (req.method === "GET" && req.path === "/")
+    return res.redirect(process.env.CENTER_URL || "http://localhost:5310");
   if (
     req.method === "GET" &&
     (req.path === "/" ||
