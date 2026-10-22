@@ -15,6 +15,7 @@ import { config, appConfigs, productApps } from "./config";
 import { pool, tx, assert, Fault, lock } from "./db";
 import {
   installAuth,
+  installConsumerEntry,
   sessionAuth,
   csrf,
   serviceAuth,
@@ -124,9 +125,7 @@ app.get("/api/config", async (_req, res) => {
     focustake: config.FOCUSTAKE_URL,
     login: "/auth/login",
     contextProduct: (() => {
-      const id = String(
-        _req.query.product || _req.cookies.zy_product_context || "",
-      );
+      const id = String(_req.query.product || "");
       const p = appConfigs[id];
       return serverId === "center" &&
         p?.enabled &&
@@ -151,6 +150,7 @@ app.get("/api/config", async (_req, res) => {
   });
 });
 installAuth(app, serverId);
+if (serverId === "center") installConsumerEntry(app);
 app.get("/login", (_req, res) => res.redirect("/auth/login"));
 
 if (serverId === "center") {
@@ -695,11 +695,23 @@ if (serverId === "center") {
   app.post("/api/admin/reconcile", async (req: Authenticated, res) =>
     res.json(await reconcile(req.identity.uid)),
   );
-  app.use("/api", sessionAuth("center"), csrf("center"), (req, _res, next) => {
-    if (req.query.uid || req.query.user_id)
-      throw new Fault(403, "CROSS_USER", "不能指定其他用户的身份");
-    next();
-  });
+  app.use(
+    "/api",
+    sessionAuth("center"),
+    csrf("center"),
+    (req: Authenticated, _res, next) => {
+      const expected = req.headers["x-expected-account"];
+      assert(
+        !expected || expected === req.identity.uid,
+        409,
+        "ACCOUNT_MISMATCH",
+        "当前个人中心已切换账号，请从产品重新进入；本页未继续操作",
+      );
+      if (req.query.uid || req.query.user_id)
+        throw new Fault(403, "CROSS_USER", "不能指定其他用户的身份");
+      next();
+    },
+  );
   app.post(
     "/api/subscriptions/refresh",
     rateLimit({
@@ -907,22 +919,6 @@ if (serverId === "center") {
 app.use("/api", (_req, res) =>
   res.status(404).json({ error: "接口不存在", code: "NOT_FOUND" }),
 );
-app.get("/", (req, res, next) => {
-  const id = String(req.query.product || "");
-  if (
-    serverId === "center" &&
-    appConfigs[id]?.enabled &&
-    !["center", "admin"].includes(id)
-  )
-    res.cookie("zy_product_context", id, {
-      httpOnly: true,
-      secure: config.production,
-      sameSite: "lax",
-      maxAge: 3600000,
-      path: "/",
-    });
-  next();
-});
 app.use(express.static(resolve("dist/web"), { index: false }));
 app.use((req, res, next) => {
   if (/\.(png|jpe?g|svg|gif|webp|ico|woff2?|ttf|css|js|map)$/i.test(req.path))
@@ -957,7 +953,7 @@ app.use((e: any, req: Request, res: Response, _next: NextFunction) => {
       .status(status)
       .type("html")
       .send(
-        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="/auth/login?${req.originalUrl.startsWith("/auth/callback/admin") ? "mode=admin&" : ""}switch=1">重新登录 / 切换账号</a></body></html>`,
+        `<!doctype html><html lang="zh"><meta charset="UTF-8"><title>登录未完成</title><body><h1>登录未完成</h1><p>${message.replace(/[<>&"']/g, "")}</p><a href="${String(res.locals.loginRetry || (req.originalUrl.startsWith("/auth/callback/admin") ? "/auth/login?mode=admin" : "/auth/login")).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!)}">重新登录 / 切换账号</a></body></html>`,
       );
   else res.status(status).json({ error: message, code });
 });

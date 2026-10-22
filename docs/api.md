@@ -83,3 +83,7 @@ Content-Type: application/json
 恢复不支持 confirm、reserve、grant；不接受 uid/user_id。跨产品URI拒绝403，其他产品预占ID返回404，歧义请求号返回409 `AMBIGUOUS_REQUEST`。重复恢复返回既有终态，不增加第二笔流水／恢复审计。已超时的 reserved 可转 expired 并释放；已确认消费只能按原预占部件返还，不创建新额度。
 
 网络断开、响应丢失或5xx必须视为 unknown；先按原请求号／预占ID查询，或使用原请求号幂等重试。示例客户端提供 `status`、`recover` 和 `confirmKnown`。确认已入账时依真实业务任务交付或返还；无法核实则保留 `pending_recovery`。示例HTTP接口对此返回202，不返回“确定失败”。详见接入文档中的持久化任务例子。
+
+### 消费者导航入口
+
+`POST /api/v1/products/{product}/consumer-entry {tab}` 沿用产品后端双重鉴权，不接受 UID 或任意 returnUrl；tab 为 overview/security/redeem/records。返回 `{url}` 只能用于启动中心自己的 OIDC 会话或校验现有同一 UID 的会话，不能替代登录。多标签授权及重试的目标绑定各自事务。

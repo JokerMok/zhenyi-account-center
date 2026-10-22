@@ -57,6 +57,7 @@ for (const path of [
   "pages/PaymentResultPage.tsx",
   "pages/UserEditPage.tsx",
   "hooks/use-logout.ts",
+  "pages/auth/ForgetPage.tsx",
 ])
   run("tar", [
     "-xzf",
@@ -176,7 +177,7 @@ const layout = source + "/web/src/components/layout/AppLayout.tsx";
 let lo = readFileSync(layout, "utf8");
 lo = lo.replace(
   '  return (\n    <div className="flex h-screen',
-  `  if (account && !Setting.isLocalAdminUser(account)) return <div className="min-h-screen bg-background"><header className="border-b p-4"><a href=${JSON.stringify(target)}>返回个人中心</a><span className="ml-4">账号与安全</span></header><main className="mx-auto max-w-4xl p-4"><Outlet/></main><footer className="p-4 text-center text-xs"><PoweredBy/></footer></div>;\n  return (\n    <div className="flex h-screen`,
+  `  if (account && !Setting.isLocalAdminUser(account)) return <div className="min-h-screen bg-background"><header className="border-b p-4"><a href={${JSON.stringify(target)}+"/?"+new URLSearchParams({tab:"security",...(new URLSearchParams(location.search).get("product")?{product:new URLSearchParams(location.search).get("product")!}:{})})}>返回个人中心</a><span className="ml-4">账号与安全</span></header><main className="mx-auto max-w-4xl p-4"><Outlet/></main><footer className="p-4 text-center text-xs"><PoweredBy/></footer></div>;\n  return (\n    <div className="flex h-screen`,
 );
 writeFileSync(layout, lo);
 const setting = source + "/web/src/lib/setting.tsx";
@@ -188,7 +189,23 @@ st = st.replace(
   "return getFullServerUrl();\n}",
   "return " + JSON.stringify(env.CASDOOR_URL) + ";\n}",
 );
+// Each auth page carries its OAuth parameters; sessionStorage is only a legacy fallback.
+st = st.replace(
+  "return `/forget/${application.name}`;",
+  "return `/forget/${application.name}` + window.location.search;",
+);
+st = st.replace(
+  'return "/forget";',
+  'return "/forget" + window.location.search;',
+);
 writeFileSync(setting, st);
+const forgetFile = source + "/web/src/pages/auth/ForgetPage.tsx";
+let forget = readFileSync(forgetFile, "utf8");
+forget = forget.replaceAll(
+  "Setting.getStoredSigninUrl() || Setting.getLoginLink(application)",
+  '((new URLSearchParams(location.search).has("client_id") ? "/login/oauth/authorize" + location.search : "") || Setting.getStoredSigninUrl()) || Setting.getLoginLink(application)',
+);
+writeFileSync(forgetFile, forget);
 const logoutFile = source + "/web/src/hooks/use-logout.ts";
 let logoutSource = readFileSync(logoutFile, "utf8");
 logoutSource = logoutSource.replace(
@@ -222,10 +239,16 @@ if (!existsSync(source + "/web/node_modules/.bin/vite"))
 const conf = source + "/web/src/Conf.ts";
 writeFileSync(
   conf,
-  readFileSync(conf, "utf8").replace(
-    'colorPrimary: "#262626"',
-    'colorPrimary: "#35644f"',
-  ),
+  readFileSync(conf, "utf8")
+    .replace(
+      'export let DefaultApplication = "app-built-in";',
+      'export let DefaultApplication = "zhenyi-center";',
+    )
+    .replace(
+      'curCookie["jsonWebConfig"] ?? document.querySelector<HTMLMetaElement>("meta[name=\'casdoor-web-config\']")?.content',
+      'document.querySelector<HTMLMetaElement>("meta[name=\'casdoor-web-config\']")?.content ?? curCookie["jsonWebConfig"]',
+    )
+    .replace('colorPrimary: "#262626"', 'colorPrimary: "#35644f"'),
 );
 const footer = source + "/web/src/components/layout/PoweredBy.tsx";
 let f = readFileSync(footer, "utf8");

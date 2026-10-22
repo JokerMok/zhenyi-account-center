@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { resolve } from "node:path";
+import { readFile } from "node:fs/promises";
 import { proxyTo } from "../src/server/proxy";
 dotenv.config({ quiet: true });
 const app = express();
@@ -129,6 +130,39 @@ app.use((req, res, next) => {
   )
     return res.status(404).type("text/plain").send("资源不存在");
   next();
+});
+// Public identity UI always defaults to consumers. /admin has its own host-local proxy cookie and config.
+app.get("/{*page}", async (req, res, next) => {
+  if (
+    ["/api/", "/.well-known/", "/swagger/", "/cas/", "/scim/"].some((p) =>
+      req.path.startsWith(p),
+    )
+  )
+    return next();
+  try {
+    const html = await readFile(
+      resolve(".local/casdoor/web/build/index.html"),
+      "utf8",
+    );
+    const web = JSON.stringify({
+      defaultApplication: "zhenyi-center",
+      staticBaseUrl: "/static",
+      forceLanguage: "zh",
+      defaultLanguage: "zh",
+      showGithubCorner: false,
+    }).replaceAll('"', "&quot;");
+    res
+      .set("Cache-Control", "no-store")
+      .type("html")
+      .send(
+        html.replace(
+          "<head>",
+          '<head><meta name="casdoor-web-config" content="' + web + '">',
+        ),
+      );
+  } catch (e) {
+    next(e);
+  }
 });
 app.use(
   proxyTo("http://127.0.0.1:" + (process.env.CASDOOR_BACKEND_PORT || 5305)),

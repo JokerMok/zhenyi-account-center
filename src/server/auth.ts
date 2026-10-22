@@ -1,6 +1,12 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Express, Request, Response, NextFunction } from "express";
 import { pool, assert, Fault } from "./db";
+import {
+  consumerTarget,
+  consumerTabs,
+  flowCookieSuffix,
+  escapeHtml,
+} from "./consumer-context";
 import { config, appConfigs, productApps, type AppId } from "./config";
 import {
   discovery,
@@ -79,17 +85,162 @@ export function sessionAuth(appId: AppId) {
     }
   };
 }
+// Optional session lookup: invalid sessions do not trigger silent retries.
+async function consumerSession(req: Request) {
+  const token = req.cookies[cookie("center")];
+  if (!token) return null;
+  const row = (
+    await pool.query(
+      "SELECT * FROM sessions WHERE token_hash=$1 AND app_id='center' AND expires_at>now()",
+      [hash(token)],
+    )
+  ).rows[0];
+  if (!row) return null;
+  try {
+    const identity = await identityFromToken(row.access_token, "center");
+    return identity.uid === row.uid ? identity : null;
+  } catch (e) {
+    if (e instanceof Fault && e.status === 401) return null;
+    throw e;
+  }
+}
+async function entryContext(value: unknown) {
+  assert(
+    typeof value === "string" && /^[A-Za-z0-9_-]{43}$/.test(value),
+    400,
+    "INVALID_ENTRY",
+    "进入链接无效，请从产品重新打开",
+  );
+  const row = (
+    await pool.query(
+      "SELECT mode FROM login_attempts WHERE token_hash=$1 AND app_id='consumer-entry' AND expires_at>now()",
+      [hash(value)],
+    )
+  ).rows[0];
+  assert(row, 410, "ENTRY_EXPIRED", "进入链接已过期，请返回产品重新打开");
+  return JSON.parse(row.mode);
+}
+function mismatch(res: Response, retry: string, back: string) {
+  res
+    .status(409)
+    .type("html")
+    .send(
+      `<!doctype html><html lang="zh"><meta charset="utf-8"><title>账号不一致</title><body><h1>产品与个人中心的账号不一致</h1><p>为防止将权益或操作归到另一账号，本次已停止。原有作品和会话未被合并。</p><a href="${escapeHtml(retry)}">使用产品账号重新验证</a> · <a href="${escapeHtml(back)}">返回产品</a></body></html>`,
+    );
+}
+export function installConsumerEntry(app: Express) {
+  app.post(
+    "/api/v1/products/:product/consumer-entry",
+    serviceAuth,
+    async (req: Authenticated, res) => {
+      const tab = req.body?.tab;
+      assert(
+        Object.keys(req.body || {}).length === 1 && consumerTabs.includes(tab),
+        400,
+        "INVALID_TARGET",
+        "个人中心目标无效",
+      );
+      const target = consumerTarget(
+        { product: req.serviceProduct, tab, account: req.identity.uid },
+        appConfigs,
+      );
+      const context = random();
+      // An opaque navigation reference cannot create a session: a normal center OIDC exchange is still required.
+      await pool.query(
+        "INSERT INTO login_attempts VALUES($1,'consumer-entry','','','',$2,now()+interval '10 minutes')",
+        [hash(context), JSON.stringify(target)],
+      );
+      res.json({
+        url: config.CENTER_URL + "/auth/consumer?context=" + context,
+      });
+    },
+  );
+  app.get("/auth/consumer", async (req, res) => {
+    const target = await entryContext(req.query.context);
+    res.locals.loginRetry =
+      "/auth/consumer?context=" + encodeURIComponent(String(req.query.context));
+    const current = await consumerSession(req);
+    if (!current)
+      return res.redirect(
+        "/auth/login?context=" + encodeURIComponent(String(req.query.context)),
+      );
+    if (current.uid !== target.account)
+      return mismatch(
+        res,
+        "/auth/login?switch=1&context=" +
+          encodeURIComponent(String(req.query.context)),
+        appConfigs[target.product].url,
+      );
+    res.redirect(target.path);
+  });
+  // Explicit consumer deep links authorize once. A logout goes to bare /, which stays logged out.
+  app.get("/", async (req, res, next) => {
+    if (!req.query.product && !req.query.tab && !req.query.account)
+      return next();
+    let target;
+    try {
+      target = consumerTarget(req.query, appConfigs);
+    } catch {
+      throw new Fault(
+        400,
+        "INVALID_TARGET",
+        "个人中心目标无效，请从产品重新进入",
+      );
+    }
+    const current = await consumerSession(req);
+    const query = new URLSearchParams({
+      product: target.product,
+      tab: target.tab,
+      ...(target.account ? { account: target.account } : {}),
+    });
+    if (!current) return res.redirect("/auth/login?" + query);
+    if (target.account && current.uid !== target.account)
+      return mismatch(
+        res,
+        "/auth/login?switch=1&" + query,
+        appConfigs[target.product]?.url || "/",
+      );
+    next();
+  });
+}
 export function installAuth(app: Express, serverId: string) {
   app.get("/auth/login", async (req, res) => {
     const appId: AppId =
       serverId === "center" && req.query.mode === "admin" ? "admin" : serverId;
     const a = appConfigs[appId],
       d = await discovery(appId);
+    const target =
+      appId === "admin"
+        ? null
+        : req.query.context
+          ? await entryContext(req.query.context)
+          : consumerTarget(
+              {
+                ...req.query,
+                account:
+                  req.query.account === "1" ? undefined : req.query.account,
+              },
+              appConfigs,
+            );
+    const current =
+      appId === "center" && req.query.account === "1"
+        ? await consumerSession(req)
+        : null;
+    const retry = new URLSearchParams();
+    if (target) {
+      if (target.product) retry.set("product", target.product);
+      retry.set("tab", target.tab);
+      if (target.account) retry.set("account", target.account);
+    }
+    if (appId === "admin") retry.set("mode", "admin");
+    res.locals.loginRetry = "/auth/login?" + retry;
     const attempt = random(),
       state = random(),
       nonce = random(),
       verifier = random();
-    await pool.query("DELETE FROM login_attempts WHERE expires_at<=now()");
+    await pool.query(
+      "DELETE FROM login_attempts WHERE expires_at<now()-interval '1 day'",
+    );
     await pool.query(
       "INSERT INTO login_attempts VALUES($1,$2,$3,$4,$5,$6,now()+interval '10 minutes')",
       [
@@ -105,6 +256,9 @@ export function installAuth(app: Express, serverId: string) {
               : appId === "admin"
                 ? "admin"
                 : "user",
+          target,
+          expectedUid: current?.uid || target?.account || null,
+          retry: res.locals.loginRetry,
           next:
             appId === "admin" &&
             typeof req.query.next === "string" &&
@@ -115,7 +269,7 @@ export function installAuth(app: Express, serverId: string) {
         }),
       ],
     );
-    res.cookie(cookie("login_" + appId), attempt, {
+    res.cookie(cookie(flowCookieSuffix(appId, state)), attempt, {
       ...cookieOptions,
       maxAge: 600000,
     });
@@ -136,8 +290,7 @@ export function installAuth(app: Express, serverId: string) {
       code_challenge_method: "S256",
     };
     Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v));
-    if (req.query.switch === "1" || req.query.account === "1")
-      u.searchParams.set("prompt", "login");
+    if (req.query.switch === "1") u.searchParams.set("prompt", "login");
     res.redirect(u.href);
   });
   app.get("/auth/callback/:id", async (req, res) => {
@@ -149,17 +302,38 @@ export function installAuth(app: Express, serverId: string) {
       "回调应用无效",
     );
     const a = appConfigs[appId];
-    const attempt = req.cookies[cookie("login_" + appId)];
+    const callbackState =
+      typeof req.query.state === "string" ? req.query.state : "";
+    const loginCookie = cookie(flowCookieSuffix(appId, callbackState));
+    const attempt = req.cookies[loginCookie];
+    if (!attempt && callbackState) {
+      const old = (
+        await pool.query(
+          "SELECT mode FROM login_attempts WHERE app_id=$1 AND state=$2",
+          [appId, callbackState],
+        )
+      ).rows[0];
+      try {
+        res.locals.loginRetry = JSON.parse(old?.mode || "{}").retry;
+      } catch {}
+    }
     assert(attempt, 401, "MISSING_LOGIN", "登录会话缺失，请重新开始");
     const row = (
       await pool.query(
-        "DELETE FROM login_attempts WHERE token_hash=$1 AND app_id=$2 AND expires_at>now() RETURNING *",
+        "DELETE FROM login_attempts WHERE token_hash=$1 AND app_id=$2 RETURNING *",
         [hash(attempt), appId],
       )
     ).rows[0];
-    res.clearCookie(cookie("login_" + appId), cookieOptions);
+    res.clearCookie(loginCookie, cookieOptions);
+    const savedMode = row?.mode.startsWith("{")
+      ? JSON.parse(row.mode)
+      : { kind: row?.mode };
+    res.locals.loginRetry =
+      savedMode.retry ||
+      (appId === "admin" ? "/auth/login?mode=admin" : "/auth/login");
     assert(
       row &&
+        new Date(row.expires_at).getTime() > Date.now() &&
         typeof req.query.state === "string" &&
         equal(req.query.state, row.state),
       401,
@@ -211,6 +385,12 @@ export function installAuth(app: Express, serverId: string) {
       "两种令牌的身份不一致",
     );
     const identity = await identityFromToken(t.access_token, appId, access);
+    if (savedMode.expectedUid && identity.uid !== savedMode.expectedUid)
+      return mismatch(
+        res,
+        res.locals.loginRetry + "&switch=1",
+        appConfigs[savedMode.target?.product]?.url || "/",
+      );
     // Rotate rather than reuse a pre-login session, and never merge data from another identity.
     const previous = req.cookies[cookie(appId)];
     if (previous)
@@ -236,19 +416,16 @@ export function installAuth(app: Express, serverId: string) {
       ],
     );
     res.cookie(cookie(appId), token, { ...cookieOptions, expires: expiry });
-    const savedMode = row.mode.startsWith("{")
-      ? JSON.parse(row.mode)
-      : { kind: row.mode };
     res.redirect(
       savedMode.kind === "account"
-        ? config.CASDOOR_URL + "/account"
+        ? config.CASDOOR_URL +
+            "/account" +
+            (savedMode.target?.path?.startsWith("/?")
+              ? savedMode.target.path.slice(1)
+              : "")
         : appId === "admin"
           ? savedMode.next || "/admin"
-          : serverId === "center" &&
-              appConfigs[req.cookies.zy_product_context]?.enabled &&
-              !["center", "admin"].includes(req.cookies.zy_product_context)
-            ? "/?product=" + encodeURIComponent(req.cookies.zy_product_context)
-            : "/",
+          : savedMode.target?.path || "/",
     );
   });
   for (const appId of (serverId === "center"

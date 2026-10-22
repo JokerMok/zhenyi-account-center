@@ -42,7 +42,17 @@ async function api(path: string, body?: unknown, method?: string) {
   const r = await fetch(path, {
     method: method || (body === undefined ? "GET" : "POST"),
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf },
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrf,
+      ...(new URLSearchParams(location.search).get("account")
+        ? {
+            "X-Expected-Account": new URLSearchParams(location.search).get(
+              "account",
+            )!,
+          }
+        : {}),
+    },
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
   });
@@ -54,6 +64,17 @@ async function api(path: string, body?: unknown, method?: string) {
       code: x.code,
     });
   return x;
+}
+function consumerLogin(switchAccount = false) {
+  const src = new URLSearchParams(location.search),
+    q = new URLSearchParams();
+  for (const k of ["product", "tab", "account"])
+    if (src.get(k)) q.set(k, src.get(k)!);
+  if (switchAccount) {
+    q.set("switch", "1");
+    q.delete("account");
+  }
+  return "/auth/login" + (q.size ? "?" + q : "");
 }
 const date = (x: any) =>
   x ? new Date(x).toLocaleString("zh-CN", { hour12: false }) : "无到期限制";
@@ -169,6 +190,20 @@ export function App() {
       current = false;
     };
   }, [version]);
+  useEffect(() => {
+    const update = () => refresh();
+    window.addEventListener("focus", update);
+    const pop = () => {
+      const q = new URLSearchParams(location.search);
+      setTab(q.get("tab") || "overview");
+      refresh();
+    };
+    window.addEventListener("popstate", pop);
+    return () => {
+      window.removeEventListener("focus", update);
+      window.removeEventListener("popstate", pop);
+    };
+  }, []);
   async function perform(fn: () => Promise<unknown>, success = "操作已完成") {
     if (busy) return;
     setBusy(true);
@@ -293,7 +328,7 @@ export function App() {
                 </button>
               </>
             ) : (
-              <a href="/auth/login">登录</a>
+              <a href={consumerLogin()}>登录</a>
             )}
           </div>
         </header>
@@ -375,7 +410,7 @@ function Welcome({ cfg, admin }: { cfg: Any; admin: boolean }) {
       <div className="button-row">
         <a
           className="button primary"
-          href={"/auth/login" + (admin ? "?mode=admin" : "")}
+          href={admin ? "/auth/login?mode=admin" : consumerLogin()}
         >
           {admin ? "管理员登录" : "登录账号"}
           <ArrowUpRight size={17} />
@@ -579,7 +614,14 @@ function Consumer(c: Context & { tab: string }) {
             </div>
             <a
               className="button secondary"
-              href={c.me.profileUrl}
+              href={
+                c.me.profileUrl +
+                "&" +
+                new URLSearchParams({
+                  product: c.cfg?.contextProduct?.id || "",
+                  tab: "security",
+                })
+              }
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -597,7 +639,7 @@ function Consumer(c: Context & { tab: string }) {
               href={
                 c.me.isAdmin
                   ? "/auth/login?mode=admin&switch=1"
-                  : "/auth/login?switch=1"
+                  : consumerLogin(true)
               }
             >
               切换账号
@@ -998,9 +1040,7 @@ export function Demo(c: Context & { tab: string }) {
       </section>
       <a
         href={
-          c.me.isAdmin
-            ? "/auth/login?mode=admin&switch=1"
-            : "/auth/login?switch=1"
+          c.me.isAdmin ? "/auth/login?mode=admin&switch=1" : consumerLogin(true)
         }
         className="text-link"
       >
