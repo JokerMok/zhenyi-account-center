@@ -177,7 +177,7 @@ const layout = source + "/web/src/components/layout/AppLayout.tsx";
 let lo = readFileSync(layout, "utf8");
 lo = lo.replace(
   '  return (\n    <div className="flex h-screen',
-  `  if (account && !Setting.isLocalAdminUser(account)) return <div className="min-h-screen bg-background"><header className="border-b p-4"><a href={${JSON.stringify(target)}+"/?"+new URLSearchParams({tab:"security",...(new URLSearchParams(location.search).get("product")?{product:new URLSearchParams(location.search).get("product")!}:{})})}>返回个人中心</a><span className="ml-4">账号与安全</span></header><main className="mx-auto max-w-4xl p-4"><Outlet/></main><footer className="p-4 text-center text-xs"><PoweredBy/></footer></div>;\n  return (\n    <div className="flex h-screen`,
+  `  if (account && !Setting.isLocalAdminUser(account)) return <div className="min-h-screen bg-background"><header className="border-b p-4"><a href={${JSON.stringify(target)}+"/?"+new URLSearchParams({tab:"security",...(new URLSearchParams(location.search).get("account")?{account:new URLSearchParams(location.search).get("account")!}:{}),...(new URLSearchParams(location.search).get("product")?{product:new URLSearchParams(location.search).get("product")!}:{})})}>返回个人中心</a><span className="ml-4">账号与安全</span></header><main className="mx-auto max-w-4xl p-4"><Outlet/></main><footer className="p-4 text-center text-xs"><PoweredBy/></footer></div>;\n  return (\n    <div className="flex h-screen`,
 );
 writeFileSync(layout, lo);
 const setting = source + "/web/src/lib/setting.tsx";

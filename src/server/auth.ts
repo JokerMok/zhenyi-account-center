@@ -209,7 +209,7 @@ export function installAuth(app: Express, serverId: string) {
       serverId === "center" && req.query.mode === "admin" ? "admin" : serverId;
     const a = appConfigs[appId],
       d = await discovery(appId);
-    const target =
+    let target =
       appId === "admin"
         ? null
         : req.query.context
@@ -218,7 +218,9 @@ export function installAuth(app: Express, serverId: string) {
               {
                 ...req.query,
                 account:
-                  req.query.account === "1" ? undefined : req.query.account,
+                  req.query.account === "1"
+                    ? req.query.expected
+                    : req.query.account,
               },
               appConfigs,
             );
@@ -226,6 +228,8 @@ export function installAuth(app: Express, serverId: string) {
       appId === "center" && req.query.account === "1"
         ? await consumerSession(req)
         : null;
+    if (current && target && !target.account)
+      target = consumerTarget({ ...target, account: current.uid }, appConfigs);
     const retry = new URLSearchParams();
     if (target) {
       if (target.product) retry.set("product", target.product);
@@ -257,7 +261,7 @@ export function installAuth(app: Express, serverId: string) {
                 ? "admin"
                 : "user",
           target,
-          expectedUid: current?.uid || target?.account || null,
+          expectedUid: target?.account || current?.uid || null,
           retry: res.locals.loginRetry,
           next:
             appId === "admin" &&

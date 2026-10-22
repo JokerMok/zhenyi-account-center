@@ -780,7 +780,7 @@ if (serverId === "center") {
       user: req.identity,
       csrf: req.session.csrf,
       isAdmin: false,
-      profileUrl: "/auth/login?account=1",
+      profileUrl: "/auth/login?account=1&expected=" + req.identity.uid,
     }),
   );
   app.get("/api/entitlements", async (req: Authenticated, res) => {
@@ -843,7 +843,7 @@ if (serverId === "center") {
     res.json({
       user: req.identity,
       csrf: req.session.csrf,
-      profileUrl: "/auth/login?account=1",
+      profileUrl: "/auth/login?account=1&expected=" + req.identity.uid,
     }),
   );
   const center = async (req: Authenticated, path: string, body?: unknown) => {
