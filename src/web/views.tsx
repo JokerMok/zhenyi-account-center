@@ -38,26 +38,45 @@ import {
 
 type Any = Record<string, any>;
 let csrf = "";
+let displayedUid = "";
 async function api(path: string, body?: unknown, method?: string) {
+  const expectedUid =
+    new URLSearchParams(location.search).get("account") || displayedUid;
+  const consumer = !path.startsWith("/api/admin");
+  // A profile/OIDC popup can rotate the same account's center session. Refresh its
+  // CSRF token before a write, while refusing an identity changed in another tab.
+  if (consumer && body !== undefined) {
+    const check = await fetch("/api/me", {
+      cache: "no-store",
+      headers: expectedUid ? { "X-Expected-Account": expectedUid } : {},
+    });
+    const current = await check.json();
+    if (!check.ok)
+      throw Object.assign(new Error(current.error || "请重新登录"), {
+        status: check.status,
+        code: current.code,
+      });
+    if (expectedUid && current.user?.uid !== expectedUid)
+      throw Object.assign(new Error("账号已改变，请从产品重新进入"), {
+        status: 409,
+        code: "ACCOUNT_MISMATCH",
+      });
+    csrf = current.csrf;
+  }
   const r = await fetch(path, {
     method: method || (body === undefined ? "GET" : "POST"),
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
       "X-CSRF-Token": csrf,
-      ...(new URLSearchParams(location.search).get("account")
-        ? {
-            "X-Expected-Account": new URLSearchParams(location.search).get(
-              "account",
-            )!,
-          }
-        : {}),
+      ...(consumer && expectedUid ? { "X-Expected-Account": expectedUid } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
   });
   const x = await r.json();
   if (x?.csrf) csrf = x.csrf;
+  if (consumer && x?.user?.uid && r.ok) displayedUid = x.user.uid;
   if (!r.ok)
     throw Object.assign(new Error(x.error || "请求失败"), {
       status: r.status,
@@ -214,7 +233,7 @@ export function App() {
       setNotice(success);
     } catch (e: any) {
       setError(e.message);
-      if (e.status === 401) {
+      if (e.status === 401 || e.code === "ACCOUNT_MISMATCH") {
         setMe(null);
         csrf = "";
       }
