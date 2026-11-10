@@ -208,6 +208,36 @@ test("模型配置、产品授权、幂等与未知结果，使用独立PostgreS
       ).rows[0].status,
       "unknown",
     );
+    const recovered = await originalFetch(
+      base + "/api/v1/products/" + product + "/ai/requests/unknown-test-01",
+      {
+        headers: {
+          Authorization:
+            "Bearer " + productApps.find((p) => p.id === product)!.serviceKey,
+        },
+      },
+    );
+    assert.equal(recovered.status, 200);
+    assert.equal((await recovered.json()).status, "unknown");
+    assert.equal(
+      (
+        await originalFetch(
+          base +
+            "/api/v1/products/" +
+            product +
+            "/ai/requests/unknown-test-01?uid=" +
+            other,
+          {
+            headers: {
+              Authorization:
+                "Bearer " +
+                productApps.find((p) => p.id === product)!.serviceKey,
+            },
+          },
+        )
+      ).status,
+      400,
+    );
     await pool.query("UPDATE products SET status='disabled' WHERE id=$1", [
       product,
     ]);

@@ -3,7 +3,13 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { appConfigs, config, productApps } from "./config";
 import { pool, tx, lock, assert, Fault } from "./db";
-import { sessionAuth, csrf, serviceAuth, type Authenticated } from "./auth";
+import {
+  sessionAuth,
+  csrf,
+  serviceAuth,
+  productBackendAuth,
+  type Authenticated,
+} from "./auth";
 import { audit, reasonSchema } from "./entitlements";
 import { encryptModelKey, decryptModelKey } from "./ai-crypto";
 
@@ -503,21 +509,16 @@ export function installAiGateway(app: Express) {
   );
   app.get(
     "/api/v1/products/:product/ai/requests/:requestId",
-    ...product,
+    productBackendAuth,
     async (req: Authenticated, res) => {
       const id = requestId.parse(req.params.requestId);
       const record = (
         await pool.query(
-          "SELECT request_id,model,CASE WHEN status='processing' AND created_at<now()-interval '2 minutes' THEN 'unknown' ELSE status END AS status,stream,http_status,error_code,created_at,finished_at FROM ai_requests WHERE product_id=$1 AND uid=$2 AND request_id=$3",
-          [req.serviceProduct, req.identity.uid, id],
+          "SELECT request_id,model,CASE WHEN status='processing' AND created_at<now()-interval '2 minutes' THEN 'unknown' ELSE status END AS status,stream,http_status,error_code,created_at,finished_at FROM ai_requests WHERE product_id=$1 AND request_id=$2",
+          [req.serviceProduct, id],
         )
       ).rows[0];
-      assert(
-        record,
-        404,
-        "AI_REQUEST_NOT_FOUND",
-        "没有此账号和产品的模型请求记录",
-      );
+      assert(record, 404, "AI_REQUEST_NOT_FOUND", "当前产品没有此模型请求记录");
       res.json({ ...record, delivery_status: "unknown" });
     },
   );
