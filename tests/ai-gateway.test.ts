@@ -16,7 +16,7 @@ test("模型Key加密使用隔离用途，错误材料与篡改不能解密", ()
   assert.equal(decryptModelKey(encrypted, material), secret);
   assert.throws(() => decryptModelKey(encrypted, "wrong-material-".repeat(4)));
   const parts = encrypted.split(".");
-  parts[2] = "A" + parts[2].slice(1);
+  parts[2] = (parts[2].startsWith("A") ? "B" : "A") + parts[2].slice(1);
   assert.throws(() => decryptModelKey(parts.join("."), material));
 });
 

@@ -86,3 +86,5 @@ npm run restore -- backups/备份文件.tar.gz  # 恢复到新的独立数据库
 [页面与服务职责](docs/architecture.md) · [资源构建](docs/resources.md) · [真实产品接入指南](docs/integration.md) · [接口及额度规则](docs/api.md) · [Linux 与域名配置](docs/deployment.md) · [实际验收结果](docs/acceptance.md)
 
 未配置短信、邮件、微信登录或任何真实支付商户；没有启用真实收费。已使用 Casdoor 官方 Dummy 测试提供者完成订单 → 测试支付通知 → Paid 记录 → Active 订阅 → 权益生效，并验证重复通知不重复发放，随后关闭测试购买入口。这是本地模拟支付，不等于支付宝、微信或 Stripe 商户沙箱验收。中心没有自建 webhook 接收器，采用经过验证的 Casdoor 服务端查询与周期核对；商业化前仍需验证真实提供者通知、退款和恢复规则。
+
+模型 API：统一后台“AI与MCP → 模型 API”集中管理中转配置与产品授权。接入、密钥保管、任务状态与次数边界见[AI产品接入](docs/ai-products.md)。
