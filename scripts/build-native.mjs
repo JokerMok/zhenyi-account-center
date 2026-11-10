@@ -230,6 +230,23 @@ forget = forget.replaceAll(
   "Setting.getStoredSigninUrl() || Setting.getLoginLink(application)",
   '((new URLSearchParams(location.search).has("client_id") ? "/login/oauth/authorize" + location.search : "") || Setting.getStoredSigninUrl()) || Setting.getLoginLink(application)',
 );
+const recoveryHook = "  // only advertise the identifiers that can be used:";
+if (!forget.includes(recoveryHook)) throw Error("Locked recovery hook changed");
+forget = forget.replace(
+  recoveryHook,
+  `  if (!hasProviderOfCategory("Email") && !hasProviderOfCategory("SMS")) {
+    return <AuthLayout application={application}>
+      <div className="space-y-4">
+        <h1 className="text-lg font-semibold">找回密码</h1>
+        <p role="status">尚未配置邮件或短信找回服务。</p>
+        {Setting.BasePath === "/admin" ? <><p>管理员请在本机项目终端运行以下命令，隐藏输入新密码：</p><code className="block rounded border p-3">npm run production:admin</code></> : <p>请联系管理员协助恢复账号。</p>}
+        <Button asChild><a href={Setting.BasePath === "/admin" ? "/auth/login?mode=admin" : "/auth/login"}>返回登录</a></Button>
+      </div>
+    </AuthLayout>;
+  }
+
+` + recoveryHook,
+);
 writeFileSync(forgetFile, forget);
 const logoutFile = source + "/web/src/hooks/use-logout.ts";
 let logoutSource = readFileSync(logoutFile, "utf8");
