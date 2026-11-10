@@ -58,6 +58,7 @@ for (const path of [
   "pages/UserEditPage.tsx",
   "hooks/use-logout.ts",
   "pages/auth/ForgetPage.tsx",
+  "pages/auth/LoginPage.tsx",
 ])
   run("tar", [
     "-xzf",
@@ -67,8 +68,32 @@ for (const path of [
     "--strip-components=1",
     `casdoor-4.22.0/web/src/${path}`,
   ]);
+const loginFile = source + "/web/src/pages/auth/LoginPage.tsx";
+let loginSource = readFileSync(loginFile, "utf8");
+loginSource =
+  'import {isSessionSigninFailure} from "@/zhenyi/session-signin";\n' +
+  loginSource;
+loginSource = loginSource.replace(
+  "const {account, reload} = useAccount();",
+  "const {account, reload, setAccount} = useAccount();",
+);
+const loginError =
+  'Setting.showMessage("error", `${i18next.t("application:Failed to sign in")}: ${res.msg}`);\n          onRejected();';
+if (!loginSource.includes(loginError))
+  throw Error("Locked login error hook changed");
+loginSource = loginSource.replaceAll(
+  loginError,
+  `if (isSessionSigninFailure(values, res)) {
+            setAccount(null);
+            Setting.showMessage("info", "登录状态已失效，请输入账号和密码重新登录。");
+          } else {
+            ${loginError}
+          }`,
+);
+writeFileSync(loginFile, loginSource);
 const ext = source + "/web/src/zhenyi";
 mkdirSync(ext, { recursive: true });
+cpSync("upstream/extensions/session-signin.ts", ext + "/session-signin.ts");
 cpSync("upstream/console/BusinessPage.tsx", ext + "/BusinessPage.tsx");
 writeFileSync(
   ext + "/shared.tsx",

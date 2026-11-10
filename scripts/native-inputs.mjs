@@ -12,6 +12,7 @@ export function nativeBuildKey() {
         "src/web/management.tsx",
         "src/web/style.css",
         "upstream/console/BusinessPage.tsx",
+        "upstream/extensions/session-signin.ts",
         "upstream/assets/manifest.json",
         "public/brand.svg",
         "config/casdoor-modules.json",

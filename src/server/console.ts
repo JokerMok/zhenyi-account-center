@@ -12,6 +12,7 @@ export function installConsole(app: Express) {
   app.use(
     "/admin/api",
     (req, res, next) => {
+      res.set("Cache-Control", "no-store");
       if (
         !["GET", "HEAD"].includes(req.method) &&
         req.headers.origin !== new URL(config.CENTER_URL).origin
@@ -44,12 +45,10 @@ export function installConsole(app: Express) {
         .find((x) => x.startsWith("zy_identity_admin="))
         ?.slice("zy_identity_admin=".length);
       if (!value)
-        return res
-          .status(401)
-          .json({
-            error: "请从 /admin 登录管理员",
-            code: "ADMIN_LOGIN_REQUIRED",
-          });
+        return res.status(401).json({
+          error: "请从 /admin 登录管理员",
+          code: "ADMIN_LOGIN_REQUIRED",
+        });
       try {
         const response = await fetch(
           "http://127.0.0.1:" +
