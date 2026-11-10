@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir, readdir } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
+import { shortcutImagePaths } from "./native-dynamic-assets.mjs";
 const root = ".upstream/source-v4.22.0/web/src",
   out = "upstream/assets";
 async function files(dir) {
@@ -18,6 +19,10 @@ let paths = new Set([
   "img/casdoor-logo_1185x256.png",
   "img/casdoor-logo_1185x256_dark.png",
 ]);
+for (const path of shortcutImagePaths(
+  await readFile(root + "/pages/ShortcutsPage.tsx", "utf8"),
+))
+  paths.add(path);
 for (const file of sources) {
   const s = await readFile(file, "utf8");
   for (const m of s.matchAll(
@@ -87,13 +92,13 @@ await Promise.all(
     }
   }),
 );
-entries.sort((a, b) => a.path.localeCompare(b.path));
+entries.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 await writeFile(
   out + "/manifest.json",
   JSON.stringify(
     {
       upstream: "Casdoor v4.22.0",
-      scope: "仅固定源码显式图片与OAuth提供者图标，非完整CDN",
+      scope: "固定源码显式图片、快捷操作动态图片与OAuth提供者图标，非完整CDN",
       files: entries,
       unavailable: failures,
     },

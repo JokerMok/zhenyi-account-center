@@ -7,6 +7,7 @@ export function nativeBuildKey() {
         "scripts/native-inputs.mjs",
         "scripts/build-native.mjs",
         "scripts/sync-native-assets.mjs",
+        "scripts/native-dynamic-assets.mjs",
         "scripts/localize-native-images.mjs",
         "src/web/views.tsx",
         "src/web/management.tsx",

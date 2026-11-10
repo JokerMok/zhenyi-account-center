@@ -7,8 +7,18 @@ import {
   copyFileSync,
 } from "node:fs";
 import { createHash } from "node:crypto";
+import { shortcutImagePaths } from "./native-dynamic-assets.mjs";
 const out = ".local/native-static",
   manifest = JSON.parse(readFileSync("upstream/assets/manifest.json"));
+for (const path of shortcutImagePaths(
+  readFileSync(
+    ".upstream/source-v4.22.0/web/src/pages/ShortcutsPage.tsx",
+    "utf8",
+  ),
+)) {
+  if (!manifest.files.some((file) => file.path === path))
+    throw Error("构建缺少快捷操作图片：" + path);
+}
 mkdirSync(out, { recursive: true });
 for (const file of manifest.files) {
   const path = "upstream/assets/" + file.path;
