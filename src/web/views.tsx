@@ -29,6 +29,7 @@ import {
   Copy,
 } from "lucide-react";
 import "./style.css";
+import { AiModels } from "./ai-models";
 import {
   CompleteManagement,
   TaskTrace,
@@ -3386,6 +3387,8 @@ export function BusinessView({
         )}
         {!me || !cfg ? (
           <p role="status">正在加载管理数据…</p>
+        ) : tab === "ai" ? (
+          <AiModels request={api} />
         ) : tab === "diagnostics" ? (
           <CompleteManagement request={api} casdoor="/admin" />
         ) : tab === "tasks" ? (

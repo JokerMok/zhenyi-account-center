@@ -34,7 +34,8 @@
     "test:purchase": "tsx scripts/local-purchase.ts",
     "native:report": "python3 scripts/report-coverage.py",
     "production:build": "node scripts/production-release.mjs",
-    "production:admin": "node scripts/production-admin-remote.mjs"
+    "production:admin": "node scripts/production-admin-remote.mjs",
+    "ai:configure": "tsx scripts/ai-configure.ts"
   },
   "dependencies": {
     "bcryptjs": "3.0.2",

@@ -11,6 +11,7 @@ import * as Setting from "@/lib/setting";
 import { Button } from "@/components/ui/button";
 import { BusinessView } from "./shared";
 const labels: Record<string, string> = {
+  ai: "模型 API",
   users: "用户与权益",
   products: "业务产品",
   features: "功能规则",

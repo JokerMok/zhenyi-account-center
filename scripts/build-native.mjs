@@ -95,6 +95,7 @@ const ext = source + "/web/src/zhenyi";
 mkdirSync(ext, { recursive: true });
 cpSync("upstream/extensions/session-signin.ts", ext + "/session-signin.ts");
 cpSync("upstream/console/BusinessPage.tsx", ext + "/BusinessPage.tsx");
+cpSync("src/web/ai-models.tsx", ext + "/ai-models.tsx");
 writeFileSync(
   ext + "/shared.tsx",
   readFileSync("src/web/views.tsx", "utf8").replace(
@@ -165,6 +166,7 @@ nav = nav
     code + "  return applyNavItems(groups, account);",
   )
   .replace('label: i18next.t("general:LLM AI")', 'label: "AI与MCP"')
+  .replace('key: "/agents",', 'key: "/business/ai", label: "模型 API"}, {key: "/agents",')
   .replace('label: i18next.t("general:Applications")', 'label: "应用接入"')
   .replace('label: i18next.t("general:Products")', 'label: "商业商品"')
   .replace('label: i18next.t("general:Plans")', 'label: "商业套餐"')
@@ -188,7 +190,7 @@ const breadcrumb = source + "/web/src/components/layout/BreadcrumbBar.tsx";
 let bc = readFileSync(breadcrumb, "utf8");
 bc = bc.replace(
   "const listLabelKey = RESOURCE_LABELS[rootSegment];",
-  `if(rootSegment==='business'){const labels=${JSON.stringify(Object.fromEntries([...entries, ["diagnostics", "配置与诊断"]]))};return [{label:'管理首页',to:'/'},{label:labels[pathSegments[1]]||'业务管理'}];} if(rootSegment==='system')return [{label:'管理首页',to:'/'},{label:'身份统计'}];\n  const listLabelKey = RESOURCE_LABELS[rootSegment];`,
+  `if(rootSegment==='business'){const labels=${JSON.stringify(Object.fromEntries([...entries, ["ai", "模型 API"], ["diagnostics", "配置与诊断"]]))};return [{label:'管理首页',to:'/'},{label:labels[pathSegments[1]]||'业务管理'}];} if(rootSegment==='system')return [{label:'管理首页',to:'/'},{label:'身份统计'}];\n  const listLabelKey = RESOURCE_LABELS[rootSegment];`,
 );
 writeFileSync(breadcrumb, bc);
 const userFile = source + "/web/src/pages/UserEditPage.tsx";

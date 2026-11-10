@@ -8,6 +8,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { resolve } from "node:path";
 import { installConsole } from "./console";
+import { installAiGateway } from "./ai-gateway";
 import { z, ZodError } from "zod";
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -150,6 +151,7 @@ app.get("/api/config", async (_req, res) => {
   });
 });
 installAuth(app, serverId);
+if (serverId === "center") installAiGateway(app);
 if (serverId === "center") installConsumerEntry(app);
 app.get("/login", (_req, res) => res.redirect("/auth/login"));
 

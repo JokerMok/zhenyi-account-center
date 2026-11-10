@@ -21,3 +21,9 @@
 没有必须一次性提供以上所有资料：只需为准备启用的提供者配置。缺少真实商户、目录或模型账户时，其他身份与权益功能可正常使用。
 
 独立A2A协议、独立LLM模型管理／推理未在固定源码中发现，不属于“等待API Key就能启用”的功能，见固定版本证据清单。
+
+## 2026-11-10 模型中转连通性
+
+从正式账号中心所在腾讯云服务器向 `https://api-relay.shizibandu.icu/v1/chat/completions` 实际调用 `gpt-6.1-terra`：普通请求200 application/json且收到文本；流式请求200 text/event-stream，收到3个数据块及[DONE]。Key由本机私密文件经SSH标准输入临时提供，没有写入服务器文件、代码或日志。此结果更新此前“腾讯云直连待测”的状态。
+
+这仅证明模型服务连通。固定v4.22.0的Agent字段为url/token/application，提供者类别没有AI，也没有模型推理客户端；不能把模型Base URL填进Agent监听URL就宣称接入。当前没有新增Agent或将模型Key误写到Agent令牌中。按用户后续确认，模型配置与产品授权由独立业务扩展实现，详见[模型 API 与 AI 产品接入](ai-products.md)；Casdoor原生边界不变。

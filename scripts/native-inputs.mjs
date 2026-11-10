@@ -11,6 +11,7 @@ export function nativeBuildKey() {
         "scripts/localize-native-images.mjs",
         "src/web/views.tsx",
         "src/web/management.tsx",
+        "src/web/ai-models.tsx",
         "src/web/style.css",
         "upstream/console/BusinessPage.tsx",
         "upstream/extensions/session-signin.ts",
