@@ -218,11 +218,15 @@ if (!(await exists(".local/casdoor/initialized"))) {
       signinMethods: [{ name: "Password", displayName: "密码", rule: "All" }],
       signupItems: template.applications[0].signupItems.map((i: any) => ({
         ...i,
+        ...(i.name === "Email" && organization === "consumers"
+          ? { rule: "No verification" }
+          : {}),
         visible: [
           "Username",
           "Display name",
           "Password",
           "Confirm password",
+          ...(organization === "consumers" ? ["Email"] : []),
         ].includes(i.name),
         required: [
           "ID",
@@ -230,6 +234,7 @@ if (!(await exists(".local/casdoor/initialized"))) {
           "Display name",
           "Password",
           "Confirm password",
+          ...(organization === "consumers" ? ["Email"] : []),
         ].includes(i.name),
       })),
     });

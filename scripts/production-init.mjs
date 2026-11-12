@@ -144,11 +144,15 @@ export async function initializeProduction(root, release) {
     signinMethods: [{ name: "Password", displayName: "密码", rule: "All" }],
     signupItems: base.applications[0].signupItems.map((i) => ({
       ...i,
+      ...(i.name === "Email" && organization === "consumers"
+        ? { rule: "No verification" }
+        : {}),
       visible: [
         "Username",
         "Display name",
         "Password",
         "Confirm password",
+        ...(organization === "consumers" ? ["Email"] : []),
       ].includes(i.name),
       required: [
         "ID",
@@ -156,6 +160,7 @@ export async function initializeProduction(root, release) {
         "Display name",
         "Password",
         "Confirm password",
+        ...(organization === "consumers" ? ["Email"] : []),
       ].includes(i.name),
     })),
   });
