@@ -559,7 +559,7 @@ function EntitlementList({ items }: { items: Any[] }) {
                     <small>当前不可使用，请查看会员与产品状态。</small>
                   )}
                   {f.kind === "quota" && <QuotaSources feature={f} />}
-                  {f.kind === "quota" && (
+                  {f.kind === "quota" && !f.unlimited && (
                     <small>
                       {f.held > 0 ? `${f.held} 次预占中 · ` : ""}
                       {periods[f.period]}
@@ -2684,11 +2684,13 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
                   <strong>{e.product.name}</strong>
                   <span>
                     <Tag tone={e.membership.active ? "green" : "neutral"}>
-                      {e.membership.active
-                        ? "有效会员"
-                        : e.membership.expires_at
-                          ? "会员已到期"
-                          : "未开通会员"}
+                      {e.membership.permanent
+                        ? "全产品会员 · 永久有效"
+                        : e.membership.active
+                          ? "有效会员"
+                          : e.membership.expires_at
+                            ? "会员已到期"
+                            : "未开通会员"}
                     </Tag>
                     {e.membership.expires_at &&
                       ` 到期 ${date(e.membership.expires_at)}`}

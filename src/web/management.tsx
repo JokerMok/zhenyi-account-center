@@ -279,6 +279,7 @@ export function TaskTrace({
   );
 }
 export function QuotaSources({ feature }: { feature: Any }) {
+  if (feature.unlimited) return null;
   const names: Any = {
     free: "免费",
     admin: "管理员赠送",
