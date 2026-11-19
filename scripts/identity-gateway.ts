@@ -3,9 +3,12 @@ import dotenv from "dotenv";
 import { resolve } from "node:path";
 import { readFile } from "node:fs/promises";
 import { proxyTo } from "../src/server/proxy";
+import { consumerSignin } from "../src/server/consumer-signin";
 dotenv.config({ quiet: true });
 const app = express();
 app.disable("x-powered-by");
+const backend =
+  "http://127.0.0.1:" + (process.env.CASDOOR_BACKEND_PORT || 5305);
 const staticRoot = resolve(".local/native-static");
 app.use(["/static", "/img", "/flag-icons"], (req, res, next) => {
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
@@ -105,12 +108,9 @@ app.use(async (req, res, next) => {
       ))
   ) {
     try {
-      const r = await fetch(
-        "http://127.0.0.1:" +
-          (process.env.CASDOOR_BACKEND_PORT || 5305) +
-          "/api/get-account",
-        { headers: { Cookie: req.headers.cookie || "" } },
-      );
+      const r = await fetch(backend + "/api/get-account", {
+        headers: { Cookie: req.headers.cookie || "" },
+      });
       const body = (await r.json()) as any;
       if (body.status === "ok" && body.data?.owner !== "built-in")
         return next();
@@ -168,9 +168,8 @@ app.get("/{*page}", async (req, res, next) => {
     next(e);
   }
 });
-app.use(
-  proxyTo("http://127.0.0.1:" + (process.env.CASDOOR_BACKEND_PORT || 5305)),
-);
+app.use(consumerSignin(backend));
+app.use(proxyTo(backend));
 app.use((e: any, _req: any, res: any, _next: any) =>
   res
     .status(e.status || 500)

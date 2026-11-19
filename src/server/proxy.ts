@@ -19,8 +19,12 @@ export function identityCookie(
   return (value += "; SameSite=Lax");
 }
 // Streaming reverse proxy: forwards the browser's own identity cookie; no administrative credential is added.
-export function proxyTo(target: string, strip = ""): RequestHandler {
-  return (req: Request, res: Response) => {
+export function proxyTo(
+  target: string,
+  strip = "",
+  bufferedBody?: (req: Request) => Buffer | Promise<Buffer>,
+): RequestHandler {
+  return async (req: Request, res: Response) => {
     const path = req.originalUrl.slice(strip.length) || "/";
     const url = new URL(path, target);
     if (
@@ -41,9 +45,11 @@ export function proxyTo(target: string, strip = ""): RequestHandler {
         ?.slice("zy_identity_admin=".length);
       headers.cookie = native ? "casdoor_session_id=" + native : "";
     }
-    delete headers["content-length"];
-    if (req.headers["content-length"])
-      headers["content-length"] = req.headers["content-length"];
+    const body = await bufferedBody?.(req);
+    if (body) {
+      delete headers["transfer-encoding"];
+      headers["content-length"] = String(body.length);
+    }
     const client = url.protocol === "https:" ? https : http;
     const upstream = client.request(
       url,
@@ -79,6 +85,7 @@ export function proxyTo(target: string, strip = ""): RequestHandler {
           .json({ error: "身份服务暂不可用", code: "IDENTITY_UNAVAILABLE" });
       else res.end();
     });
-    req.pipe(upstream);
+    if (body) upstream.end(body);
+    else req.pipe(upstream);
   };
 }

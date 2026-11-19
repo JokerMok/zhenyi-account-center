@@ -122,7 +122,7 @@ Casdoor商业套餐 → 业务套餐的 `casdoor_plan=consumers/原生套餐名`
 
 ### 平台所有者自用权限
 
-当前登记的可信超管可以在消费者登录页选择“平台管理员登录”，使用现有账号登录各产品；产品仍使用各自的 client ID、回调和独立会话。服务端依据可信 issuer、固定管理员 subject、`built-in` 组织及 Casdoor 实时管理员状态校验，既有统一 UID 与审计关联不变。不要另建同名消费者或按邮箱合并。
+现有超管和普通账号共用一个登录表单。账号密码通过统一身份网关送往 Casdoor，网关按已登记的管理员身份匹配登录名，Casdoor 验证密码。若已有同名消费者，优先按该消费者身份验证。产品继续使用自己的 client ID、回调和独立会话。超管权限依据可信 issuer、固定管理员 subject、`built-in` 组织及 Casdoor 实时管理员状态判定，既有 UID 与审计关联沿用。
 
 该身份对现在和以后登记的启用产品获得永久会员与全部启用功能，次数不限；封禁账号、停用产品和停用功能仍不可使用。权益响应使用 `membership.permanent=true`、`source=platform_owner`，次数功能使用 `unlimited=true`。界面应显示“不限次数”，不以数字余额估算剩余使用量；为兼容现有数字字段，`remaining` 返回 2147483647，但不会创建或扣减此数额的额度桶。
 
@@ -132,6 +132,6 @@ Casdoor商业套餐 → 业务套餐的 `casdoor_plan=consumers/原生套餐名`
 
 产品登记可设置 `ssoLoginPath`，例如风格排版的 `/api/account/sso`。该路径必须是产品站内的固定绝对路径；中心不会接受浏览器提交的外部跳转地址。个人中心“打开产品”先通过 `/auth/products/:product/launch` 校验当前中心会话和登记状态，再产生2分钟、单产品、单次使用的随机上下文引用。
 
-产品后端凭自己的独立调用凭据 `POST /api/v1/products/:product/login-context`，请求体 `{ "context": "进入URL中的launch值" }`，获取 `uid` 和 `platform_owner` 作为本次授权的预期身份及界面提示。这不是登录凭据，也不发放会话或令牌。产品仍自行生成 state、nonce 和 PKCE，先发起 OIDC `prompt=none`，无可复用身份会话时转入正常登录；回调验证签名、issuer、audience、state、nonce、PKCE后，再核对中心返回的稳定 UID 与预期 UID 完全一致，才建立产品独立 Cookie。
+产品后端凭自己的独立调用凭据 `POST /api/v1/products/:product/login-context`，请求体 `{ "context": "进入URL中的launch值" }`，读取 `uid` 作为本次授权的预期身份。产品自行生成 state、nonce 和 PKCE，先发起 OIDC `prompt=none`。没有可复用会话，或现有会话和预期 UID 不一致时，进入统一登录表单。回调验证签名、issuer、audience、state、nonce、PKCE 和预期 UID 后建立产品独立 Cookie。
 
 超管只有中心服务端验证的 `organization=built-in` 且 `platform_owner=true` 可以进入产品；不能仅按用户名 admin 或浏览器参数放行。普通消费者保持原规则。产品端账号切换使用 `prompt=login`，回调不合并历史账号、作品或工作区。未实现此登录协议的产品不能仅靠设置 URL 宣称已完成单点登录。

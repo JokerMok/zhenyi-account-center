@@ -2,12 +2,19 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { once } from "node:events";
+import type { AddressInfo } from "node:net";
 import dotenv from "dotenv";
 import pg from "pg";
 
-test("可信超管跨产品保持同一 UID，普通用户和未登记管理员不能继承", async () => {
+test("超管用普通产品登录保留 UID，同名消费者保留独立身份", async () => {
   dotenv.config({ quiet: true });
   assert.notEqual(process.env.NODE_ENV, "production");
+  assert(
+    ["localhost", "127.0.0.1", "[::1]"].includes(
+      new URL(process.env.CASDOOR_URL!).hostname,
+    ),
+  );
   const schema = "qa_owner_" + randomUUID().replaceAll("-", "");
   const connection = new URL(process.env.DATABASE_URL!);
   const bootstrap = new pg.Pool({ connectionString: connection.toString() });
@@ -41,6 +48,25 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
     isAdmin: false,
     createdTime: new Date().toISOString(),
   };
+  const { default: express } = await import("express");
+  const { default: cookieParser } = await import("cookie-parser");
+  const { installConsumerEntry, hash } = await import("../src/server/auth");
+  const { consumerSignin } = await import("../src/server/consumer-signin");
+  const gateway = express();
+  gateway.use(
+    consumerSignin(
+      `http://127.0.0.1:${process.env.CASDOOR_BACKEND_PORT || 5305}`,
+    ),
+  );
+  gateway.use(express.json(), cookieParser());
+  installConsumerEntry(gateway);
+  gateway.use((error: any, _req: any, res: any, _next: any) =>
+    res.status(error.status || 500).json({ code: error.code }),
+  );
+  const listener = gateway.listen(0, "127.0.0.1");
+  await once(listener, "listening");
+  const base = `http://127.0.0.1:${(listener.address() as AddressInfo).port}`;
+
   async function accessToken(appId: string, user: any) {
     const app = appConfigs[appId];
     const verifier = randomBytes(32).toString("base64url");
@@ -56,21 +82,24 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
       code_challenge_method: "S256",
       code_challenge: createHash("sha256").update(verifier).digest("base64url"),
     });
-    const login = await fetch(config.CASDOOR_URL + "/api/login?" + params, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        application: app.application,
-        organization: user.owner,
-        username: user.name,
-        password: user.password,
-        type: "code",
-        signinMethod: "Password",
-        loginMethod: "password",
-      }),
-    });
+    const login = await fetch(
+      (appId === "admin" ? config.CASDOOR_URL : base) + "/api/login?" + params,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          application: app.application,
+          organization: appId === "admin" ? "built-in" : "consumers",
+          username: user.name,
+          password: user.password,
+          type: "code",
+          signinMethod: "Password",
+          loginMethod: "password",
+        }),
+      },
+    );
     const result = (await login.json()) as any;
-    assert.equal(result.status, "ok", result.msg);
+    assert.equal(result.status, "ok", `Casdoor ${appId} 登录失败`);
     const response = await fetch(
       config.CASDOOR_URL + "/api/login/oauth/access_token",
       {
@@ -218,18 +247,6 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
     );
     await assert.rejects(() => checkAccess(stableUid, "beadgrid", "premium"));
     await pool.query("UPDATE products SET status='active' WHERE id='beadgrid'");
-    const { default: express } = await import("express");
-    const { default: cookieParser } = await import("cookie-parser");
-    const { installConsumerEntry, hash } = await import("../src/server/auth");
-    const app = express();
-    app.use(express.json(), cookieParser());
-    installConsumerEntry(app);
-    app.use((error: any, _req: any, res: any, _next: any) =>
-      res.status(error.status || 500).json({ code: error.code }),
-    );
-    const listener = app.listen(0, "127.0.0.1");
-    await new Promise<void>((r) => listener.once("listening", r));
-    const base = "http://127.0.0.1:" + (listener.address() as any).port;
     const sessionKey = randomUUID();
     await pool.query(
       "INSERT INTO sessions(token_hash,app_id,uid,access_token,id_token,csrf,expires_at) VALUES($1,'center',$2,$3,'','',now()+interval '1 hour')",
@@ -294,7 +311,6 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
       );
     } finally {
       appConfigs.beadgrid.ssoLoginPath = savedPath;
-      await new Promise<void>((r) => listener.close(() => r()));
     }
     const otherToken = await accessToken("beadgrid", second);
     assert.equal(
@@ -317,6 +333,18 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
       }),
     );
     const ownerToken = await accessToken("beadgrid", first);
+    const sameName = { ...second, name: first.name, id: randomUUID() };
+    assert.equal(
+      await casdoorApi("get-user", { id: `consumers/${first.name}` }),
+      null,
+    );
+    await casdoorApi("add-user", {}, sameName);
+    users.push(sameName);
+    const sameNameToken = await accessToken("beadgrid", sameName);
+    const sameNameIdentity = await identityFromToken(sameNameToken, "beadgrid");
+    assert.equal(sameNameIdentity.subject, sameName.id);
+    assert.equal(sameNameIdentity.platform_owner, false);
+    assert.notEqual(sameNameIdentity.uid, stableUid);
     config.ADMIN_SUB = randomUUID();
     await assert.rejects(() => identityFromToken(ownerToken, "beadgrid"));
     assert.equal(
@@ -328,6 +356,7 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
       stableUid,
     );
   } finally {
+    await new Promise<void>((r) => listener.close(() => r()));
     config.ADMIN_SUB = savedSubject;
     for (const user of users.reverse())
       await casdoorApi(
