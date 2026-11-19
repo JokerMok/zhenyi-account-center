@@ -127,3 +127,11 @@ Casdoor商业套餐 → 业务套餐的 `casdoor_plan=consumers/原生套餐名`
 该身份对现在和以后登记的启用产品获得永久会员与全部启用功能，次数不限；封禁账号、停用产品和停用功能仍不可使用。权益响应使用 `membership.permanent=true`、`source=platform_owner`，次数功能使用 `unlimited=true`。界面应显示“不限次数”，不以数字余额估算剩余使用量；为兼容现有数字字段，`remaining` 返回 2147483647，但不会创建或扣减此数额的额度桶。
 
 免扣次任务依然经过原有预占、确认、取消、超时和返还流程，保留业务请求号、`quota_exempt`、请求次数和零金额流水。重复操作不增加余额；普通用户继续按原会员与额度规则结算。该权限只用于中心已登记产品，不代表尚未接入中心的独立产品会自动识别账号，也不绕过产品自身的本地业务角色或模型独立调用授权。
+
+### 从个人中心进入产品时接续登录
+
+产品登记可设置 `ssoLoginPath`，例如风格排版的 `/api/account/sso`。该路径必须是产品站内的固定绝对路径；中心不会接受浏览器提交的外部跳转地址。个人中心“打开产品”先通过 `/auth/products/:product/launch` 校验当前中心会话和登记状态，再产生2分钟、单产品、单次使用的随机上下文引用。
+
+产品后端凭自己的独立调用凭据 `POST /api/v1/products/:product/login-context`，请求体 `{ "context": "进入URL中的launch值" }`，获取 `uid` 和 `platform_owner` 作为本次授权的预期身份及界面提示。这不是登录凭据，也不发放会话或令牌。产品仍自行生成 state、nonce 和 PKCE，先发起 OIDC `prompt=none`，无可复用身份会话时转入正常登录；回调验证签名、issuer、audience、state、nonce、PKCE后，再核对中心返回的稳定 UID 与预期 UID 完全一致，才建立产品独立 Cookie。
+
+超管只有中心服务端验证的 `organization=built-in` 且 `platform_owner=true` 可以进入产品；不能仅按用户名 admin 或浏览器参数放行。普通消费者保持原规则。产品端账号切换使用 `prompt=login`，回调不合并历史账号、作品或工作区。未实现此登录协议的产品不能仅靠设置 URL 宣称已完成单点登录。

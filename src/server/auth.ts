@@ -129,6 +129,82 @@ function mismatch(res: Response, retry: string, back: string) {
     );
 }
 export function installConsumerEntry(app: Express) {
+  app.get(
+    "/auth/products/:product/launch",
+    sessionAuth("center"),
+    async (req: Authenticated, res) => {
+      const id = String(req.params.product);
+      const product = appConfigs[id];
+      assert(
+        product?.enabled &&
+          product.ssoLoginPath &&
+          !["center", "admin"].includes(id),
+        404,
+        "SSO_ENTRY_UNAVAILABLE",
+        "该产品尚未配置单点登录入口",
+      );
+      const row = (
+        await pool.query(
+          "SELECT * FROM products WHERE id=$1 AND status='active'",
+          [id],
+        )
+      ).rows[0];
+      assert(
+        row &&
+          row.origin === product.url &&
+          row.application === product.application,
+        409,
+        "PRODUCT_CONFIG_MISMATCH",
+        "产品接入配置不一致，请联系管理员",
+      );
+      const context = random();
+      await pool.query(
+        "INSERT INTO login_attempts VALUES($1,$2,'','','',$3,now()+interval '2 minutes')",
+        [
+          hash(context),
+          "product-launch:" + id,
+          JSON.stringify({
+            uid: req.identity.uid,
+            platform_owner: req.identity.platform_owner === true,
+          }),
+        ],
+      );
+      const target = new URL(product.ssoLoginPath, product.url);
+      target.searchParams.set("launch", context);
+      res
+        .set("Cache-Control", "private, no-store")
+        .set("Referrer-Policy", "no-referrer")
+        .redirect(target.href);
+    },
+  );
+  app.post(
+    "/api/v1/products/:product/login-context",
+    productBackendAuth,
+    async (req: Authenticated, res) => {
+      const context = req.body?.context;
+      assert(
+        Object.keys(req.body || {}).length === 1 &&
+          typeof context === "string" &&
+          /^[A-Za-z0-9_-]{43}$/.test(context),
+        400,
+        "INVALID_LAUNCH",
+        "登录上下文无效",
+      );
+      const row = (
+        await pool.query(
+          "DELETE FROM login_attempts WHERE token_hash=$1 AND app_id=$2 AND expires_at>now() RETURNING mode",
+          [hash(context), "product-launch:" + req.serviceProduct],
+        )
+      ).rows[0];
+      assert(
+        row,
+        410,
+        "LAUNCH_EXPIRED",
+        "产品进入链接已过期或已使用，请从个人中心重新打开",
+      );
+      res.set("Cache-Control", "private, no-store").json(JSON.parse(row.mode));
+    },
+  );
   app.post(
     "/api/v1/products/:product/consumer-entry",
     serviceAuth,

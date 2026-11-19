@@ -111,8 +111,10 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
       users.push(user);
     }
     const identities = [];
+    let centerToken = "";
     for (const appId of ["admin", "center", "beadgrid", "focustake"]) {
       const token = await accessToken(appId, first);
+      if (appId === "center") centerToken = token;
       const identity = await identityFromToken(token, appId);
       assert.equal(identity.subject, first.id);
       assert.equal(identity.uid, stableUid);
@@ -216,6 +218,84 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
     );
     await assert.rejects(() => checkAccess(stableUid, "beadgrid", "premium"));
     await pool.query("UPDATE products SET status='active' WHERE id='beadgrid'");
+    const { default: express } = await import("express");
+    const { default: cookieParser } = await import("cookie-parser");
+    const { installConsumerEntry, hash } = await import("../src/server/auth");
+    const app = express();
+    app.use(express.json(), cookieParser());
+    installConsumerEntry(app);
+    app.use((error: any, _req: any, res: any, _next: any) =>
+      res.status(error.status || 500).json({ code: error.code }),
+    );
+    const listener = app.listen(0, "127.0.0.1");
+    await new Promise<void>((r) => listener.once("listening", r));
+    const base = "http://127.0.0.1:" + (listener.address() as any).port;
+    const sessionKey = randomUUID();
+    await pool.query(
+      "INSERT INTO sessions(token_hash,app_id,uid,access_token,id_token,csrf,expires_at) VALUES($1,'center',$2,$3,'','',now()+interval '1 hour')",
+      [hash(sessionKey), stableUid, centerToken],
+    );
+    const savedPath = appConfigs.beadgrid.ssoLoginPath;
+    appConfigs.beadgrid.ssoLoginPath = "/api/account/sso";
+    await pool.query(
+      "UPDATE products SET origin=$1,application=$2 WHERE id='beadgrid'",
+      [appConfigs.beadgrid.url, appConfigs.beadgrid.application],
+    );
+    try {
+      assert.equal(
+        (
+          await fetch(base + "/auth/products/beadgrid/launch", {
+            redirect: "manual",
+          })
+        ).status,
+        401,
+      );
+      const response = await fetch(base + "/auth/products/beadgrid/launch", {
+        headers: { Cookie: "zy_center=" + sessionKey },
+        redirect: "manual",
+      });
+      assert.equal(response.status, 302);
+      const target = new URL(response.headers.get("location")!);
+      assert.equal(target.origin, new URL(appConfigs.beadgrid.url).origin);
+      assert.equal(target.pathname, "/api/account/sso");
+      const context = target.searchParams.get("launch");
+      assert(context);
+      async function resolve(product: string, key: string) {
+        return fetch(base + "/api/v1/products/" + product + "/login-context", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + key,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ context }),
+        });
+      }
+      assert.equal(
+        (await resolve("beadgrid", appConfigs.focustake.serviceKey)).status,
+        403,
+      );
+      assert.equal(
+        (await resolve("focustake", appConfigs.focustake.serviceKey)).status,
+        410,
+      );
+      assert.equal((await resolve("beadgrid", "fake-key")).status, 401);
+      const resolved = await resolve(
+        "beadgrid",
+        appConfigs.beadgrid.serviceKey,
+      );
+      assert.equal(resolved.status, 200);
+      assert.deepEqual(await resolved.json(), {
+        uid: stableUid,
+        platform_owner: true,
+      });
+      assert.equal(
+        (await resolve("beadgrid", appConfigs.beadgrid.serviceKey)).status,
+        410,
+      );
+    } finally {
+      appConfigs.beadgrid.ssoLoginPath = savedPath;
+      await new Promise<void>((r) => listener.close(() => r()));
+    }
     const otherToken = await accessToken("beadgrid", second);
     assert.equal(
       (await identityFromToken(otherToken, "beadgrid")).platform_owner,

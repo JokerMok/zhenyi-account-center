@@ -189,6 +189,11 @@ export async function overview(
       read_only: !!options.readOnly,
       product: {
         ...p,
+        launch_url: productApps.some(
+          (a) => a.id === p.id && a.enabled && a.ssoLoginPath,
+        )
+          ? "/auth/products/" + encodeURIComponent(p.id) + "/launch"
+          : null,
         integration_ready: productApps.some(
           (a) =>
             a.id === p.id &&

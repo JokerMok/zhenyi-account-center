@@ -35,6 +35,7 @@ export type AppConfig = {
   clientId: string;
   secret: string;
   serviceKey: string;
+  ssoLoginPath?: string;
   enabled: boolean;
   port: number;
 };

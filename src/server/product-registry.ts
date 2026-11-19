@@ -11,6 +11,10 @@ const schema = z.array(
       name: z.string().min(1),
       url: z.url(),
       urlEnv: key.optional(),
+      ssoLoginPath: z
+        .string()
+        .regex(/^\/(?!\/)[a-zA-Z0-9_/-]+$/)
+        .optional(),
       application: z
         .string()
         .regex(/^[a-z][a-z0-9_-]{1,99}$/)

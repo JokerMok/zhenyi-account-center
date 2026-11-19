@@ -570,7 +570,10 @@ function EntitlementList({ items }: { items: Any[] }) {
             </div>
           </div>
           {e.product.integration_ready ? (
-            <a className="button secondary" href={e.product.origin}>
+            <a
+              className="button secondary"
+              href={e.product.launch_url || e.product.origin}
+            >
               打开产品
               <ArrowUpRight size={15} />
             </a>
