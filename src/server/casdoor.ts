@@ -134,7 +134,8 @@ export async function identityFromToken(
     "SUBJECT_MISMATCH",
     "身份令牌与用户信息不一致",
   );
-  const org = appId === "admin" ? "built-in" : "consumers";
+  const ownerSubject = payload.sub === config.ADMIN_SUB;
+  const org = appId === "admin" || ownerSubject ? "built-in" : "consumers";
   let user: any;
   const existing = (
     await pool.query(
@@ -142,7 +143,12 @@ export async function identityFromToken(
       [config.CASDOOR_URL, payload.sub],
     )
   ).rows[0];
-  if (existing) {
+  if (ownerSubject) {
+    user = await casdoorApi("get-user", {
+      owner: "built-in",
+      userId: config.ADMIN_SUB,
+    });
+  } else if (existing) {
     user = await casdoorApi("get-user", {
       id: `${existing.organization}/${existing.username}`,
     });
@@ -167,7 +173,7 @@ export async function identityFromToken(
     "USER_BLOCKED",
     "账号已封禁或停用",
   );
-  if (appId === "admin")
+  if (appId === "admin" || ownerSubject)
     assert(
       payload.sub === config.ADMIN_SUB && user.isAdmin === true,
       403,
@@ -188,7 +194,7 @@ export async function identityFromToken(
     )
   ).rows[0];
   assert(!row.blocked, 403, "USER_BLOCKED", "账号已被权益平台停用");
-  return row;
+  return { ...row, platform_owner: ownerSubject && user.isAdmin === true };
 }
 export async function upstreamLogout(accessToken: string) {
   const res = await fetch(

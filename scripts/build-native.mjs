@@ -90,6 +90,31 @@ loginSource = loginSource.replaceAll(
             ${loginError}
           }`,
 );
+// Preserve each product's OIDC client, callback, state and PKCE when the owner
+// signs in with the existing built-in identity.
+loginSource = loginSource.replace(
+  '  const navigate = useNavigate();',
+  '  const navigate = useNavigate();\n  const ownerSignin = new URLSearchParams(location.search).get("platform_owner") === "1";',
+);
+loginSource = loginSource.replaceAll(
+  "organization: application.organization,",
+  'organization: ownerSignin ? "built-in" : application.organization,',
+);
+loginSource = loginSource
+  .replaceAll(
+    "account.owner !== application.organization",
+    'account.owner !== (ownerSignin ? "built-in" : application.organization)',
+  )
+  .replaceAll(
+    "account.owner === application.organization",
+    'account.owner === (ownerSignin ? "built-in" : application.organization)',
+  );
+const ownerEntry = '<div className="space-y-6">';
+if (!loginSource.includes(ownerEntry)) throw Error("Locked login layout changed");
+loginSource = loginSource.replace(
+  ownerEntry,
+  ownerEntry + `{application.organization === "consumers" && !Setting.BasePath ? <div className="text-right text-sm"><a href={(() => { const q = new URLSearchParams(location.search); if(ownerSignin)q.delete("platform_owner");else q.set("platform_owner","1");return location.pathname+"?"+q.toString();})()}>{ownerSignin ? "返回用户登录" : "平台管理员登录"}</a>{ownerSignin ? <p role="status">使用现有平台管理员账号登录本产品</p> : null}</div> : null}`,
+);
 writeFileSync(loginFile, loginSource);
 const ext = source + "/web/src/zhenyi";
 mkdirSync(ext, { recursive: true });
