@@ -2,6 +2,10 @@ import { createHmac, randomBytes, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { pool, tx, lock, assert, type DB } from "./db";
 import { config, productApps } from "./config";
+import {
+  isPlatformOwner,
+  ownerQuotaCompatibilityBalance,
+} from "./platform-owner";
 
 export const ident = z.uuid();
 export const reasonSchema = z.string().trim().min(2).max(500);
@@ -119,7 +123,8 @@ async function featureContext(
   product: string,
   feature: string,
 ) {
-  await activeContext(db, uid, product);
+  const { u } = await activeContext(db, uid, product);
+  const owner = isPlatformOwner(u);
   const f = (
     await db.query(
       "SELECT * FROM features WHERE product_id=$1 AND id=$2 AND active",
@@ -129,13 +134,13 @@ async function featureContext(
   assert(f, 404, "FEATURE_NOT_FOUND", "功能不存在或已停用");
   const until = await memberUntil(db, uid, product);
   assert(
-    !f.member_only || (until && new Date(until) > new Date()),
+    !f.member_only || owner || (until && new Date(until) > new Date()),
     403,
     "MEMBERSHIP_REQUIRED",
     "该功能需要有效会员，账号及已有数据仍可正常访问",
   );
-  await ensureFree(db, uid, product, f);
-  return f;
+  if (!owner) await ensureFree(db, uid, product, f);
+  return { ...f, quota_exempt: owner };
 }
 export async function overview(
   uid: string,
@@ -151,9 +156,10 @@ export async function overview(
       : await activeContext(db, uid, product);
     assert(p, 404, "PRODUCT_NOT_FOUND", "产品不存在");
     const identity = (
-      await db.query("SELECT blocked FROM identities WHERE uid=$1", [uid])
+      await db.query("SELECT * FROM identities WHERE uid=$1", [uid])
     ).rows[0];
     assert(identity, 404, "USER_NOT_FOUND", "用户不存在");
+    const owner = isPlatformOwner(identity);
     await lock(db, `quota:${uid}:${product}`);
     const fs = (
       await db.query(
@@ -162,9 +168,10 @@ export async function overview(
       )
     ).rows;
     for (const f of fs)
-      if (f.active && !options.readOnly) await ensureFree(db, uid, product, f);
+      if (f.active && !options.readOnly && !owner)
+        await ensureFree(db, uid, product, f);
     const until = await memberUntil(db, uid, product);
-    const member = !!until && new Date(until) > new Date();
+    const member = owner || (!!until && new Date(until) > new Date());
     const qs = (
       await db.query(
         `SELECT feature_id,sum(remaining)::int AS remaining,sum(held)::int AS held FROM quota_buckets
@@ -191,10 +198,18 @@ export async function overview(
             a.url + "/auth/callback/" + a.id === p.callback_url,
         ),
       },
-      membership: { active: member, expires_at: until },
+      membership: {
+        active: member,
+        expires_at: owner ? null : until,
+        permanent: owner,
+        source: owner ? "platform_owner" : "product",
+      },
       features: fs.map((f) => ({
         ...f,
         ...(qs.find((q) => q.feature_id === f.id) || { remaining: 0, held: 0 }),
+        ...(owner && f.kind === "quota"
+          ? { remaining: ownerQuotaCompatibilityBalance, unlimited: true }
+          : { unlimited: false }),
         buckets: buckets
           .filter((b) => b.feature_id === f.id)
           .map((b) => ({
@@ -251,6 +266,29 @@ export async function reserve(
         "同一业务请求的功能或次数不一致",
       );
       return existing;
+    }
+    if (f.quota_exempt) {
+      const record = (
+        await db.query(
+          "INSERT INTO reservations(uid,product_id,feature_id,request_id,amount,status,expires_at,quota_exempt) VALUES($1,$2,$3,$4,$5,'reserved',now()+interval '5 minutes',true) RETURNING *",
+          [uid, product, input.feature_id, input.request_id, input.amount],
+        )
+      ).rows[0];
+      await ledger(
+        db,
+        uid,
+        product,
+        input.feature_id,
+        "reserve",
+        0,
+        record.id,
+        {
+          request_id: input.request_id,
+          quota_exempt: true,
+          requested_amount: input.amount,
+        },
+      );
+      return record;
     }
     const buckets = (
       await db.query(
@@ -374,10 +412,13 @@ export async function transition(
       product,
       r.feature_id,
       target,
-      target === "confirmed" ? 0 : r.amount,
+      r.quota_exempt || target === "confirmed" ? 0 : r.amount,
       r.id,
       {
         request_id: r.request_id,
+        ...(r.quota_exempt
+          ? { quota_exempt: true, requested_amount: r.amount }
+          : {}),
         ...(recovery
           ? { recovery: { product: recovery.product, reason: recovery.reason } }
           : {}),

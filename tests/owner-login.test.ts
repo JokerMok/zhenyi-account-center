@@ -123,10 +123,118 @@ test("可信超管跨产品保持同一 UID，普通用户和未登记管理员�
         await assert.rejects(() => identityFromToken(token, "focustake"));
     }
     assert.equal(new Set(identities).size, 1);
+    await pool.query(
+      await readFile("migrations/007_platform_owner.sql", "utf8"),
+    );
+    const { overview, checkAccess, reserve, transition, releaseExpired } =
+      await import("../src/server/entitlements");
+    for (const product of ["beadgrid", "focustake", "future-product"]) {
+      await pool.query(
+        "INSERT INTO products(id,name,application,callback_url,origin) VALUES($1,$1,$1,'http://localhost/callback','http://localhost')",
+        [product],
+      );
+      await pool.query(
+        "INSERT INTO features(product_id,id,name,kind,member_only,free_quota) VALUES($1,'premium','高级功能','access',true,0),($1,'render','生成','quota',true,5)",
+        [product],
+      );
+      const rights = await overview(stableUid, product);
+      assert.equal(rights.membership.permanent, true);
+      assert.equal(
+        rights.features.find((f) => f.id === "render").unlimited,
+        true,
+      );
+      assert.equal(
+        (await checkAccess(stableUid, product, "premium")).allowed,
+        true,
+      );
+      const input = {
+        feature_id: "render",
+        request_id: "owner-request-" + product,
+        amount: 1000000,
+      };
+      const [r, repeat] = await Promise.all([
+        reserve(stableUid, product, input),
+        reserve(stableUid, product, input),
+      ]);
+      assert.equal(r.id, repeat.id);
+      assert.equal(r.quota_exempt, true);
+      await assert.rejects(() =>
+        transition(stableUid, "not-this-product", r.id, "cancel"),
+      );
+      await transition(stableUid, product, r.id, "confirm");
+      await transition(stableUid, product, r.id, "confirm");
+      // Existing exempt tasks cannot credit quota even if the global grant is later revoked.
+      config.ADMIN_SUB = randomUUID();
+      await transition(stableUid, product, r.id, "refund");
+      await transition(stableUid, product, r.id, "refund");
+      config.ADMIN_SUB = savedSubject;
+      const hold = await reserve(stableUid, product, {
+        ...input,
+        request_id: input.request_id + "-expire",
+      });
+      await pool.query(
+        "UPDATE reservations SET expires_at=now()-interval '1 second' WHERE id=$1",
+        [hold.id],
+      );
+      await releaseExpired();
+      assert.equal(
+        (
+          await pool.query("SELECT status FROM reservations WHERE id=$1", [
+            hold.id,
+          ])
+        ).rows[0].status,
+        "expired",
+      );
+    }
+    assert.equal(
+      (
+        await pool.query(
+          "SELECT count(*)::int n FROM quota_buckets WHERE uid=$1",
+          [stableUid],
+        )
+      ).rows[0].n,
+      0,
+    );
+    assert.equal(
+      (
+        await pool.query(
+          "SELECT count(*)::int n FROM ledger WHERE uid=$1 AND amount<>0",
+          [stableUid],
+        )
+      ).rows[0].n,
+      0,
+    );
+    await pool.query("UPDATE identities SET blocked=true WHERE uid=$1", [
+      stableUid,
+    ]);
+    await assert.rejects(() => checkAccess(stableUid, "beadgrid", "premium"));
+    await pool.query("UPDATE identities SET blocked=false WHERE uid=$1", [
+      stableUid,
+    ]);
+    await pool.query(
+      "UPDATE products SET status='disabled' WHERE id='beadgrid'",
+    );
+    await assert.rejects(() => checkAccess(stableUid, "beadgrid", "premium"));
+    await pool.query("UPDATE products SET status='active' WHERE id='beadgrid'");
     const otherToken = await accessToken("beadgrid", second);
     assert.equal(
       (await identityFromToken(otherToken, "beadgrid")).platform_owner,
       false,
+    );
+    const otherIdentity = await identityFromToken(otherToken, "beadgrid");
+    assert.equal(
+      (await overview(otherIdentity.uid, "beadgrid")).membership.active,
+      false,
+    );
+    await assert.rejects(() =>
+      checkAccess(otherIdentity.uid, "beadgrid", "premium"),
+    );
+    await assert.rejects(() =>
+      reserve(otherIdentity.uid, "beadgrid", {
+        feature_id: "render",
+        request_id: "ordinary-request",
+        amount: 1,
+      }),
     );
     const ownerToken = await accessToken("beadgrid", first);
     config.ADMIN_SUB = randomUUID();

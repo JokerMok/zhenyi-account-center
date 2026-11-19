@@ -526,17 +526,21 @@ function EntitlementList({ items }: { items: Any[] }) {
             <div className="product-heading">
               <h2>{e.product.name}</h2>
               <Tag tone={e.membership.active ? "green" : "neutral"}>
-                {e.membership.active
-                  ? "会员生效中"
-                  : e.membership.expires_at
-                    ? "会员已到期"
-                    : "未开通会员"}
+                {e.membership.permanent
+                  ? "全产品会员"
+                  : e.membership.active
+                    ? "会员生效中"
+                    : e.membership.expires_at
+                      ? "会员已到期"
+                      : "未开通会员"}
               </Tag>
             </div>
             <p>
-              {e.membership.expires_at
-                ? `会员到期：${date(e.membership.expires_at)}`
-                : "尚未开通会员，免费功能可正常使用"}
+              {e.membership.permanent
+                ? "永久有效"
+                : e.membership.expires_at
+                  ? `会员到期：${date(e.membership.expires_at)}`
+                  : "尚未开通会员，免费功能可正常使用"}
             </p>
             <div className="feature-lines">
               {e.features.map((f: Any) => (
@@ -544,7 +548,9 @@ function EntitlementList({ items }: { items: Any[] }) {
                   <span>{f.name}</span>
                   <strong>
                     {f.kind === "quota"
-                      ? `${f.remaining} 次`
+                      ? f.unlimited
+                        ? "不限次数"
+                        : `${f.remaining} 次`
                       : f.allowed
                         ? "可使用"
                         : "需有效会员"}
@@ -1886,7 +1892,8 @@ function BusinessAdmin(c: Context & { tab: string }) {
                                 <small>
                                   {r.quotas
                                     .map(
-                                      (q: Any) => `${q.name} ${q.remaining} 次`,
+                                      (q: Any) =>
+                                        `${q.name} ${q.unlimited ? "不限次数" : q.remaining + " 次"}`,
                                     )
                                     .join(" · ")}
                                 </small>
@@ -2689,7 +2696,10 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
                   <span>
                     {e.features
                       .filter((f: Any) => f.kind === "quota")
-                      .map((f: Any) => `${f.name} ${f.remaining} 次`)
+                      .map(
+                        (f: Any) =>
+                          `${f.name} ${f.unlimited ? "不限次数" : f.remaining + " 次"}`,
+                      )
                       .join(" · ")}
                   </span>
                   {e.features
@@ -2706,12 +2716,17 @@ function UserEditor(c: EditorContext & { user: Any; onClose: () => void }) {
         <div className="operation-preview" role="status">
           已保存。服务端实际结果：{actual.product.name}，会员
           {actual.membership.active
-            ? "有效，到期 " + date(actual.membership.expires_at)
+            ? actual.membership.permanent
+              ? "全产品会员 · 永久有效"
+              : "有效，到期 " + date(actual.membership.expires_at)
             : "未生效"}
           ；
           {actual.features
             .filter((f: Any) => f.kind === "quota")
-            .map((f: Any) => f.name + " " + f.remaining + " 次")
+            .map(
+              (f: Any) =>
+                f.name + " " + (f.unlimited ? "不限次数" : f.remaining + " 次"),
+            )
             .join("；")}
         </div>
       )}
