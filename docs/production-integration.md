@@ -12,11 +12,11 @@
 {"id":"beadgrid","name":"拼豆","url":"https://真实拼豆域名","application":"zhenyi-beadgrid","clientIdEnv":"CASDOOR_BEADGRID_CLIENT_ID","clientSecretEnv":"CASDOOR_BEADGRID_CLIENT_SECRET","serviceKeyEnv":"BEADGRID_SERVICE_KEY","enabled":true}
 ```
 
-4. 对应机器凭据存放 `shared/config/app.env`。client ID/secret来自官方应用；独立 service key 使用至少32字节加密随机数生成，不由人手输密码，不复用其他产品。操作前运行项目backup；通过SSH受限编辑或部署秘密管理注入，文件root:zyaccounts、0640。禁止把内容放Git、工单、浏览器或普通日志。设置后重启本项目 center，核对启动验证；生产**禁止运行本机 setup/npm start**，它们会创建本地示例和测试配置。
+4. 对应机器凭据存放 `shared/config/app.env`。client ID/secret 来自官方应用，独立 service key 使用至少 32 字节加密随机数。变更前执行项目备份，通过受限通道写入凭据文件 `root:zyaccounts`、0640。登记和凭据写完后执行 `sudo systemctl restart zhenyi-accounts-identity.service zhenyi-accounts-center.service`，两个服务都在启动时读取产品配置。确认两者运行正常。生产使用正式服务，禁止运行本机 `setup` 或 `npm start`。
 5. 在“产品与权益→业务产品”保存同名业务产品 `beadgrid`、应用名称、来源和精确回调，再创建功能／权益套餐。`access`只校验功能权限；`quota`计次。免费额度一次性／UTC每日／UTC每月；会员续期取当前时间与原到期较晚者。人工开通填写真实原因并保留审计，不生成虚假支付记录。
 6. 后台产品“检查配置”只证明登记匹配；完成真实产品登录、任务、隔离与恢复后，才记录实际环境、时间和验收结果。产品业务启用和鉴权登记独立，元数据保存不等于接入完成。
 
-本轮无需提供拼豆生产数据库，不允许真实产品读取账号中心数据库。当前机器登记为空，等待真实产品确定回调再开放。
+产品继续使用自己的数据库，凭独立后端凭据调用中心接口。当前登记以正式配置和产品后台为准。
 
 ## 产品后端环境变量与最小代码
 
@@ -58,6 +58,7 @@ OIDC发现地址：`https://identity.accounts.shizibandu.icu/.well-known/zhenyi-
 
 ## 登录、退出与数据隔离
 
+- 产品回调验证 `issuer` 和 `sub` 后，使用产品凭据和当前令牌向中心获取活跃身份。回调和后续会话复核均接受 `organization === "consumers"`，以及中心明确返回 `organization === "built-in" && platform_owner === true` 的既有超管。账号名不决定权限。使用中心返回的 UID 绑定各自的工作区，从同一个普通入口验收消费者与 `admin` 登录。
 - 登录后回到精确登记的产品回调。账号与安全进入 `ACCOUNTS_URL/?product=beadgrid&tab=security`；返回产品地址只从中心可信登记取得。product仅为展示上下文。
 - “退出当前产品”销毁该产品服务端会话及Cookie；需要切换账号时发起prompt=login并清掉旧用户缓存。中心和其他产品会话仍独立。
 - “退出全部产品”由当前产品后端携自己的服务密钥和当前access token POST `/api/v1/products/beadgrid/logout-all`，body为`{}`。成功后删除本地会话；其他产品在下次敏感校验时失效。本版没有实时back-channel推送，不声称所有已打开页面立即关闭。
